@@ -34,6 +34,7 @@
 </template>
 
 <script>
+  import conf from '../../../configure.json'
 import axios from 'axios'
 import validUserCheck from '@/utils/auth'
 import { required, minLength, email } from 'vuelidate/lib/validators'
@@ -62,7 +63,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      const baseURL = process.env.API_URL || 'http://localhost:8000'
+      const baseURL = conf.API_URL
       const loginUrl = baseURL + '/api/user/token/'
       axios.post(loginUrl, {
         email: this.email,
@@ -76,7 +77,7 @@ export default {
           localStorage.setItem('email', res.data.email)
           localStorage.setItem('org', res.data.org)
           const token = localStorage.getItem('token')
-          if (token) {
+          if (token && token!=='undifined') {
             this.$router.go('/org/dashboard')
           } else {
             this.$router.push({ path: '/' })

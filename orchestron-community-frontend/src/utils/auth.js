@@ -1,5 +1,5 @@
 import axios from 'axios'
-var api_url = process.env.API_URL || 'http://localhost:8000'
+var api_url = process.env.API_URL
 var jwtToken = 'JWT ' + localStorage.getItem('token')
 
 const instance = axios.create({
