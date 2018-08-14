@@ -16,7 +16,7 @@
                             <b-col><label class="label">Name:</label></b-col>
                             <b-col sm="12">
                                 <b-form-input
-                                    v-model="orgName"
+                                    v-model="updateOrgName"
                                     type="text"
                                     class="inline-form-control"></b-form-input>
                             </b-col>
@@ -199,6 +199,25 @@
                   this.$router.push('/error')
                 }
               })
+
+            axios.get('/organizations/options/')
+            .then(res => {
+              for (const value of res.data.timezone) {
+                this.orgTimezoneOption.push(value[1])
+              }
+              for (const value of res.data.industry) {
+                this.orgTypeOption.push({ value: value[0], label: value[1] })
+              }
+            }).catch(error => {
+              if (error.res.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.res.status === 403) {
+                  this.$router.push('/forbidden')
+                } else {
+                  this.$router.push('/error')
+                }
+            })
+
           } else {
             notValidUser()
             this.$router.push('/')
@@ -207,13 +226,19 @@
         updateOrganization(event) {
           if (this.org && this.token && event.id) {
             this.updateOrgId = event.id
+            this.orgId = this.org
             axios.get('/organizations/' + event.id + '/')
               .then(res => {
-                this.orgName = res.data.name
+                this.updateOrgName = res.data.name
                 this.updateOrgLocation = res.data.location
-                this.updateOrgType = res.data.industry
+                // this.updateOrgType = res.data.industry
                 this.updateOrgTimezone = res.data.timezone
                 this.updateOrgEndDate = res.data.end_date
+                for (const appVal of this.orgTypeOption) {
+                  if (res.data.industry === appVal.value) {
+                    this.updateOrgType = {'label':appVal.label, 'value':res.data.industry}
+                  }
+                }
                 this.$refs.updateOrgModal.show()
               }).catch(error => {
                 if (error.res.status === 404) {
@@ -233,7 +258,7 @@
           this.$refs.updateOrgModal.hide()
         },
         submitUpdateOrganization() {
-          if (this.org && this.token && this.orgId) {
+          if (this.org && this.token) {
             const orgEndDate = new Date(this.updateOrgEndDate)
             const d = orgEndDate.getDate()
             const m = orgEndDate.getMonth() + 1
@@ -243,10 +268,10 @@
             form_data.append('name', this.updateOrgName)
             form_data.append('logo', this.updateOrgLogo)
             form_data.append('location', this.updateOrgLocation)
-            form_data.append('industry', this.updateOrgType)
+            form_data.append('industry', this.updateOrgType.value)
             form_data.append('timezone', this.updateOrgTimezone)
             form_data.append('end_date', endDate)
-            axios.post('/organizations/' + this.updateOrgId + '/', form_data, {
+            axios.post('/organizations/' + this.orgId + '/', form_data, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -264,6 +289,10 @@
                   position: 'top right'
                 })
               }).catch(error => {
+                console.log("error data  =====>",error.response.data)
+                console.log("error msg  =====>",error.response.message)
+                console.log("error resp  =====>",error.response.status)
+              // console.log("error  =====>",error.res.data)
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
@@ -272,7 +301,7 @@
                   this.$router.push('/error')
                 }
               })
-          } else {
+          }else {
             notValidUser()
             this.$router.push('/')
           }
