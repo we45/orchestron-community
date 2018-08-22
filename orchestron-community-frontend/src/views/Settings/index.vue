@@ -289,10 +289,6 @@
                   position: 'top right'
                 })
               }).catch(error => {
-                console.log("error data  =====>",error.response.data)
-                console.log("error msg  =====>",error.response.message)
-                console.log("error resp  =====>",error.response.status)
-              // console.log("error  =====>",error.res.data)
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
