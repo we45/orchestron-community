@@ -13,6 +13,7 @@ def parse_owasp_dep_checker(xml_file,user_name,init_es):
 	to results to DB
 	"""
 	try:
+		print("Dep Check parsing initiated")
 		file = open(xml_file).read()
 		data = BeautifulSoup(file,'lxml')
 		dependencies = data.findAll('dependencies')
@@ -65,3 +66,5 @@ def parse_owasp_dep_checker(xml_file,user_name,init_es):
 
 	except BaseException as e:
 		log_exception(e)
+	else:
+		print("Dep Check parsing completed")

@@ -18,9 +18,11 @@ def create_vul(data,es_reference,confidence,severity,cwe,tool,evidences):
             os.mkdir(evid_dir_path)
         cvss_dict = {3:7.5,2:4.5,1:2.5,0:0}
         vul_name = data['vulnerability'].get('name','')
-        created_on = data['vulnerability'].get('created_on',timezone.now())
+        created_on = timezone.now()
+        # created_on = data['vulnerability'].get('created_on',timezone.now())
         scan_obj = Scan.objects.select_related('application__org').get(name=es_reference)
         org_obj = scan_obj.application.org
+        cwe = cwe or 0
         if org_obj.orl_config_exists():
             common_name = get_open_vul_name_from_api(cwe,org_obj)
             vul_info = get_open_vul_info_from_api(cwe,org_obj)

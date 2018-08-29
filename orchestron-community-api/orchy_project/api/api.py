@@ -1188,7 +1188,7 @@ class ParserView(viewsets.ViewSet):
         complete_path = os.path.join(dir_path, '{0}.{1}'.format(str(uuid4()), ext))
         with open(complete_path, 'wb') as fp:
             fp.write(result_file.read())
-        result_tool = validate_allowed_files(complete_path, request.user)
+        result_tool = validate_allowed_files(complete_path)
         scan_log.status = 'Uploaded'
         scan_log.save()
         if result_tool != tool:
@@ -1588,88 +1588,190 @@ class ScanResultView(APIView):
 
 
 class WebhookUploadView(APIView):
+    def create_scan(self, tool, name, application, engagement_id):
+        obj_dict = {
+            'application': application,
+            'tool': tool,
+            'scan_type': 'Webhook',
+            'short_name': name,
+        }
+        scan = Scan.objects.create(**obj_dict)
+        if engagement_id:
+            engagement = Engagement.objects.filter(uniq_id=engagement_id, closed=False).last()
+            if engagement:
+                scan.engagements.add(engagement)
+        log_obj = {
+            'status':'Initiated',
+            'scan':scan
+        }
+        scan_log = ScanLog.objects.create(**log_obj)
+        return scan.name
+
+    def save_file(self, file):
+        es_reference = str(uuid4())
+        dir_path = settings.XML_ROOT
+        if not os.path.isdir(dir_path):
+            os.mkdir(dir_path)
+        ext = file.name.split('.')[-1]
+        complete_path = os.path.join(dir_path, '{0}.{1}'.format(es_reference, ext))
+        with open(complete_path, 'wb') as fp:
+            fp.write(file.read())
+        return complete_path
+                
+    def get_tool(self, json=None, file_path=None):
+        if json:
+            tool = json.get('vuls', {}).get('tool', 'Unknown')
+        elif file_path:
+            tool = validate_allowed_files(file_path)
+        else:
+            tool = None
+        return tool        
 
     def post(self, request, pk, format=None):
-        obj = Webhook.objects.get(pk=pk)                
-        log_dict = {
-            'file_upload_event':False, 
-            'file_upload_exception':'', 
-            'file_upload_datetime':timezone.now(), 
-            'webhook':obj
-        }
-        log_obj = WebhookLog.objects.create(**log_dict)
         try:
-            es_reference = str(uuid4())
-            enagegement_id = request.META.get('HTTP_ENGAGEMENT', '')
-            webhook_scan_name = request.META.get('HTTP_SCAN', '')
-            if webhook_scan_name:
-                scan_short_name = webhook_scan_name
-            else:
-                scan_short_name = '{0}_{1}_webhook_{2}'.format(obj.tool, obj.application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
-            obj_dict = {
-                'application': obj.application,
-                'tool': obj.tool,
-                'scan_type': 'Webhook',
-                'short_name': scan_short_name,
-            }
-            scan = Scan.objects.create(**obj_dict)
-            if enagegement_id:
-                engagement = Engagement.objects.filter(uniq_id=enagegement_id, closed=False).last()
-                if engagement:
-                    scan.engagements.add(engagement)
-            scan_name = scan.name
-            init_json = {
-                'scan_reference':{
-                    'es_reference':scan_name, 
-                }, 
-                'organization':{
-                    'name':request.user.org.name, 
-                }, 
-                'host':{
-                    'app_uri':obj.application.url, 
-                    'name':obj.application.name, 
+            obj = get_object_or_404(Webhook,pk=pk)
+            json_dict = request.data.get('vuls')
+            result_file = request.data.get('file')
+            if json_dict or result_file:
+                application = obj.application
+                engagement_id = request.META.get('HTTP_ENGAGEMENT', '')
+                webhook_scan_name = request.META.get('HTTP_SCAN', '')
+                log_dict = {
+                    'file_upload_event':False, 
+                    'file_upload_exception':'', 
+                    'file_upload_datetime':timezone.now(), 
+                    'webhook':obj
                 }
-            } 
-            if obj.tool == 'Orchestron JSON':
-                json_dict = request.data.get('vuls')
-                if not json_dict or request.content_type != 'application/json':
-                    error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
-                    return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)
-                tool = request.data.get('vuls', {}).get('tool', 'Unknown')
-                vulnerabilities = request.data.get('vuls', {}).get('vulnerabilities')
-                if not vulnerabilities:
-                    error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
-                    return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)                    
-                webhook_process_json(request.user, obj.application.id, json_dict, init_json, tool, scan_name, request.get_host(), request.user.username, log_obj.id)          
+                log_obj = WebhookLog.objects.create(**log_dict)
+                if json_dict:
+                    webhook_tool = self.get_tool(json=json_dict, file_path=None)
+                else:
+                    complete_path = self.save_file(result_file)
+                    webhook_tool = self.get_tool(json=None, file_path=complete_path)
+                if webhook_scan_name:
+                    scan_short_name = webhook_scan_name
+                else:
+                    scan_short_name = '{0}_{1}_webhook_{2}'.format(tool, application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
+                scan_name = self.create_scan(webhook_tool, scan_short_name, application, engagement_id)
+                init_json = {
+                    'scan_reference':{
+                        'es_reference':scan_name, 
+                    }, 
+                    'organization':{
+                        'name':request.user.org.name, 
+                    }, 
+                    'host':{
+                        'app_uri':application.url, 
+                        'name':application.name, 
+                    }
+                }
+                if json_dict:
+                    vulnerabilities = request.data.get('vuls', {}).get('vulnerabilities')
+                    if not vulnerabilities:
+                        return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)                    
+                    webhook_process_json(request.user, application.id, json_dict, init_json, webhook_tool, scan_name, request.get_host(), request.user.username, log_obj.id)          
+                    return Response({'Success':'Result pushed successfully', 'scan_id':scan_name}, status=status.HTTP_200_OK)
+                else:               
+                    valid_file = webhook_tool in settings.WEBHOOK_TOOLS.keys()
+                    ext = complete_path.split('.')[-1]
+                    if valid_file:
+                        file_format = settings.WEBHOOK_TOOLS.get(webhook_tool)
+                        if ext not in file_format:
+                            remove_file(complete_path)
+                            return Response({'Error':'Unsupported file format, supported file formats are {0}'.format(file_format)}, status=status.HTTP_403_FORBIDDEN)
+                        webhook_upload(None, application.id, complete_path, init_json, webhook_tool, scan_name, request.get_host(), request.user.username, log_obj.id)
+                        return Response({'Success':'Result pushed successfully', 'scan_id':scan_name}, status=status.HTTP_200_OK)
+                    else:
+                        remove_file(complete_path)
+                        return Response({'Error':'Sorry!!! This file is not supported'}, status=status.HTTP_403_FORBIDDEN)
             else:
-                result_file = request.data.get('file')
-                dir_path = settings.XML_ROOT
-                if not os.path.isdir(dir_path):
-                    os.mkdir(dir_path)
-                ext = result_file.name.split('.')[-1]
-                complete_path = os.path.join(dir_path, '{0}.{1}'.format(es_reference, ext))
-                with open(complete_path, 'wb') as fp:
-                    fp.write(result_file.read())
-                tool = validate_allowed_files(complete_path, request.user)
-                if tool != obj.tool:
-                    remove_file(complete_path)
-                    error_debug_log(ip=request.get_host(), user=request.user.username, event='Invalid file', status='failure')
-                    return Response({'Error':'Sorry!!! This is not a {0} file'.format(obj.tool)}, status=status.HTTP_403_FORBIDDEN)
-                file_format = settings.WEBHOOK_TOOLS.get(obj.tool)
-                if ext not in file_format:
-                    error_debug_log(ip=request.get_host(), user=request.user.username, event='Unsupported file format', status='failure')
-                    return Response({'Error':'Unsupported file format, supported file formats are {0}'.format(file_format)}, status=status.HTTP_403_FORBIDDEN)
-                webhook_upload(None, obj.application.id, complete_path, init_json, obj.tool, scan_name, request.get_host(), request.user.username, log_obj.id)
-                info_debug_log(ip=request.get_host(), user=request.user.username, event='Push results', status='success')
-            return Response({'Success':'Result pushed successfully', 'scan_id':scan_name}, status=status.HTTP_200_OK)
+                return Response({'Error':'Sorry!!! Could not process the event'}, status=status.HTTP_403_FORBIDDEN)            
         except BaseException as e:
-            critical_debug_log(ip=request.get_host(), user=request.user.username, event=e, status='failure')
-            log_obj.file_upload_exception = e
-            log_obj.file_upload_datetime = timezone.now()
-            log_obj.save()
-            log_exception(e)
+            # print(e)
             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
-            
-                  
-       
+
+
+# class WebhookUploadView(APIView):
+
+#     def post(self, request, pk, format=None):
+#         obj = Webhook.objects.get(pk=pk)                
+#         log_dict = {
+#             'file_upload_event':False, 
+#             'file_upload_exception':'', 
+#             'file_upload_datetime':timezone.now(), 
+#             'webhook':obj
+#         }
+#         log_obj = WebhookLog.objects.create(**log_dict)
+#         try:
+#             es_reference = str(uuid4())
+#             engagement_id = request.META.get('HTTP_ENGAGEMENT', '')
+#             webhook_scan_name = request.META.get('HTTP_SCAN', '')
+#             if webhook_scan_name:
+#                 scan_short_name = webhook_scan_name
+#             else:
+#                 scan_short_name = '{0}_{1}_webhook_{2}'.format(obj.tool, obj.application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
+#             obj_dict = {
+#                 'application': obj.application,
+#                 'tool': obj.tool,
+#                 'scan_type': 'Webhook',
+#                 'short_name': scan_short_name,
+#             }
+#             scan = Scan.objects.create(**obj_dict)
+#             if engagement_id:
+#                 engagement = Engagement.objects.filter(uniq_id=engagement_id, closed=False).last()
+#                 if engagement:
+#                     scan.engagements.add(engagement)
+#             scan_name = scan.name
+#             init_json = {
+#                 'scan_reference':{
+#                     'es_reference':scan_name, 
+#                 }, 
+#                 'organization':{
+#                     'name':request.user.org.name, 
+#                 }, 
+#                 'host':{
+#                     'app_uri':obj.application.url, 
+#                     'name':obj.application.name, 
+#                 }
+#             } 
+#             if obj.tool == 'Orchestron JSON':
+#                 json_dict = request.data.get('vuls')
+#                 if not json_dict or request.content_type != 'application/json':
+#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
+#                     return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)
+#                 tool = request.data.get('vuls', {}).get('tool', 'Unknown')
+#                 vulnerabilities = request.data.get('vuls', {}).get('vulnerabilities')
+#                 if not vulnerabilities:
+#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
+#                     return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)                    
+#                 webhook_process_json(request.user, obj.application.id, json_dict, init_json, tool, scan_name, request.get_host(), request.user.username, log_obj.id)          
+#             else:
+#                 result_file = request.data.get('file')
+#                 dir_path = settings.XML_ROOT
+#                 if not os.path.isdir(dir_path):
+#                     os.mkdir(dir_path)
+#                 ext = result_file.name.split('.')[-1]
+#                 complete_path = os.path.join(dir_path, '{0}.{1}'.format(es_reference, ext))
+#                 with open(complete_path, 'wb') as fp:
+#                     fp.write(result_file.read())
+#                 tool = validate_allowed_files(complete_path, request.user)
+#                 if tool != obj.tool:
+#                     remove_file(complete_path)
+#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='Invalid file', status='failure')
+#                     return Response({'Error':'Sorry!!! This is not a {0} file'.format(obj.tool)}, status=status.HTTP_403_FORBIDDEN)
+#                 file_format = settings.WEBHOOK_TOOLS.get(obj.tool)
+#                 if ext not in file_format:
+#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='Unsupported file format', status='failure')
+#                     return Response({'Error':'Unsupported file format, supported file formats are {0}'.format(file_format)}, status=status.HTTP_403_FORBIDDEN)
+#                 webhook_upload(None, obj.application.id, complete_path, init_json, obj.tool, scan_name, request.get_host(), request.user.username, log_obj.id)
+#                 info_debug_log(ip=request.get_host(), user=request.user.username, event='Push results', status='success')
+#             return Response({'Success':'Result pushed successfully', 'scan_id':scan_name}, status=status.HTTP_200_OK)
+#         except BaseException as e:
+#             critical_debug_log(ip=request.get_host(), user=request.user.username, event=e, status='failure')
+#             log_obj.file_upload_exception = e
+#             log_obj.file_upload_datetime = timezone.now()
+#             log_obj.save()
+#             log_exception(e)
+#             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+   

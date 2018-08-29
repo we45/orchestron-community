@@ -1,6 +1,5 @@
 from django.utils import timezone
 from lxml import etree
-from base64  import b64encode
 import json
 from os import path
 from api.utils import log_exception
@@ -62,8 +61,8 @@ def parse_appscan_dast(xml_file,user_name,init_es):
 							evid_dict = {
 								'url':url,
 								'name':param_name,
-								'request':b64encode(req),
-								'response':b64encode(res),
+								'request':b64encode(bytes(req.encode('utf-8'))),
+								'response':b64encode(bytes(res.encode('utf-8'))),
 							}
 							evidences.append(evid_dict)
 		vul_dict = init_es

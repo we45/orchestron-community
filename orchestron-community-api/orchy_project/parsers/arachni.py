@@ -47,8 +47,8 @@ def parse_arachni(json_file,user_name,init_es):
 				new_vuls[(name,description,remediation,severity,cwe,references)].append({
 					'url':url,
 					'name':parameter,
-					'request':b64encode(req_str),
-					'response':b64encode(res_str)
+					'request':b64encode(bytes(req_str.encode('utf-8'))),
+					'response':b64encode(bytes(res_str.encode('utf-8')))
 				})	
 			for d,url_param_list in new_vuls.items():
 				vul_dict = init_es

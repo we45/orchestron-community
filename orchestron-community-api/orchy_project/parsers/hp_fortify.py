@@ -27,6 +27,7 @@ def parse_hp_fortify(xml_file,user_name,init_es):
 		raise MalFormedXMLException(user_name)
 	rootelement = nreport.getroot()
 	outsidepath = rootelement.xpath(r'//GroupingSection')
+	print("HP Fortify parsing initiated")
 	for path_value in outsidepath:
 		meta_info = path_value.findall("MajorAttributeSummary/MetaInfo")
 		if len(meta_info) > 2:
@@ -66,6 +67,7 @@ def parse_hp_fortify(xml_file,user_name,init_es):
 				'evidences':evids
 			}
 			write_results(vul_dict)
+	print("HP Fortify parsing completed")
 
 
 # with io.open("testJson.json",'w',encoding="utf-8") as outfile:

@@ -9,6 +9,7 @@ def parse_xanitizer(xml_file,user_name,init_es):
 		raise MalFormedXMLException(user_name)
 	data = data.getroot()
 	path = data.xpath(r'//XanitizerFindingsList')
+	print("xanitizer parsing initiated")
 	for main in path :
 		for finding in main.findall('finding'):
 			problemType = finding.findtext("problemType")
@@ -73,3 +74,5 @@ def parse_xanitizer(xml_file,user_name,init_es):
 					}		
 
 			write_results(vul_dict)
+	print("xanitizer parsing completed")
+

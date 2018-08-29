@@ -22,6 +22,7 @@ def parse_burp(xml_file,user_name,init_es):
         update the ES.
     """    
     try:
+        print('Burp XML parsing initiated')
         try:
             nreport = xml.parse(xml_file)
         except (xml.XMLSyntaxError,xml.ParserError):
@@ -109,11 +110,10 @@ def parse_burp(xml_file,user_name,init_es):
                 'cwe_id':0
             }            
             write_results(vul_dict)
-        print('Burp XML parsing completed')
     except BaseException as e:
         log_exception(e)
     else:
-        print('XML Parsing Completed')
+        print('Checkmarx XML parsing completed')
 
 
 # End-Of-File            

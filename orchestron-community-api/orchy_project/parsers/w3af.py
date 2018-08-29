@@ -46,8 +46,8 @@ class W3afParser(Parser):
                             url_param_list.append({
                                 'url':url,
                                 'name':param,
-                                'request':b64encode(request),
-                                'response':b64encode(response)
+                                'request':b64encode(bytes(request.encode('utf-8'))),
+                                'response':b64encode(bytes(response.encode('utf-8')))
                             })              
                     vul_name = parent_obj.attrib.get('name','Unknown')
                     desc = parent_obj.findtext('long-description',default='')

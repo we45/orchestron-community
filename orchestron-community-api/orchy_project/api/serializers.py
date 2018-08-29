@@ -15,6 +15,10 @@ from api.validators import text_file_validator, image_file_validator, start_date
 	flat_file_validator
 from api.messages import *
 from api import jira_utils as jira 
+from api.utils import draw_thumnail
+import os
+import uuid
+from api.minio_utils import MinioUtil
 
 
 class OpenVulSerializer(serializers.Serializer):
@@ -158,6 +162,23 @@ class OrganizationSerializer(serializers.ModelSerializer):
 	def get_projects_count(self,obj):
 		return obj.project_set.count()
 
+	def validate(self, data):
+		logo = data.get('logo')
+		name = data.get('name')
+		if not logo:
+			today = datetime.today()
+			file_path = "{0}{1}/{2}/{3}/".format(settings.ORGANIZATION_MEDIA_URL,today.year,today.month,today.day)
+			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+			if not os.path.isdir(dir_path):
+				os.makedirs(dir_path)
+			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+			draw_thumnail(name, full_path)
+			MinioUtil().upload_file_from_path(file_name,full_path)
+			data['logo'] = file_name
+		return data	
+
+
 
 class OrganizationConfigurationSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -236,7 +257,25 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['email','first_name','last_name','last_login','img']
-		read_only_fields = ['last_login']			
+		read_only_fields = ['last_login']	
+
+	def validate(self, data):
+		img = data.get('img')
+		first_name = data.get('first_name')
+		last_name = data.get('last_name','')
+		name = '{0} {1}'.format(first_name.lstrip(),last_name.lstrip())
+		if not img:
+			today = datetime.today()
+			file_path = "{0}{1}/{2}/{3}/".format(settings.USER_MEDIA_URL,today.year,today.month,today.day)
+			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+			if not os.path.isdir(dir_path):
+				os.makedirs(dir_path)
+			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+			draw_thumnail(name, full_path)
+			MinioUtil().upload_file_from_path(file_name,full_path)
+			data['img'] = file_name
+		return data				
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -260,6 +299,7 @@ class SuperUserSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
 	parser_classes = (MultiPartParser,JSONParser)
+	# logo = serializers.ImageField(req)
 
 	class Meta:
 		model = Project
@@ -268,6 +308,22 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 	def __init__(self, *args, **kwargs):
 		super(ProjectSerializer, self).__init__(*args, **kwargs)
+
+	def validate(self, data):
+		logo = data.get('logo')
+		name = data.get('name')
+		if not logo:
+			today = datetime.today()
+			file_path = "{0}{1}/{2}/{3}/".format(settings.PROJECT_MEDIA_URL,today.year,today.month,today.day)
+			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+			if not os.path.isdir(dir_path):
+				os.makedirs(dir_path)
+			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+			draw_thumnail(name, full_path)
+			MinioUtil().upload_file_from_path(file_name,full_path)
+			data['logo'] = file_name
+		return data
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
@@ -288,6 +344,22 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 	def get_org_details(self, obj):
 		return OrganizationSerializer(obj.org,context=self.context).data
+
+	def validate(self, data):
+		logo = data.get('logo')
+		name = data.get('name')
+		if not logo:
+			today = datetime.today()
+			file_path = "{0}{1}/{2}/{3}/".format(settings.APPLICATION_MEDIA_URL,today.year,today.month,today.day)
+			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+			if not os.path.isdir(dir_path):
+				os.makedirs(dir_path)
+			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+			draw_thumnail(name, full_path)
+			MinioUtil().upload_file_from_path(file_name,full_path)
+			data['logo'] = file_name
+		return data		
 
 
 class EngagementSerializer(serializers.ModelSerializer):
@@ -352,7 +424,7 @@ class ScanSerializer(serializers.ModelSerializer):
 
 
 class WebhookSerializer(serializers.ModelSerializer):
-	tool = serializers.ChoiceField(choices=[(t,t) for t in settings.WEBHOOK_TOOLS.keys()])
+	# tool = serializers.ChoiceField(choices=[(t,t) for t in settings.WEBHOOK_TOOLS.keys()])
 	parser_classes = (JSONParser,)
 
 	class Meta:

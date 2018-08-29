@@ -63,8 +63,8 @@ INSTALLED_APPS = [
     'background_task',
     'api',
     'corsheaders',
-    'rest_framework_filters',
-    'django_extensions'
+    # 'rest_framework_filters',
+    # 'django_extensions'
 ]
 
 SITE_ID = 1
@@ -346,6 +346,7 @@ LOGGING = {
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'api/media/')
+FONT_ROOT = os.path.join(BASE_DIR, 'api/fonts/')
 MEDIA_URL = '/media/'
 PROJECT_MEDIA_URL = 'project_logo/'
 APPLICATION_MEDIA_URL = 'app_logo/'

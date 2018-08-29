@@ -15,6 +15,37 @@ from parsers.exceptions import MalFormedXMLException
 from api.orl import get_open_vul_info_from_api
 from django.forms.models import model_to_dict
 from django.contrib.sites.models import Site
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+import random
+
+
+def draw_thumnail(text, temp_file):
+    split_text = text.strip().split(' ')[:2]
+    draw_text = ''.join([s[0].upper() for s in split_text if s])
+    r = lambda: random.randint(0,255)
+    color = '#%02X%02X%02X' % (r(),r(),r())
+    image = Image.new('RGBA', (150, 150),color = color)
+    draw = ImageDraw.Draw(image)
+    bounding_box = [50, 50, 100, 100]
+    x1, y1, x2, y2 = bounding_box
+    font_file = os.path.join(settings.FONT_ROOT,'arial.ttf')
+    font = ImageFont.truetype(font_file, size=58)
+    w, h = draw.textsize(draw_text, font=font)
+    x = (x2 - x1 - w)/2 + x1
+    y = (y2 - y1 - h)/2 + y1
+    rad = 20
+    draw.text((x, y), draw_text, align='center', font=font)
+    circle = Image.new('L', (rad * 2, rad * 2), 0)
+    draw = ImageDraw.Draw(circle)
+    draw.ellipse((0, 0, rad * 2, rad * 2), fill=color)
+    alpha = Image.new('L', image.size, color)
+    w, h = image.size
+    alpha.paste(circle.crop((0, 0, rad, rad)), (0, 0))
+    alpha.paste(circle.crop((0, rad, rad, rad * 2)), (0, h - rad))
+    alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (w - rad, 0))
+    alpha.paste(circle.crop((rad, rad, rad * 2, rad * 2)), (w - rad, h - rad))
+    image.putalpha(alpha)
+    image.save(temp_file)
 
 
 def jwt_response_payload_handler(token, user=None, request=None):
@@ -223,7 +254,7 @@ def remove_file(file_name):
         os.unlink(file_name)
 
 
-def validate_allowed_files(flat_file,user):
+def validate_allowed_files(flat_file):
     """
     Parse the xml and verify whether the xml header is under the valid uploadable xml files list
     """
@@ -259,7 +290,6 @@ def validate_allowed_files(flat_file,user):
                         remove_file(flat_file) 
                 return None
             except (xml.XMLSyntaxError,xml.ParserError):
-                raise MalFormedXMLException(user)
                 return None
         elif ext == 'html':
             try:
@@ -273,7 +303,6 @@ def validate_allowed_files(flat_file,user):
                         remove_file(flat_file) 
                 return None
             except (xml.XMLSyntaxError,xml.ParserError):
-                raise MalFormedXMLException(user)
                 return None
         else:
             return None

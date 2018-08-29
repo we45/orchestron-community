@@ -65,10 +65,10 @@ urlpatterns = [
     re_path(r'^api/engagements/(?P<pk>\d+)/$', EngagementView.as_view({'get':'retrieve','post':'update','delete':'destroy','patch':'close'}),name='ind_engagement'),
     re_path(r'^api/engagements/(?P<pk>\d+)/scans/assign/$', EngagementView.as_view({'post':'assign_scans'}),name='assign_scans_to_engagement'),
 
-    re_path(r'^api/webhooks/$', WebhookView.as_view({'get':'list','put':'create'}),name='webhook'),
-    re_path(r'^api/webhooks/(?P<pk>.*)/$', WebhookView.as_view({'get':'retrieve','post':'update','delete':'destroy'}),name='ind_webhook'),
     re_path(r'^api/webhooks/post/(?P<pk>.*)/$', WebhookUploadView.as_view(),name='webhook_upload'),
     re_path(r'^api/webhooks/result/(?P<name>.*)/$', ScanResultView.as_view(),name='webhook_result'),
+    re_path(r'^api/webhooks/(?P<pk>.*)/$', WebhookView.as_view({'get':'retrieve','post':'update','delete':'destroy'}),name='ind_webhook'),
+    re_path(r'^api/webhooks/$', WebhookView.as_view({'get':'list','put':'create'}),name='webhook'),
     re_path(r'^api/scan/status/(?P<name>.*)/$', ScanStatusView.as_view(),name='ind_scan_status'),
 
     re_path(r'^api/vulnerabilities/$', VulnerabilityView.as_view({'get':'list','put':'create'}),name='vul'),
