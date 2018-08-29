@@ -1,0 +1,15 @@
+export MYSQL_USER="root"
+export MYSQL_PASSWORD="root12"
+export DB_IP="127.0.0.1"
+export MINIO_URL="127.0.0.1"
+export MINIO_PORT=9000
+export MINIO_BUCKET_NAME="storage"
+export MINIO_ACCESS_KEY=VT721O0FMREVVTXMWU1U
+export MINIO_SECRET_KEY=+sLWugt2KdD0osKgqCCI6Orj/BNJE8lXZ5oNOJ5F
+export DB_PORT=3306
+export ENC_KEY='IThbCjOzJHaOkCDSX6rSegSISTgaTq'
+export JWT_SECRET_KEY='3b4913972f9b2e22a12f6cfe43a324d2fb1737fcd6c8347ff2f97d2186afff41'
+export EMAIL_HOST='smtp.mandrillapp.com'
+export EMAIL_PORT=587
+export EMAIL_HOST_USER='abhay@we45.com'
+export EMAIL_HOST_PASSWORD='ZlEMHUlQlOg6pnXIPIBe8Q'
