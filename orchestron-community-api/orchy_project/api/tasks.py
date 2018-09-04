@@ -114,11 +114,9 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
     try:
         application = Application.objects.get(id=application)
         scan = Scan.objects.get(name=scan_name)
-        log_obj = {
-            'status':'Initiated',
-            'scan':scan
-        }
-        scan_log, created = ScanLog.objects.get_or_create(**log_obj)
+        scan.scanlog.status = 'Initiated'
+        scan.scanlog.save()
+        scan_log = scan.scanlog
         scan_log.status = 'In Progress'
         scan_log.save()
         try:
