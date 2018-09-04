@@ -1755,7 +1755,7 @@ class WebhookUploadView(APIView):
 #                 complete_path = os.path.join(dir_path, '{0}.{1}'.format(es_reference, ext))
 #                 with open(complete_path, 'wb') as fp:
 #                     fp.write(result_file.read())
-#                 tool = validate_allowed_files(complete_path, request.user)
+#                 tool = validate_allowed_files(complete_path)
 #                 if tool != obj.tool:
 #                     remove_file(complete_path)
 #                     error_debug_log(ip=request.get_host(), user=request.user.username, event='Invalid file', status='failure')
