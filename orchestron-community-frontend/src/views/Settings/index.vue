@@ -148,7 +148,7 @@
           // minLength: minLength(1)
         },
         updateOrgLogo: {
-          required
+          
         },
         updateOrgLocation: {
           required

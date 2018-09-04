@@ -155,7 +155,7 @@
           minLength: minLength(1)
         },
         logo: {
-          required
+          // minLength: minLength(0)
         },
         oldPassword: {
           required
@@ -203,7 +203,9 @@
             form_data.append('first_name', this.firstName)
             form_data.append('last_name', this.lastName)
             form_data.append('email', this.email)
-            form_data.append('img', this.logo)
+            if(this.logo.name){
+                form_data.append('img', this.logo)
+            }
             axios.post('/user/profile/', form_data, {
               headers: {
                 'Content-Type': 'multipart/form-data'

@@ -176,7 +176,7 @@ export default {
         minLength: minLength(1)
       },
       projectLogo: {
-        required
+        
       },
       updateProjectName: {
         required,

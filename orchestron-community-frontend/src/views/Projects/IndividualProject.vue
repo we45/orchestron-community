@@ -334,7 +334,7 @@
         minLength: minLength(1)
       },
       appLogo: {
-        required
+        
       },
       appHostType: {
         required
