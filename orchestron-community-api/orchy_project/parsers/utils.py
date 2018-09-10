@@ -4,7 +4,7 @@ import lxml.etree as xml
 import uuid
 import json
 from parsers.exceptions import MalFormedXMLException
-from api.utils import log_exception
+from api.utils import log_exception, validate_allowed_files
 
 def remove_file(file_name):
     """
@@ -12,63 +12,6 @@ def remove_file(file_name):
     """
     if os.path.exists(file_name):
         os.unlink(file_name)
-
-
-
-def validate_allowed_files(flat_file,user):
-    """
-    Parse the xml and verify whether the xml header is under the valid uploadable xml files list
-    """
-    try:
-        ext = flat_file.split('.')[-1]
-        print(ext)
-        if ext == 'json':
-            with open(flat_file) as data_file:
-                data = json.load(data_file)
-                is_brakeman = data.get('scan_info',{}).get('brakeman_version')
-                is_bandit = data.get('results',[])
-                is_arachni = data.get('issues',[])
-                if is_brakeman:
-                    return 'Brakeman'
-                elif is_bandit:
-                    return 'Bandit'
-                elif is_arachni:
-                    return 'Arachni'
-                else:
-                    return None
-        elif ext == 'xml':
-            try:
-                nreport = xml.parse(flat_file)  
-                root_elem = nreport.getroot()
-                if root_elem is not None:            
-                    header = settings.HEADER_MAP.get(root_elem.tag)
-                    if header:            
-                        return header
-                    else:
-                        remove_file(flat_file) 
-                return None
-            except (xml.XMLSyntaxError,xml.ParserError):
-                raise MalFormedXMLException(user)
-                return None
-        elif ext == 'html':
-            try:
-                nreport = xml.parse(flat_file)  
-                root_elem = nreport.getroot()
-                if root_elem is not None:            
-                    header = settings.HEADER_MAP.get(root_elem.tag)
-                    if header:            
-                        return header
-                    else:
-                        remove_file(flat_file) 
-                return None
-            except (xml.XMLSyntaxError,xml.ParserError):
-                raise MalFormedXMLException(user)
-                return None
-        else:
-            return None
-    except BaseException as e:
-        log_exception(e)
-        return None
 
 
 def validate_flat_file(file_name):
@@ -99,6 +42,6 @@ def upload_to_server(file_name,temp_file_obj,user):
     complete_path = os.path.join(settings.XML_ROOT,file_name)
     with open(complete_path,'wb') as fp:
         fp.write(temp_file_obj.read())
-    allowed = validate_allowed_files(complete_path,user)
+    allowed = validate_allowed_files(complete_path)
     if allowed:
         return complete_path

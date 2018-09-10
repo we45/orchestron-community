@@ -63,7 +63,7 @@ class Organization(BaseModel):
     TIMEZONE_LIST = l + [(tz,tz) for tz in pytz.all_timezones]
     name = models.CharField(max_length=200, unique=True)
     location = models.CharField(max_length=100)
-    logo = models.ImageField(upload_to="{0}%Y/%m/%d".format(settings.ORGANIZATION_MEDIA_URL), storage=OverwriteStorage())
+    logo = models.ImageField(upload_to="{0}%Y/%m/%d".format(settings.ORGANIZATION_MEDIA_URL), blank=True, null=True, storage=OverwriteStorage())
     industry = models.CharField(max_length=50,choices=ORGANIZATION_TYPE)
     timezone = models.CharField(max_length=100,choices=TIMEZONE_LIST)
     contact = models.CharField(max_length=50, null=True, blank=True)

@@ -1,13 +1,13 @@
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import LimitOffsetPagination
 from collections import OrderedDict
 from rest_framework.response import Response
 
-class OrchyPagination(PageNumberPagination):
+class OrchyPagination(LimitOffsetPagination):
 	sev_context = {}
 
 	def get_paginated_response(self, data):
 		return Response(OrderedDict([
-			('count', self.page.paginator.count),
+			('count', self.count),
 			('next', self.get_next_link()),
 			('previous', self.get_previous_link()),
 			('results', data),
