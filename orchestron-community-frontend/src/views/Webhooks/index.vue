@@ -4,11 +4,13 @@
           <loading :active.sync="isLoading" :can-cancel="true"></loading>
             <web-hook-common-table
             :headerTitle=" 'List of Webhooks' "
+            @clickPagination="clickPagination($event)" 
             :dataItems="webhookData"
             @createModal="createWebhook"
             @updateModal="updateWebhook($event)"
             @copyModal="copyWebhook($event)"
             @deleteModal="deleteWebhook($event)" :pageCount="webhookCount"></web-hook-common-table>
+            <!-- {{webhookPaginatedData}} -->
             <!--Create-->
             <b-modal
                 ref="createWebhookModal"
@@ -202,9 +204,11 @@
     data() {
       return {
         isLoading: false,
+        isPaginated: false,
         webhookCount: 0,
         webhookData: [],
         applicationOption: [],
+        webhookPaginatedData: [],
         toolOption: [],
         webhookName: '',
         application: '',
@@ -254,6 +258,14 @@
         })
         this.isLoading = false
       }
+    if (this.isPaginated) {
+        this.$nextTick(() => {
+          this.webhookData = []
+          this.webhookData = this.webhookPaginatedData
+        })
+        this.isPaginated = false
+      }
+
     },
     methods: {
       fetchData() {
@@ -301,6 +313,55 @@
           this.$router.push('/')
         }
       },
+     clickPagination(event) {
+      if (event.page) {
+        if (event.page > 1) {
+          axios.get('/applications/')
+            .then(res => {
+              this.applicationOption = []
+              for (const value of res.data) {
+                this.applicationOption.push({ value: value.id, label: value.name })
+              }
+            }).catch(error => {
+              if (error.response.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.response.status === 403) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
+            })
+          axios.get('/webhooks/?page='+ event.page)
+            .then(res => {
+              this.webhookPaginatedData = []
+              for (const value of res.data.results) {
+                let appName = ''
+                for (const app of this.applicationOption) {
+                  if (value.application === app.value) {
+                    appName = app.label
+                  }
+                }
+                this.webhookPaginatedData.push({ 'name': value.name, 'app': appName, 'tool': value.tool, 'id': value.hook_id })
+                this.isPaginated = true
+              }
+            }).catch(error => {
+              if (error.response.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.response.status === 403) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
+            })
+          //  this.isPaginated = true
+        } else {
+          this.fetchData()
+        }
+      } else {
+        notValidUser()
+        this.$router.push('/')
+      }
+    },
       createWebhook() {
         if (this.org && this.token) {
           this.$refs.createWebhookModal.show()

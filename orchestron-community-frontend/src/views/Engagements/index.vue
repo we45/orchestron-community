@@ -5,7 +5,9 @@
         <common-table :pageCount="engagementsCount" :dataItems="engagementList" :headerTitle="headerTitles"
             @createModal="createEngagement"
             @updateModal="updateEngagement($event)"
-            @deleteModal="deleteEngagement($event)"></common-table>
+            @deleteModal="deleteEngagement($event)"
+            @clickPagination="clickPagination($event)"
+            ></common-table>
 
         <!--create-->
         <b-modal
@@ -283,6 +285,55 @@
                   this.$router.push('/error')
                 }
               })
+          } else {
+            notValidUser()
+            this.$router.push('/')
+          }
+        },
+        clickPagination(event) {
+          if (event.page) {
+            if (event.page > 1) {
+              axios.get('/engagements/?page=' + event.page)
+                  .then(res => {
+                    this.engagementPagnatedList = []
+                    for (const value of res.data.results) {
+                        this.engagementList.push({
+                        name: { vul_name: value.name },
+                        sev: value.severity,
+                        id: value.id,
+                        url: 'individual_engagement/' + value.id + '/',
+                        appName: value.app_details.name,
+                        engId: value.uniq_id
+                  })
+                    }
+                  }).catch(error => {
+                    if (error.response.status === 404) {
+                      this.$router.push('/not_found')
+                    } else if (error.response.status === 404) {
+                      this.$router.push('/forbidden')
+                    } else {
+                      this.$router.push('/error')
+                    }
+                  }),
+                   axios.get('/applications/')
+                  .then(res => {
+                    this.applicationOption = []
+                    for (const value of res.data) {
+                      this.applicationOption.push({ value: value.id, label: value.name })
+                    }
+                  }).catch(error => {
+                    if (error.response.status === 404) {
+                      this.$router.push('/not_found')
+                    } else if (error.response.status === 404) {
+                      this.$router.push('/forbidden')
+                    } else {
+                      this.$router.push('/error')
+                    }
+                  })
+              //  this.isPaginated = true
+            } else {
+              this.fetchData()
+            }
           } else {
             notValidUser()
             this.$router.push('/')

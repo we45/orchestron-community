@@ -24,7 +24,10 @@
                     <b-col md="6" class="my-1">
                     </b-col>
                     <b-col md="6" class="my-1">
-                        <b-pagination :total-rows="numPages" :per-page="perPage" v-model="currentPage" class="my-1" align="right"/>
+                        <b-pagination :total-rows="numPages"
+                                      :per-page="perPage" 
+                                      v-model="currentPage" 
+                                      class="my-1" @input="paginationClick(currentPage)" align="right"/>
                     </b-col>
                 </b-row>
                 <b-table show-empty
@@ -115,6 +118,7 @@ export default {
   beforeUpdate() {
     this.items = this.dataItems
     this.numPages = this.pageCount
+    this.currentPage = this.pageCurrent
   },
   computed: {
     sortOptions() {
@@ -139,6 +143,9 @@ export default {
     },
     copyModal(id) {
       this.$emit('copyModal', { id: id, show: this.showModal })
+    },
+    paginationClick(page) {
+      this.$emit('clickPagination', { page: page })
     }
   }
 }

@@ -2,13 +2,14 @@
     <div>
         <b-container fluid>
             <b-row style="background-color: #FFFFFF;">
-                <b-col>
+                <b-col v-if="openVul >0 ">
                     <center>
                         <br/>
                         <p class="title">Open Vulnerabilities</p>
                         <br>
                         <router-link :to="openVulUrl">
                             <p>
+                                
                                 <strong class="open-vul-count">
                                 {{ openVul }}
                                 </strong>
@@ -16,7 +17,20 @@
                         </router-link>
                     </center>
                 </b-col>
-                <b-col>
+                <b-col v-else>
+                    <center>
+                        <br/>
+                        <p class="title">Open Vulnerabilities</p>
+                        <br>
+                        <p>
+                            
+                            <strong class="open-vul-count">
+                            {{ openVul }}
+                            </strong>
+                        </p>
+                    </center>
+                </b-col>
+                <b-col v-if="closedVul > 0">
                     <center>
                         <br/>
                         <p class="title">Closed Vulnerabilities</p>
@@ -28,6 +42,18 @@
                                 </strong>
                             </p>
                         </router-link>
+                    </center>
+                </b-col>
+                <b-col v-else>
+                    <center>
+                        <br/>
+                        <p class="title">Closed Vulnerabilities</p>
+                        <br>
+                            <p>
+                                <strong class="closed-vul-count">
+                                {{ closedVul }}
+                                </strong>
+                            </p>
                     </center>
                 </b-col>
                 <b-col>

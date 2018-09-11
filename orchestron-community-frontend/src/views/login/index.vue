@@ -64,7 +64,7 @@ export default {
   methods: {
     onSubmit() {
       const baseURL = conf.API_URL
-      const loginUrl = baseURL + '/api/user/token/'
+      const loginUrl = "http://127.0.0.1:8000" + '/api/user/token/'
       axios.post(loginUrl, {
         email: this.email,
         password: this.password

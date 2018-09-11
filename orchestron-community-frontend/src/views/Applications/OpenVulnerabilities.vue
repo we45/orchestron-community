@@ -16,7 +16,7 @@
                     <b-col sm="4">
                         <v-select  :options="selectOption"
                             v-model="selectedOption"
-                            v-on:input="onInput(selectedOption)">
+                            v-on:input="onInput(selectedOption)" style="font-family: Avenir;">
                         </v-select>
                     </b-col>
                 </b-row>
