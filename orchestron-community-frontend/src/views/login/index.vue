@@ -44,7 +44,8 @@ export default {
     return {
       email: '',
       password: '',
-      isFormInvalid: false
+      isFormInvalid: false,
+      isLogin: false
     }
   },
   validations: {
@@ -63,50 +64,55 @@ export default {
   },
   methods: {
     onSubmit() {
-      const baseURL = conf.API_URL
-      const loginUrl = baseURL + '/api/user/token/'
-      axios.post(loginUrl, {
-        email: this.email,
-        password: this.password
-      })
-        .then(res => {
-          localStorage.setItem('username', res.data.username)
-          localStorage.setItem('token', res.data.token)
-          localStorage.setItem('superuser', res.data.superuser)
-          localStorage.setItem('admin', res.data.admin)
-          localStorage.setItem('email', res.data.email)
-          localStorage.setItem('org', res.data.org)
-          const token = localStorage.getItem('token')
-          if (token && token!=='undifined') {
-            this.$router.go('/org/dashboard')
-          } else {
-            this.$router.push({ path: '/' })
-            this.isFormInvalid = true
-            localStorage.removeItem('username')
-            localStorage.removeItem('token')
-            localStorage.removeItem('superuser')
-            localStorage.removeItem('admin')
-            localStorage.removeItem('email')
-            localStorage.removeItem('org')
-          }
-        }).catch(error => {
+      this.isLogin = true
+      if(this.isLogin) {
+        const baseURL = conf.API_URL
+        const loginUrl = baseURL + '/api/user/token/'
+        axios.post(loginUrl, {
+          email: this.email,
+          password: this.password
+        })
+          .then(res => {
+            localStorage.setItem('username', res.data.username)
+            localStorage.setItem('token', res.data.token)
+            localStorage.setItem('superuser', res.data.superuser)
+            localStorage.setItem('admin', res.data.admin)
+            localStorage.setItem('email', res.data.email)
+            localStorage.setItem('org', res.data.org)
+            const token = localStorage.getItem('token')
+            if (token && token !== 'undifined') {
+              this.$router.go('/org/dashboard')
+            } else {
+              // this.$router.push({ path: '/' })
+              this.isFormInvalid = true
+              localStorage.removeItem('username')
+              localStorage.removeItem('token')
+              localStorage.removeItem('superuser')
+              localStorage.removeItem('admin')
+              localStorage.removeItem('email')
+              localStorage.removeItem('org')
+            }
+          }).catch(error => {
+          console.log('errorr', error.response.data)
           localStorage.removeItem('username')
           localStorage.removeItem('token')
           localStorage.removeItem('superuser')
           localStorage.removeItem('admin')
           localStorage.removeItem('email')
           localStorage.removeItem('org')
-          this.$router.push({ path: '/' })
+          // this.$router.push({ path: '/' })
           this.isFormInvalid = true
         })
+      }
     },
     checkLogedInfo() {
-      const token = localStorage.getItem('token')
-      if (token) {
-        validUserCheck.get('/user/profile/')
-          .then(res => {
-            this.$router.push('/org/dashboard/')
-          }).catch(error => {
+      if(!this.isLogin) {
+        const token = localStorage.getItem('token')
+        if (token) {
+          validUserCheck.get('/user/profile/')
+            .then(res => {
+              this.$router.push('/org/dashboard/')
+            }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {
@@ -114,7 +120,8 @@ export default {
             } else {
               this.$router.push('/error')
             }
-        })
+          })
+        }
       }
     }
   }

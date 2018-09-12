@@ -95,6 +95,7 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8",
-    "Firefox > 20"
+    "Firefox > 20",
+    "Firefox ESR"
   ]
 }
