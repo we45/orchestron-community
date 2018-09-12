@@ -84,7 +84,7 @@ export default {
         this.selectedOption = 'Info'
       }
       if (this.org && this.token && this.appId && this.param) {
-        axios.get('/openvul/app/' + this.appId + '/?severity=' + this.param)
+        axios.get('/openvul/app/' + this.appId + '/?severity=' + this.param + '/')
           .then(res => {
             if (res.status === 200) {
               this.totalVul = res.data.count

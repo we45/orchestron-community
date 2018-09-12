@@ -28,7 +28,11 @@
                     :info="infoCount"
                     :total="totalVul"></vul-progress-bar>
                 <br>
-                <closed-vul-table :dataItems="items" :pageNumberCount="totalVul"></closed-vul-table>
+                <closed-vul-table :dataItems="items" 
+                :pageNumberCount="totalVul"
+                :currentPage="currentPage"
+                @clickPagination="clickPagination($event)"
+                ></closed-vul-table>
             </b-card>
         </b-container>
     </div>
@@ -48,13 +52,25 @@ export default {
   data() {
     return {
       items: [],
+      isLoading: false,
+      paginationItems: [],
       totalVul: 0,
       highCount: 0,
       mediumCount: 0,
       lowCount: 0,
       infoCount: 0,
+      currentPage: 0,
       selectOption: ['Default View', 'Show False Positives'],
       selectedOption: 'Default View'
+    }
+  },
+  updated() {
+    if (this.isLoading) {
+      this.$nextTick(() => {
+        this.items = []
+        this.items = this.paginationItems
+      })
+      this.isLoading = false
     }
   },
   created() {
@@ -67,18 +83,22 @@ export default {
       if (this.org && this.token) {
         axios.get('/closedvul/org/' + this.org + '/?true=1')
           .then(res => {
+            this.highCount = res.data.severity[3] | 0
+            this.mediumCount = res.data.severity[2] | 0
+            this.lowCount = res.data.severity[1] | 0
+            this.infoCount = res.data.severity[0] | 0
             for (const val of Object.values(res.data.results)) {
-              if (val.severity === 3) {
-                this.highCount += 1
-              } else if (val.severity === 2) {
-                this.mediumCount += 1
-              } else if (val.severity === 1) {
-                this.lowCount += 1
-              } else if (val.severity === 0) {
-                this.infoCount += 1
-              } else {
-                this.infoCount += 1
-              }
+              // if (val.severity === 3) {
+              //   this.highCount += 1
+              // } else if (val.severity === 2) {
+              //   this.mediumCount += 1
+              // } else if (val.severity === 1) {
+              //   this.lowCount += 1
+              // } else if (val.severity === 0) {
+              //   this.infoCount += 1
+              // } else {
+              //   this.infoCount += 1
+              // }
               const splitVuls = val.names.split(',')
               const cwe = val.cwe
               const sev = val.severity
@@ -143,6 +163,98 @@ export default {
         this.$router.push('/')
       }
     },
+     clickPagination(event) {
+      if (event.page) {
+        this.currentPage = event.page
+        if (this.currentPage > 1) {
+          axios.get('/closedvul/org/' + this.org + '/?true=1&page=' + event.page)
+          .then(res => {
+            this.totalVul = res.data.count
+            this.isLoading = true
+            this.paginationItems = []
+            this.items = []
+            this.highCount = res.data.severity[3] | 0
+            this.mediumCount = res.data.severity[2] | 0
+            this.lowCount = res.data.severity[1] | 0
+            this.infoCount = res.data.severity[0] | 0
+            for (const val of Object.values(res.data.results)) {
+              // if (val.severity === 3) {
+              //   this.highCount += 1
+              // } else if (val.severity === 2) {
+              //   this.mediumCount += 1
+              // } else if (val.severity === 1) {
+              //   this.lowCount += 1
+              // } else if (val.severity === 0) {
+              //   this.infoCount += 1
+              // } else {
+              //   this.infoCount += 1
+              // }
+              const splitVuls = val.names.split(',')
+              const cwe = val.cwe
+              const sev = val.severity
+              const openFor = val.open_for
+              const tool = val.tools
+              let commonName = ''
+              let vulName = ''
+              let appName = ''
+              const multipleVuls = {}
+              for (const actualVul of splitVuls) {
+                const vulDetail = actualVul.split('###')
+                vulName = vulDetail[0]
+                appName = vulDetail[1]
+                if (splitVuls.length > 2) {
+                  multipleVuls[vulName] = appName
+                }
+              }
+              if (val.common_name === null) {
+                commonName = vulName
+              } else {
+                commonName = val.common_name
+              }
+              const checkObjectEmpty = Object.keys(multipleVuls).length === 0
+              if (checkObjectEmpty) {
+                this.paginationItems.push({
+                  cwe: cwe,
+                  sev: sev,
+                  openFor: openFor,
+                  commonName: commonName,
+                  name: multipleVuls,
+                  app: appName,
+                  tool: tool,
+                  multiple: false,
+                  vulName: vulName
+                })
+              } else {
+                this.paginationItems.push({
+                  cwe: cwe,
+                  sev: sev,
+                  openFor: openFor,
+                  commonName: commonName,
+                  name: multipleVuls,
+                  app: appName,
+                  tool: tool,
+                  multiple: true,
+                  vulName: vulName
+                })
+              }
+            }
+          }).catch(error => {
+            if (error.response.status === 404) {
+              this.$router.push('/not_found')
+            } else if (error.response.status === 403) {
+              this.$router.push('/forbidden')
+            } else {
+              this.$router.push('/error')
+            }
+          })
+        } else {
+          this.fetchDataOpenVul()
+        }
+      } else {
+        notValidUser()
+        this.$router.push('/')
+      }
+    },
     onInput(value) {
       if (value === 'Default View') {
         if (this.org && this.token) {
@@ -154,18 +266,22 @@ export default {
               this.mediumCount = 0
               this.lowCount = 0
               this.infoCount = 0
+              this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
               for (const val of Object.values(res.data.results)) {
-                if (val.severity === 3) {
-                  this.highCount += 1
-                } else if (val.severity === 2) {
-                  this.mediumCount += 1
-                } else if (val.severity === 1) {
-                  this.lowCount += 1
-                } else if (val.severity === 0) {
-                  this.infoCount += 1
-                } else {
-                  this.infoCount += 1
-                }
+                // if (val.severity === 3) {
+                //   this.highCount += 1
+                // } else if (val.severity === 2) {
+                //   this.mediumCount += 1
+                // } else if (val.severity === 1) {
+                //   this.lowCount += 1
+                // } else if (val.severity === 0) {
+                //   this.infoCount += 1
+                // } else {
+                //   this.infoCount += 1
+                // }
                 const splitVuls = val.names.split(',')
                 const cwe = val.cwe
                 const sev = val.severity
@@ -240,18 +356,22 @@ export default {
                 this.mediumCount = 0
                 this.lowCount = 0
                 this.infoCount = 0
+                this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
                 for (const val of Object.values(res.data.results)) {
-                  if (val.severity === 3) {
-                    this.highCount += 1
-                  } else if (val.severity === 2) {
-                    this.mediumCount += 1
-                  } else if (val.severity === 1) {
-                    this.lowCount += 1
-                  } else if (val.severity === 0) {
-                    this.infoCount += 1
-                  } else {
-                    this.infoCount += 1
-                  }
+                  // if (val.severity === 3) {
+                  //   this.highCount += 1
+                  // } else if (val.severity === 2) {
+                  //   this.mediumCount += 1
+                  // } else if (val.severity === 1) {
+                  //   this.lowCount += 1
+                  // } else if (val.severity === 0) {
+                  //   this.infoCount += 1
+                  // } else {
+                  //   this.infoCount += 1
+                  // }
                   const splitVuls = val.names.split(',')
                   const cwe = val.cwe
                   const sev = val.severity

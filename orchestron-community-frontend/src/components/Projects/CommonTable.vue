@@ -19,7 +19,7 @@
                                     :per-page="perPage"
                                     v-model="currentPage"
                                     align="right"
-                                    v-on:input="paginationClick(currentPage)"></b-pagination>
+                                    @input="paginationClick(currentPage)"></b-pagination>
                     </b-col>
                 </b-row>
                 <br>
@@ -153,10 +153,13 @@ export default {
     deleteModal(id) {
       this.$emit('deleteModal', { id: id, show: this.showModal })
     },
+    // paginationClick(page) {
+    //   this.currentPage = page
+    //   this.$emit('pagination', { page: this.currentPage })
+    // },
     paginationClick(page) {
-      this.currentPage = page
-      this.$emit('pagination', { page: this.currentPage })
-    }
+      this.$emit('clickPagination', { page: page })
+    },
   }
 }
 </script>

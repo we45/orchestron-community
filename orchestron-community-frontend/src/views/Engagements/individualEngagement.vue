@@ -139,7 +139,7 @@
                     triggeredBy: value.fields.triggered_by,
                     tool: value.fields.tool,
                     scanId: value.fields.id,
-                    url: '/projects/individual_application/' + this.appId + '/individual_scan/' + value.fields.id,
+                    url: '/projects/individual_application/' + this.appId + '/individual_scan/' + value.fields.id + '/',
                     appDashboard: false
                   })
                   const vulTotal = (value.stats.severity_count[3] + value.stats.severity_count[2] + value.stats.severity_count[1] + value.stats.severity_count[0])

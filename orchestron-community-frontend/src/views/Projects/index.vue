@@ -29,6 +29,7 @@
                             <b-col sm="2"><label for="input-small" class="label">Logo:</label></b-col>
                             <b-col sm="10">
                                 <b-form-file
+                                    ref="fileinput"
                                     v-model="projectLogo"
                                     placeholder="Choose a logo..."
                                     accept="image/jpeg, image/png,image/jpg,"
@@ -226,11 +227,13 @@ export default {
         }
       },
       createProject() {
+        this.$refs.fileinput.reset();
         this.projectLogo = ''
         this.projectName = ''
         this.$refs.createProjectModal.show()
       },
       closeCreateProject() {
+        this.$refs.fileinput.reset();
         this.projectLogo = ''
         this.projectName = ''
         this.$refs.createProjectModal.hide()
@@ -260,11 +263,24 @@ export default {
               this.projectLogo = ''
               this.projectName = ''
             }).catch(error => {
+              var status_info = error.response.status
+              if(status_info === 400){
+                  this.$notify({
+                    group: 'foo',
+                    type: 'error',
+                    title: 'Error In Creation of Project',
+                    text: 'Project with this Name exists',
+                    position: 'top right'
+                })
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
-              } else if (error.res.status === 403) {
+              }
+               else if (error.res.status === 403) {
                 this.$router.push('/forbidden')
-              } else {
+              }
+              
+             else {
                 this.$router.push('/error')
               }
             })
@@ -288,6 +304,7 @@ export default {
               const logoSplit = updatelogoSplit.pop()
               this.updateLogoName = logoSplit
             }).catch(error => {
+              
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -338,6 +355,16 @@ export default {
               this.updateProjectId = ''
               this.updateLogoName = ''
             }).catch(error => {
+              var status_info = error.response.status
+              if(status_info === 400){
+                  this.$notify({
+                    group: 'foo',
+                    type: 'error',
+                    title: 'Error In Update of Project',
+                    text: 'Project with this Name exists',
+                    position: 'top right'
+                })
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -382,6 +409,8 @@ export default {
                 position: 'top right'
               })
               this.deleteProjectId = ''
+              // this.deleteProjectId = ''
+              this.typeDelete = ''
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')

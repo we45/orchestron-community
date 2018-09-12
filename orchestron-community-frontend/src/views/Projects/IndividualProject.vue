@@ -31,6 +31,7 @@
                                 <label class="label">Logo:</label>
                                 <b-col sm="12">
                                     <b-form-file
+                                      ref="fileinput"
                                       v-model="appLogo"
                                       accept="image/jpeg, image/png,image/jpg,"
                                       :state="!$v.appLogo.$invalid"
@@ -435,6 +436,14 @@
       },
       createApplication() {
         if (this.param && this.org && this.token) {
+          this.appName  = ''
+          this.appLogo = ''
+          this.appHostType = []
+          this.appUrl = ''
+          this.appPlatformTags = []
+          this.appIpv4 = ''
+          this.appOsInfo =''
+          this.$refs.fileinput.reset();
           axios.get('/hosttypes/')
             .then(res => {
               this.appTargetOption = res.data
@@ -497,6 +506,16 @@
                 position: 'top right'
               })
             }).catch(error => {
+              var status_info = error.response.status
+              if(status_info === 400){
+                  this.$notify({
+                    group: 'foo',
+                    type: 'error',
+                    title: 'Error In Creation of Application',
+                    text: 'Application with this Name exists',
+                    position: 'top right'
+                })
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {
@@ -573,6 +592,16 @@
                 position: 'top right'
               })
             }).catch(error => {
+               var status_info = error.response.status
+              if(status_info === 400){
+                  this.$notify({
+                    group: 'foo',
+                    type: 'error',
+                    title: 'Error In Update of Application',
+                    text: 'Application with this Name exists',
+                    position: 'top right'
+                })
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {

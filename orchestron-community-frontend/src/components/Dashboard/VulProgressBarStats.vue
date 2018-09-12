@@ -16,7 +16,7 @@
             <hr>
             <b-row v-for="vul in limitBy(vulData,5) " :key="vul.name">
                 <b-col cols="4">
-                    <router-link  :to="{ path: nameUrl + vul.id }" >
+                    <router-link  :to="{ path: nameUrl + vul.id + '/'}" >
                         <p class="title">{{ vul.name }}</p>
                     </router-link>
                 </b-col>
