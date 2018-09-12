@@ -270,12 +270,12 @@
     methods: {
       fetchData() {
         if (this.org && this.token) {
-          axios.get('/applications/')
+          axios.get('/applications/list/')
             .then(res => {
               this.applicationOption = []
-              this.webhookCount = 0
-              this.webhookCount = res.data.count
-              for (const value of res.data.results) {
+              // this.webhookCount = 0
+              // this.webhookCount = res.data.count
+              for (const value of res.data) {
                 this.applicationOption.push({ value: value.id, label: value.name })
               }
             }).catch(error => {
@@ -290,6 +290,7 @@
           axios.get('/webhooks/')
             .then(res => {
               this.webhookData = []
+               this.webhookCount = res.data.count
               for (const value of res.data.results) {
                 let appName = ''
                 for (const app of this.applicationOption) {
@@ -316,21 +317,21 @@
      clickPagination(event) {
       if (event.page) {
         if (event.page > 1) {
-          axios.get('/applications/')
-            .then(res => {
-              this.applicationOption = []
-              for (const value of res.data) {
-                this.applicationOption.push({ value: value.id, label: value.name })
-              }
-            }).catch(error => {
-              if (error.response.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.response.status === 403) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
+          // axios.get('/applications/')
+          //   .then(res => {
+          //     this.applicationOption = []
+          //     for (const value of res.data) {
+          //       this.applicationOption.push({ value: value.id, label: value.name })
+          //     }
+          //   }).catch(error => {
+          //     if (error.response.status === 404) {
+          //       this.$router.push('/not_found')
+          //     } else if (error.response.status === 403) {
+          //       this.$router.push('/forbidden')
+          //     } else {
+          //       this.$router.push('/error')
+          //     }
+          //   })
           axios.get('/webhooks/?page='+ event.page)
             .then(res => {
               this.webhookPaginatedData = []
@@ -341,7 +342,9 @@
                     appName = app.label
                   }
                 }
+                
                 this.webhookPaginatedData.push({ 'name': value.name, 'app': appName, 'tool': value.tool, 'id': value.hook_id })
+                this.webhookData = this.webhookPaginatedData
                 this.isPaginated = true
               }
             }).catch(error => {

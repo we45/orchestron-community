@@ -168,6 +168,7 @@
                     </div>
                 </b-col>
             </b-modal>
+            <!-- {{engagementPagnatedList}} -->
       </b-container>
     </div>
 </template>
@@ -195,6 +196,7 @@
           headerTitles: 'List of Engagements',
           individualEngagementUrl: '',
           applicationOption: [],
+          engagementPagnatedList: [],
           engagementName: '',
           engagementDesc: '',
           application: '',
@@ -205,6 +207,7 @@
           updateEngagementDateRange: '',
           engagementId: '',
           engagementsCount: 0,
+          isPaginated: false,
           today: new Date(),
           shortcuts: [
             {
@@ -255,18 +258,28 @@
           this.$nextTick(() => {
             this.applicationOption = []
             this.engagementList = []
+            // this.engagementPagnatedList = []
             this.fetchData()
           })
           this.isLoading = false
+        }
+        if (this.isPaginated){
+          this.$nextTick(() => {
+            this.fetchData()
+            this.engagementList = this.engagementPagnatedList
+          })
+          this.isPaginated = false
         }
       },
       methods: {
         fetchData() {
           if (this.org && this.token) {
+            this.engagementList = []
             axios.get('/engagements/')
               .then(res => {
                 this.engagementsCount = res.data.count
                 for (const value of res.data.results) {
+
                   this.engagementList.push({
                     name: { vul_name: value.name },
                     sev: value.severity,
@@ -285,37 +298,8 @@
                   this.$router.push('/error')
                 }
               })
-          } else {
-            notValidUser()
-            this.$router.push('/')
-          }
-        },
-        clickPagination(event) {
-          if (event.page) {
-            if (event.page > 1) {
-              axios.get('/engagements/?page=' + event.page)
-                  .then(res => {
-                    this.engagementPagnatedList = []
-                    for (const value of res.data.results) {
-                        this.engagementList.push({
-                        name: { vul_name: value.name },
-                        sev: value.severity,
-                        id: value.id,
-                        url: 'individual_engagement/' + value.id + '/',
-                        appName: value.app_details.name,
-                        engId: value.uniq_id
-                  })
-                    }
-                  }).catch(error => {
-                    if (error.response.status === 404) {
-                      this.$router.push('/not_found')
-                    } else if (error.response.status === 404) {
-                      this.$router.push('/forbidden')
-                    } else {
-                      this.$router.push('/error')
-                    }
-                  }),
-                   axios.get('/applications/')
+
+                axios.get('/applications/list/')
                   .then(res => {
                     this.applicationOption = []
                     for (const value of res.data) {
@@ -330,7 +314,40 @@
                       this.$router.push('/error')
                     }
                   })
-              //  this.isPaginated = true
+
+          } else {
+            notValidUser()
+            this.$router.push('/')
+          }
+        },
+        clickPagination(event) {
+          if (event.page) {
+            if (event.page > 1) {
+              axios.get('/engagements/?page=' + event.page)
+                  .then(res => {
+                    this.engagementPagnatedList = []
+                    this.engagementList = []
+                    for (const value of res.data.results) {
+                        this.engagementPagnatedList.push({
+                        name: { vul_name: value.name },
+                        sev: value.severity,
+                        id: value.id,
+                        url: 'individual_engagement/' + value.id + '/',
+                        appName: value.app_details.name,
+                        engId: value.uniq_id
+                  })
+                    }
+                    this.engagementList = this.engagementPagnatedList
+                  }).catch(error => {
+                    if (error.response.status === 404) {
+                      this.$router.push('/not_found')
+                    } else if (error.response.status === 404) {
+                      this.$router.push('/forbidden')
+                    } else {
+                      this.$router.push('/error')
+                    }
+                  })
+               this.isPaginated = true
             } else {
               this.fetchData()
             }
@@ -341,20 +358,6 @@
         },
         createEngagement() {
           this.$refs.createEngagementModal.show()
-          axios.get('/applications/')
-            .then(res => {
-              for (const value of res.data.results) {
-                this.applicationOption.push({ value: value.id, label: value.name })
-              }
-            }).catch(error => {
-              if (error.res.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.res.status === 404) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
         },
         closeCreateEngagement() {
           this.$refs.createEngagementModal.hide()
@@ -406,7 +409,6 @@
           this.engagementId = event.id
           if (this.org && this.token && this.engagementId) {
             this.$refs.updateEngagementModal.show()
-            this.applicationOption = []
             axios.get('/engagements/' + this.engagementId + '/')
               .then(res => {
                 this.updateEngagementName = res.data.name
@@ -414,24 +416,9 @@
                 this.updateEngagementDateRange =[res.data.start_date, res.data.stop_date]
                 for (const appVal of this.applicationOption) {
                   if (res.data.application === appVal.value) {
-                    // this.updateApplication = appVal.label
+                    this.updateApplication = appVal.label
                      this.updateApplication = {'label':appVal.label, 'value':res.data.application}
                   }
-                }
-              }).catch(error => {
-                if (error.res.status === 404) {
-                  this.$router.push('/not_found')
-                } else if (error.res.status === 404) {
-                  this.$router.push('/forbidden')
-                } else {
-                  this.$router.push('/error')
-                }
-              })
-
-            axios.get('/applications/')
-              .then(res => {
-                for (const value of res.data.results) {
-                  this.applicationOption.push({ value: value.id, label: value.name })
                 }
               }).catch(error => {
                 if (error.res.status === 404) {

@@ -83,18 +83,22 @@ export default {
       if (this.org && this.token) {
         axios.get('/closedvul/org/' + this.org + '/?true=1')
           .then(res => {
+            this.highCount = res.data.severity[3] | 0
+            this.mediumCount = res.data.severity[2] | 0
+            this.lowCount = res.data.severity[1] | 0
+            this.infoCount = res.data.severity[0] | 0
             for (const val of Object.values(res.data.results)) {
-              if (val.severity === 3) {
-                this.highCount += 1
-              } else if (val.severity === 2) {
-                this.mediumCount += 1
-              } else if (val.severity === 1) {
-                this.lowCount += 1
-              } else if (val.severity === 0) {
-                this.infoCount += 1
-              } else {
-                this.infoCount += 1
-              }
+              // if (val.severity === 3) {
+              //   this.highCount += 1
+              // } else if (val.severity === 2) {
+              //   this.mediumCount += 1
+              // } else if (val.severity === 1) {
+              //   this.lowCount += 1
+              // } else if (val.severity === 0) {
+              //   this.infoCount += 1
+              // } else {
+              //   this.infoCount += 1
+              // }
               const splitVuls = val.names.split(',')
               const cwe = val.cwe
               const sev = val.severity
@@ -169,18 +173,22 @@ export default {
             this.isLoading = true
             this.paginationItems = []
             this.items = []
+            this.highCount = res.data.severity[3] | 0
+            this.mediumCount = res.data.severity[2] | 0
+            this.lowCount = res.data.severity[1] | 0
+            this.infoCount = res.data.severity[0] | 0
             for (const val of Object.values(res.data.results)) {
-              if (val.severity === 3) {
-                this.highCount += 1
-              } else if (val.severity === 2) {
-                this.mediumCount += 1
-              } else if (val.severity === 1) {
-                this.lowCount += 1
-              } else if (val.severity === 0) {
-                this.infoCount += 1
-              } else {
-                this.infoCount += 1
-              }
+              // if (val.severity === 3) {
+              //   this.highCount += 1
+              // } else if (val.severity === 2) {
+              //   this.mediumCount += 1
+              // } else if (val.severity === 1) {
+              //   this.lowCount += 1
+              // } else if (val.severity === 0) {
+              //   this.infoCount += 1
+              // } else {
+              //   this.infoCount += 1
+              // }
               const splitVuls = val.names.split(',')
               const cwe = val.cwe
               const sev = val.severity
@@ -258,18 +266,22 @@ export default {
               this.mediumCount = 0
               this.lowCount = 0
               this.infoCount = 0
+              this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
               for (const val of Object.values(res.data.results)) {
-                if (val.severity === 3) {
-                  this.highCount += 1
-                } else if (val.severity === 2) {
-                  this.mediumCount += 1
-                } else if (val.severity === 1) {
-                  this.lowCount += 1
-                } else if (val.severity === 0) {
-                  this.infoCount += 1
-                } else {
-                  this.infoCount += 1
-                }
+                // if (val.severity === 3) {
+                //   this.highCount += 1
+                // } else if (val.severity === 2) {
+                //   this.mediumCount += 1
+                // } else if (val.severity === 1) {
+                //   this.lowCount += 1
+                // } else if (val.severity === 0) {
+                //   this.infoCount += 1
+                // } else {
+                //   this.infoCount += 1
+                // }
                 const splitVuls = val.names.split(',')
                 const cwe = val.cwe
                 const sev = val.severity
@@ -344,18 +356,22 @@ export default {
                 this.mediumCount = 0
                 this.lowCount = 0
                 this.infoCount = 0
+                this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
                 for (const val of Object.values(res.data.results)) {
-                  if (val.severity === 3) {
-                    this.highCount += 1
-                  } else if (val.severity === 2) {
-                    this.mediumCount += 1
-                  } else if (val.severity === 1) {
-                    this.lowCount += 1
-                  } else if (val.severity === 0) {
-                    this.infoCount += 1
-                  } else {
-                    this.infoCount += 1
-                  }
+                  // if (val.severity === 3) {
+                  //   this.highCount += 1
+                  // } else if (val.severity === 2) {
+                  //   this.mediumCount += 1
+                  // } else if (val.severity === 1) {
+                  //   this.lowCount += 1
+                  // } else if (val.severity === 0) {
+                  //   this.infoCount += 1
+                  // } else {
+                  //   this.infoCount += 1
+                  // }
                   const splitVuls = val.names.split(',')
                   const cwe = val.cwe
                   const sev = val.severity
