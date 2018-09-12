@@ -460,6 +460,47 @@ class OptionsListView(viewsets.ViewSet):
         return Response(data,status=status.HTTP_200_OK)               
 
 
+class ModelListView(viewsets.ModelViewSet):
+    def get_queryset(self):  
+        object_list = self.model_class.objects.all()
+        return object_list
+
+    def list(self, request):
+        serializer = self.serializer_class(self.get_queryset(), many=True,context={'request':request})
+        return Response(serializer.data)
+
+
+class OrganizationListView(ModelListView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    serializer_class = OrganizationSerializer
+    model_class = Organization
+
+
+class ProjectListView(ModelListView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    serializer_class = ProjectSerializer
+    model_class = Project 
+
+
+class ApplicationListView(ModelListView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    model_class = Application
+    serializer_class = ApplicationSerializer        
+
+
+class UserListView(ModelListView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    serializer_class = UserSerializer
+    model_class = User
+
+
+class GroupListView(ModelListView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated, SuperUserAdminPermission, )
+    serializer_class = GroupSerializer
+    model_class = Group        
+
+
 class JIRAListView(viewsets.ViewSet):
 
     def get_queryset(self, user):
