@@ -21,7 +21,7 @@ import random
 
 def draw_thumnail(text, temp_file):
     split_text = text.strip().split(' ')[:2]
-    draw_text = ''.join([s[0].upper() for s in split_text if s])
+    draw_text = ''.join([s[0].upper() for s in split_text if s and s.isalnum()])
     r = lambda: random.randint(0,255)
     color = '#%02X%02X%02X' % (r(),r(),r())
     image = Image.new('RGBA', (150, 150),color = color)
