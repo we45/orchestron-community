@@ -28,7 +28,7 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
-    JiraProjectsSerializer
+    JiraProjectsSerializer, GroupSerializer
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
