@@ -6,9 +6,9 @@
                 <p class="title"> {{ headerTitle }} </p>
                 <hr>
                 <br>
-                <b-button size="sm" @click="createModal()" class="mr-1 btn-orange" style="float: left;">
+                <!-- <b-button size="sm" @click="createModal()" class="mr-1 btn-orange" style="float: left;">
                     Create
-                </b-button>
+                </b-button> -->
                 <br>
                 <br>
                 <b-row>
@@ -16,9 +16,9 @@
                         <b-form-input v-model="filter" placeholder="Type to Search" class="inline-form-control"/>
                     </b-col>
                     <b-col md="2"></b-col>
-                    <b-col md="4" class="my-1">
+                    <!-- <b-col md="4" class="my-1">
                         <b-form-select :options="pageOptions" v-model="perPage"/>
-                    </b-col>
+                    </b-col> -->
                 </b-row>
                 <b-row>
                     <b-col md="6" class="my-1">
@@ -52,21 +52,21 @@
                                 </p>
                             </b-col>
                             <b-col cols="4">
-                                <p>
+                                <!-- <p>
                                     <span class="sub-title">Tool</span>
                                     <span class="sub-divider">:</span>
                                     <span class="sub-value" >{{ row.item.tool }} </span>
-                                </p>
+                                </p> -->
                             </b-col>
                         </b-row>
                     </template>
                     <template slot="actions" slot-scope="row">
-                        <b-button size="sm" @click="deleteModal(row.item.id)" class="mr-1 btn-orange" style="float: right;">
+                        <!-- <b-button size="sm" @click="deleteModal(row.item.id)" class="mr-1 btn-orange" style="float: right;">
                             Delete
                         </b-button>
                         <b-button size="sm" @click="updateModal(row.item.id)" class="mr-1 btn-orange" style="float: right;">
                             Update
-                        </b-button>
+                        </b-button> -->
                         <b-button size="sm" @click="copyModal(row.item.id)" class="mr-1 btn-orange" style="float: right;">
                             Copy
                         </b-button>
@@ -145,6 +145,7 @@ export default {
       this.$emit('copyModal', { id: id, show: this.showModal })
     },
     paginationClick(page) {
+      
       this.$emit('clickPagination', { page: page })
     }
   }

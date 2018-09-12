@@ -242,7 +242,7 @@
             const form_data = new FormData()
             form_data.append('old_password', this.oldPassword)
             form_data.append('new_password', this.confirmPassword)
-            axios.post('/user/profile/' + email + '/', form_data)
+            axios.post('user/password/change/' + email + '/', form_data)
               .then(res => {
                   this.isLoading = true
                   this.$router.go('/org/dashboard')

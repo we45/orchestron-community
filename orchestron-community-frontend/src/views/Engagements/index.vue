@@ -406,13 +406,16 @@
           this.engagementId = event.id
           if (this.org && this.token && this.engagementId) {
             this.$refs.updateEngagementModal.show()
+            this.applicationOption = []
             axios.get('/engagements/' + this.engagementId + '/')
               .then(res => {
                 this.updateEngagementName = res.data.name
                 this.updateEngagementDesc = res.data.description
+                this.updateEngagementDateRange =[res.data.start_date, res.data.stop_date]
                 for (const appVal of this.applicationOption) {
                   if (res.data.application === appVal.value) {
-                    this.updateApplication = appVal.label
+                    // this.updateApplication = appVal.label
+                     this.updateApplication = {'label':appVal.label, 'value':res.data.application}
                   }
                 }
               }).catch(error => {

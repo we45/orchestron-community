@@ -263,13 +263,8 @@ export default {
               this.projectLogo = ''
               this.projectName = ''
             }).catch(error => {
-              if (error.res.status === 404) {
-                this.$router.push('/not_found')
-              }
-               else if (error.res.status === 403) {
-                this.$router.push('/forbidden')
-              }
-              else if(error.response.status == 400){
+              var status_info = error.response.status
+              if(status_info === 400){
                   this.$notify({
                     group: 'foo',
                     type: 'error',
@@ -277,7 +272,14 @@ export default {
                     text: 'Project with this Name exists',
                     position: 'top right'
                 })
-            }
+              }
+              if (error.res.status === 404) {
+                this.$router.push('/not_found')
+              }
+               else if (error.res.status === 403) {
+                this.$router.push('/forbidden')
+              }
+              
              else {
                 this.$router.push('/error')
               }
@@ -302,6 +304,7 @@ export default {
               const logoSplit = updatelogoSplit.pop()
               this.updateLogoName = logoSplit
             }).catch(error => {
+              
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -352,6 +355,16 @@ export default {
               this.updateProjectId = ''
               this.updateLogoName = ''
             }).catch(error => {
+              var status_info = error.response.status
+              if(status_info === 400){
+                  this.$notify({
+                    group: 'foo',
+                    type: 'error',
+                    title: 'Error In Update of Project',
+                    text: 'Project with this Name exists',
+                    position: 'top right'
+                })
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {

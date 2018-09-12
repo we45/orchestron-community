@@ -337,6 +337,7 @@
                       cwe: val.cwe,
                       id: val.id,
                       url: '/projects/individual_application/' + this.appId + '/individual_scan/' + this.scanId + '/individual_vul/' + val.id + '/'
+                      
                     })
                   }
                 }
@@ -407,7 +408,7 @@
                 })
                   .then(res => {
                     this.$refs.addVulnerabilityModal.hide()
-                    this.$router.push('/projects/individual_application/')
+                    this.$router.push('/projects/individual_application/'+ this.appId  + '/individual_scan/'+ this.scanId +'/' )
                     this.$notify({
                       group: 'foo',
                       type: 'success',
