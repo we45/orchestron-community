@@ -30,6 +30,8 @@ def create_vul(data,es_reference,confidence,severity,cwe,tool,evidences):
         else:
             common_name = vul_name[:255]
             dread_score = 0
+        if severity == 4 or severity == '4':
+            severity = 3
         try:
             meta_dict = {
                 'name':vul_name[:255],
