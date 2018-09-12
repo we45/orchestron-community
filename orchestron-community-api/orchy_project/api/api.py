@@ -496,7 +496,6 @@ class UserListView(ModelListView):
 
 class GroupListView(ModelListView):
     authentication_classes = (JSONWebTokenAuthentication,)
-    permission_classes = (IsAuthenticated, SuperUserAdminPermission, )
     serializer_class = GroupSerializer
     model_class = Group        
 
