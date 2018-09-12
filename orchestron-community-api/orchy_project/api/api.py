@@ -28,7 +28,7 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
-    JiraProjectsSerializer, GroupSerializer
+    JiraProjectsSerializer
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
@@ -491,13 +491,7 @@ class ApplicationListView(ModelListView):
 class UserListView(ModelListView):
     authentication_classes = (JSONWebTokenAuthentication,)
     serializer_class = UserSerializer
-    model_class = User
-
-
-class GroupListView(ModelListView):
-    authentication_classes = (JSONWebTokenAuthentication,)
-    serializer_class = GroupSerializer
-    model_class = Group        
+    model_class = User       
 
 
 class JIRAListView(viewsets.ViewSet):

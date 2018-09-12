@@ -9,8 +9,7 @@ from api.api import OrganizationView, ProjectView, ApplicationView, ScanView, En
     ClosedVulnerabilityView, UserUtilityView, UserProfileView, MediaServeView, OrganizationOptionView, \
     OptionsListView, ParserView, JiraConnectionTestView, \
     ORLConfigView, ScanResultView, JiraProjectsView, JIRAListView, \
-    ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView, \
-    GroupListView
+    ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView
 from rest_framework_jwt.views import obtain_jwt_token
 from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, ApplicationAnalyticsView, \
     EngagementAnalyticsView, ScanAnalyticsView, VulnerabilityAnalyticsView
@@ -22,7 +21,6 @@ urlpatterns = [
     re_path(r'^api/user/profile/', UserProfileView.as_view()),
 
     re_path(r'^api/users/list/$', UserListView.as_view({'get':'list'}),name='user_list'),
-    re_path(r'^api/groups/list/$', GroupListView.as_view({'get':'list'}),name='group_list'),
     re_path(r'^api/organizations/list/$', OrganizationListView.as_view({'get':'list'}),name='org_list'),
     re_path(r'^api/projects/list/$', ProjectListView.as_view({'get':'list'}),name='pro_list'),
     re_path(r'^api/applications/list/$', ApplicationListView.as_view({'get':'list'}),name='app_list'),
