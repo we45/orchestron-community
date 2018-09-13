@@ -87,6 +87,7 @@ export default {
             this.mediumCount = res.data.severity[2] | 0
             this.lowCount = res.data.severity[1] | 0
             this.infoCount = res.data.severity[0] | 0
+            this.items = []
             for (const val of Object.values(res.data.results)) {
               // if (val.severity === 3) {
               //   this.highCount += 1

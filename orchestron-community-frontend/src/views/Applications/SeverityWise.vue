@@ -9,7 +9,7 @@
                     <b-col sm="8" class="m2-top">
                         <p class="text-left">
                             <span class="vul-count">
-                            {{ totalVul }}
+                            {{ totalVul }} 
                             </span>
                         </p>
                     </b-col>
@@ -84,9 +84,10 @@ export default {
         this.selectedOption = 'Info'
       }
       if (this.org && this.token && this.appId && this.param) {
-        axios.get('/openvul/app/' + this.appId + '/?severity=' + this.param + '/')
+        axios.get('/openvul/app/' + this.appId + '/?severity=' + this.param + '&page=1')
           .then(res => {
             if (res.status === 200) {
+              this.items= []
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
                 const splitVuls = val.names.split(',')
@@ -255,7 +256,7 @@ export default {
           if (this.org && this.token && this.appId && this.param) {
             axios.get('/openvul/app/' + this.appId + '/?severity=' + this.param + '&page=' + event.page)
               .then(res => {
-                if (res.status === 200) {
+                // if (res.status === 200) {
                   this.items = []
                   this.paginationItems = []
                   this.isLoading = true
@@ -309,9 +310,9 @@ export default {
                       })
                     }
                   }
-                } else {
-                  this.$router.push('/forbidden')
-                }
+                // } else {
+                //   this.$router.push('/forbidden')
+                // }
               }).catch(error => {
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')

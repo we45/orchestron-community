@@ -86,6 +86,7 @@ export default {
           .then(res => {
             this.headerTitle = 'Open Vulnerabilities'
             this.items = []
+            this.paginationItems = []
             this.totalVul = 0
             this.totalVul = res.data.count
             this.highCount = res.data.severity[3] | 0

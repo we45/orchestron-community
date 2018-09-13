@@ -86,6 +86,7 @@ export default {
         axios.get('/openvul/org/' + this.org + '/?severity=' + this.param)
           .then(res => {
             if (res.status === 200) {
+              this.items = []
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
                 const splitVuls = val.names.split(',')
@@ -251,7 +252,7 @@ export default {
         this.isLoading = true
         if (this.currentPage > 1) {
           if (this.org && this.token && this.param) {
-            axios.get('/openvul/org/' + this.org + '/?page=' + this.param + '&page=' + event.page)
+            axios.get('/openvul/org/' + this.org + '/?severity='+ this.param + '&page=' + event.page)
               .then(res => {
                 if (res.status === 200) {
                   this.items = []

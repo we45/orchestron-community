@@ -9,7 +9,7 @@
           <b-col sm="8" class="m2-top">
             <p class="text-left">
               <span class="vul-count">
-                {{ totalVul }}
+                {{ totalVul }} 
               </span>
             </p>
           </b-col>
@@ -76,10 +76,11 @@ export default {
                   cwe: val.cwe,
                   id: val.id,
                   url: '/projects/individual_application/' + this.appId + '/individual_scan/' + this.scanId + '/individual_vul/' + val.id + '/'
+                  
                 })
               }
             }
-            this.totalVul = res.data.count
+            this.totalVul = res.data.vuls.length
           }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')
@@ -110,8 +111,10 @@ export default {
         }
         axios.get('/scans/' + this.scanId + '/?severity=' + this.param)
           .then(res => {
+            console.log(this.scanId)
             this.sevData = []
             this.totalVul = 0
+            this.totalVul = res.data.vuls.length
             for (const vul of res.data.vuls) {
               for (const val of Object.values(vul)) {
                 this.sevData.push({
@@ -119,11 +122,12 @@ export default {
                   name: val.name,
                   cwe: val.cwe,
                   id: val.id,
-                  url: this.scanId + '/individual_vul/' + val.id
+                  // url: this.scanId + '/individual_vul/' + val.id
+                   url: '/projects/individual_application/' + this.appId + '/individual_scan/' + this.scanId + '/individual_vul/' + val.id + '/'
                 })
               }
             }
-            this.totalVul = res.data.count
+            
           }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')

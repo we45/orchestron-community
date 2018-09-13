@@ -262,15 +262,16 @@
         this.$nextTick(() => {
           this.webhookData = []
           this.webhookData = this.webhookPaginatedData
+          console.log(this.webhookData)
         })
         this.isPaginated = false
       }
 
     },
     methods: {
-      fetchData() {
+    async  fetchData() {
         if (this.org && this.token) {
-          axios.get('/applications/list/')
+       await   axios.get('/applications/list/')
             .then(res => {
               this.applicationOption = []
               // this.webhookCount = 0
@@ -290,7 +291,7 @@
           axios.get('/webhooks/')
             .then(res => {
               this.webhookData = []
-               this.webhookCount = res.data.count
+              this.webhookCount = res.data.count
               for (const value of res.data.results) {
                 let appName = ''
                 for (const app of this.applicationOption) {
@@ -342,11 +343,10 @@
                     appName = app.label
                   }
                 }
-                
                 this.webhookPaginatedData.push({ 'name': value.name, 'app': appName, 'tool': value.tool, 'id': value.hook_id })
-                this.webhookData = this.webhookPaginatedData
-                this.isPaginated = true
               }
+              this.webhookData = this.webhookPaginatedData
+              this.isPaginated = true
             }).catch(error => {
               if (error.response.status === 404) {
                 this.$router.push('/not_found')

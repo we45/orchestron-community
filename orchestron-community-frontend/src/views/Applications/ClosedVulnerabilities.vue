@@ -92,18 +92,22 @@
           axios.get('/closedvul/app/' + param + '/?true=1')
             .then(res => {
               this.totalVul = res.data.count
+              this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
               for (const val of Object.values(res.data.results)) {
-                if (val.severity === 3) {
-                  this.highCount += 1
-                } else if (val.severity === 2) {
-                  this.mediumCount += 1
-                } else if (val.severity === 1) {
-                  this.lowCount += 1
-                } else if (val.severity === 0) {
-                  this.infoCount += 1
-                } else {
-                  this.infoCount += 1
-                }
+                // if (val.severity === 3) {
+                //   this.highCount += 1
+                // } else if (val.severity === 2) {
+                //   this.mediumCount += 1
+                // } else if (val.severity === 1) {
+                //   this.lowCount += 1
+                // } else if (val.severity === 0) {
+                //   this.infoCount += 1
+                // } else {
+                //   this.infoCount += 1
+                // }
                 const splitVuls = val.names.split(',')
                 const cwe = val.cwe
                 const sev = val.severity
@@ -254,7 +258,7 @@
             }
           })
         } else {
-          this.fetchDataOpenVul()
+          this.fetchDataOpenVul(this.param)
         }
       } else {
         notValidUser()
@@ -274,22 +278,22 @@
                 this.infoCount = 0
                 this.currentPage = 0
                 this.currentPage = res.data.count
-                // this.highCount = res.data.severity[3] | 0
-                // this.mediumCount = res.data.severity[2] | 0
-                // this.lowCount = res.data.severity[1] | 0
-                // this.infoCount = res.data.severity[0] | 0
-                for (const val of Object.values(res.data.results)) {
-                  if (val.severity === 3) {
-                    this.highCount += 1
-                  } else if (val.severity === 2) {
-                    this.mediumCount += 1
-                  } else if (val.severity === 1) {
-                    this.lowCount += 1
-                  } else if (val.severity === 0) {
-                    this.infoCount += 1
-                  } else {
-                    this.infoCount += 1
-                  }
+                this.highCount = res.data.severity[3] | 0
+                this.mediumCount = res.data.severity[2] | 0
+                this.lowCount = res.data.severity[1] | 0
+                this.infoCount = res.data.severity[0] | 0
+                for (const val of Object.values({}, res.data.results)) {
+                  // if (val.severity === 3) {
+                  //   this.highCount += 1
+                  // } else if (val.severity === 2) {
+                  //   this.mediumCount += 1
+                  // } else if (val.severity === 1) {
+                  //   this.lowCount += 1
+                  // } else if (val.severity === 0) {
+                  //   this.infoCount += 1
+                  // } else {
+                  //   this.infoCount += 1
+                  // }
                   const splitVuls = val.names.split(',')
                   const cwe = val.cwe
                   const sev = val.severity
