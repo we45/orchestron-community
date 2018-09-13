@@ -1685,7 +1685,7 @@ class WebhookUploadView(APIView):
                 if webhook_scan_name:
                     scan_short_name = webhook_scan_name
                 else:
-                    scan_short_name = '{0}_{1}_webhook_{2}'.format(tool, application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
+                    scan_short_name = '{0}_{1}_webhook_{2}'.format(webhook_tool, application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
                 scan_name = self.create_scan(webhook_tool, scan_short_name, application, engagement_id)
                 init_json = {
                     'scan_reference':{
