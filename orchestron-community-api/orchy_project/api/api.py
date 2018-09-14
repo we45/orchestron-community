@@ -1721,7 +1721,7 @@ class WebhookUploadView(APIView):
             else:
                 return Response({'Error':'Sorry!!! Could not process the event'}, status=status.HTTP_403_FORBIDDEN)            
         except BaseException as e:
-            # print(e)
+            log_exception(e)
             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
 
