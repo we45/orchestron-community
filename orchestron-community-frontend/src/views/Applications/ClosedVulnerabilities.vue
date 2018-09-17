@@ -16,7 +16,7 @@
                     <b-col sm="4">
                         <v-select  :options="selectOption"
                             v-model="selectedOption"
-                            v-on:input="onInput(selectedOption)">
+                            @input="onInput(selectedOption)">
                         </v-select>
                     </b-col>
                 </b-row>
@@ -89,7 +89,13 @@
     methods: {
       fetchDataOpenVul(param) {
         if (this.param && this.org && this.token) {
-          axios.get('/closedvul/app/' + param + '/?true=1')
+          if(this.selectedOption == 'Default View'){
+              var url ='/closedvul/app/' + param + '/?true=1'
+            }
+            else{
+              var url = '/closedvul/app/' + this.param + '/?false=1'
+            }
+          axios.get(url)
             .then(res => {
               this.totalVul = res.data.count
               this.highCount = res.data.severity[3] | 0
@@ -176,7 +182,13 @@
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
-          axios.get('/closedvul/app/' + this.param +  '/?true=1&page=' + event.page)
+          if(this.selectedOption == 'Default View'){
+              var url ='/closedvul/app/' + this.param +'/?true=1&page=' + event.page
+            }
+            else{
+              var url = '/closedvul/app/' + this.param + '/?false=1&page=' + event.page
+            }
+          axios.get(url)
           .then(res => {
             this.totalVul = res.data.count
             this.isLoading = true
@@ -318,7 +330,7 @@
                   }
                   const checkObjectEmpty = Object.keys(multipleVuls).length === 0
                   if (checkObjectEmpty) {
-                    this.items.push({
+                    this.paginationItems.push({
                       cwe: cwe,
                       sev: sev,
                       openFor: openFor,
@@ -330,7 +342,7 @@
                       vulName: vulName
                     })
                   } else {
-                    this.items.push({
+                    this.paginationItems.push({
                       cwe: cwe,
                       sev: sev,
                       openFor: openFor,
@@ -343,6 +355,7 @@
                     })
                   }
                 }
+                this.isLoading = true
                 // this.totalVul = this.items.length
               }).catch(error => {
                 if (error.res.status === 404) {

@@ -81,7 +81,13 @@ export default {
   methods: {
     fetchDataOpenVul() {
       if (this.org && this.token) {
-        axios.get('/closedvul/org/' + this.org + '/?true=1')
+        if(this.selectedOption == 'Default View'){
+          var url ='/closedvul/org/' + this.org + '/?true=1'
+        }
+        else{
+          var url = '/closedvul/org/' + this.org + '/?false=1'
+        }
+        axios.get(url)
           .then(res => {
             this.highCount = res.data.severity[3] | 0
             this.mediumCount = res.data.severity[2] | 0
@@ -168,7 +174,13 @@ export default {
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
-          axios.get('/closedvul/org/' + this.org + '/?true=1&page=' + event.page)
+          if(this.selectedOption == 'Default View'){
+            var url ='/closedvul/org/' + this.org + '/?true=1&page=' + event.page
+          }
+          else{
+            var url = '/closedvul/org/' + this.org + '/?false=1&page=' + event.page
+          }
+          axios.get(url)
           .then(res => {
             this.totalVul = res.data.count
             this.isLoading = true

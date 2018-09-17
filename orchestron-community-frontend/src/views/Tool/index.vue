@@ -94,7 +94,13 @@ export default {
     fetchDataOpenVul() {
       if (this.org && this.token) {
         this.toolName = decodeURIComponent(escape(window.atob(this.param)))
-        axios.get('/openvul/org/' + this.org + '/?tool=' + this.toolName)
+        if(this.sevParam == 'Default View'){
+          var url = '/openvul/org/' + this.org + '/?tool=' + this.toolName 
+        }
+        else{
+          var url = '/openvul/org/' + this.org + '/?tool=' + this.toolName + '&severity=' + this.sevParam 
+        }
+        axios.get(url)
           .then(res => {
             this.totalVul = res.data.count
             this.items = []
@@ -186,7 +192,13 @@ export default {
         if (this.currentPage > 1) {
           this.sevUrl = '/org/individual_tool/' + this.param + '/severity_wise/'
           this.toolName = decodeURIComponent(escape(window.atob(this.param)))
-          axios.get('/openvul/org/' + this.org + '/?tool=' + this.toolName + '&page=' + event.page)
+          if(this.sevParam == 'Default View'){
+            var url = '/openvul/org/' + this.org + '/?tool=' + this.toolName + '&page=' + event.page
+          }
+          else{
+            var url = '/openvul/org/' + this.org + '/?tool=' + this.toolName + '&severity=' + this.sevParam +'&page='+ event.page
+          }
+          axios.get(url)
             .then(res => {
               this.isLoading = true
               this.paginationItems = []

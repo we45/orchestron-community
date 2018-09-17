@@ -84,7 +84,13 @@
       fetchDataOpenVul(param) {
         if (this.org && this.token && this.param) {
           this.headerTitle = 'Open Vulnerabilities'
-          axios.get('/openvul/app/' + param + '/?true=1')
+          if(this.selectedOption == 'Default View'){
+              var url ='/openvul/app/' + param + '/?true=1'
+            }
+            else{
+              var url = '/openvul/app/' + this.param + '/?false=1'
+            }
+          axios.get(url)
             .then(res => {
               this.totalVul = res.data.count
               this.highCount = 0
@@ -326,7 +332,13 @@
           this.currentPage = event.page
           if (this.currentPage > 1) {
             this.headerTitle = 'Open Vulnerabilities'
-            axios.get('/openvul/app/' + this.param + '/?true=1&page=' + event.page)
+             if(this.selectedOption == 'Default View'){
+              var url ='/openvul/app/' + this.param + '/?true=1&page=' + event.page
+            }
+            else{
+              var url = '/openvul/app/' + this.param + '/?false=1&page=' + event.page
+            }
+            axios.get(url)
               .then(res => {
                 this.isLoading = true
                 this.items = []
