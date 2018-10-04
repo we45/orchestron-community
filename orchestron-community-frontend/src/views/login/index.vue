@@ -67,7 +67,7 @@ export default {
       this.isLogin = true
       if(this.isLogin){
       const baseURL = conf.API_URL
-      const loginUrl = "http://127.0.0.1:8000" + '/api/user/token/'
+      const loginUrl = baseURL + '/api/user/token/'
       axios.post(loginUrl, {
         email: this.email,
         password: this.password
