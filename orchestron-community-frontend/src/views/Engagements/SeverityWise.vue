@@ -9,7 +9,7 @@
                     <b-col sm="8" class="m2-top">
                         <p class="text-left">
                             <span class="vul-count">
-                            {{ totalVul }}
+                            {{ totalVul }} 
                             </span>
                         </p>
                     </b-col>
@@ -20,7 +20,12 @@
                         </v-select>
                     </b-col>
                 </b-row>
-                <open-vul-table :dataItems="items"></open-vul-table>
+                <!-- <open-vul-table :dataItems="items"
+                ></open-vul-table> -->
+                <open-vul-table :pageNumberCount="totalVul"
+                        :currentPage="currentPage"
+                        :dataItems="items"
+                        @clickPagination="clickPagination($event)"></open-vul-table>
             </b-card>
         </b-container>
     </div>
@@ -41,7 +46,8 @@ export default {
       lowCount: 0,
       infoCount: 0,
       selectOption: ['High', 'Medium', 'Low', 'Info'],
-      selectedOption: ''
+      selectedOption: '',
+      currentPage: 0
     }
   },
   components: {
@@ -70,7 +76,10 @@ export default {
         }
         axios.get('/openvul/engagement/' + this.engId + '/?severity=' + this.param)
           .then(res => {
-            if (res.status === 200) {
+            // if (res.status === 200) {
+              this.items = []
+              this.totalVul = res.data.count
+
               for (const val of Object.values(res.data.results)) {
                 const splitVuls = val.names.split(',')
                 const cwe = val.cwe
@@ -121,10 +130,9 @@ export default {
                   })
                 }
               }
-              this.totalVul = this.items.length
-            } else {
-              this.$router.push('/forbidden')
-            }
+            // } else {
+            //   this.$router.push('/forbidden')
+            // }
           }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')
@@ -134,6 +142,83 @@ export default {
               this.$router.push('/error')
             }
           })
+      } else {
+        notValidUser()
+        this.$router.push('/')
+      }
+    },
+     clickPagination(event) {
+      if (event.page) {
+        this.currentPage = event.page
+        if (this.currentPage > 1) {
+          axios.get('/openvul/engagement/' + this.engId + '/?severity=' + this.param+'&page='+event.page)
+          .then(res => {
+            // if (res.status === 200) {
+              this.items = []
+              for (const val of Object.values(res.data.results)) {
+                const splitVuls = val.names.split(',')
+                const cwe = val.cwe
+                const sev = val.severity
+                const openFor = val.aging
+                const tool = val.tools
+                let commonName = ''
+                let vulName = ''
+                let appName = ''
+                const multipleVuls = {}
+                for (const actualVul of splitVuls) {
+                  const vulDetail = actualVul.split('###')
+                  vulName = vulDetail[0]
+                  appName = vulDetail[1]
+                  if (splitVuls.length > 2) {
+                    multipleVuls[vulName] = appName
+                  }
+                }
+                if (val.common_name === null) {
+                  commonName = vulName
+                } else {
+                  commonName = val.common_name
+                }
+                const checkObjectEmpty = Object.keys(multipleVuls).length === 0
+                if (checkObjectEmpty) {
+                  this.items.push({
+                    cwe: cwe,
+                    sev: sev,
+                    openFor: openFor,
+                    commonName: commonName,
+                    name: multipleVuls,
+                    app: appName,
+                    tool: tool,
+                    multiple: false,
+                    vulName: vulName
+                  })
+                } else {
+                  this.items.push({
+                    cwe: cwe,
+                    sev: sev,
+                    openFor: openFor,
+                    commonName: commonName,
+                    name: multipleVuls,
+                    app: appName,
+                    tool: tool,
+                    multiple: true,
+                    vulName: vulName
+                  })
+                }
+              }
+            
+          }).catch(error => {
+            if (error.res.status === 404) {
+              this.$router.push('/not_found')
+            } else if (error.res.status === 403) {
+              this.$router.push('/forbidden')
+            } else {
+              this.$router.push('/error')
+            }
+          })
+          
+           } else {
+          this.fetchSeverityData()
+        }
       } else {
         notValidUser()
         this.$router.push('/')
@@ -156,13 +241,14 @@ export default {
 
         axios.get('/openvul/engagement/' + this.engId + '/?severity=' + this.param)
           .then(res => {
-            if (res.status === 200) {
+            // if (res.status === 200) {
               this.items = []
               this.totalVul = 0
               this.highCount = 0
               this.mediumCount = 0
               this.lowCount = 0
               this.infoCount = 0
+              this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
                 const splitVuls = val.names.split(',')
                 const cwe = val.cwe
@@ -213,10 +299,10 @@ export default {
                   })
                 }
               }
-              this.totalVul = this.items.length
-            } else {
-              this.$router.push('/forbidden')
-            }
+              
+            // } else {
+            //   this.$router.push('/forbidden')
+            // }
           }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')

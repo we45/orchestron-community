@@ -81,12 +81,19 @@ export default {
   methods: {
     fetchDataOpenVul() {
       if (this.org && this.token) {
-        axios.get('/closedvul/org/' + this.org + '/?true=1')
+        if(this.selectedOption == 'Default View'){
+          var url ='/closedvul/org/' + this.org + '/?true=1'
+        }
+        else{
+          var url = '/closedvul/org/' + this.org + '/?false=1'
+        }
+        axios.get(url)
           .then(res => {
             this.highCount = res.data.severity[3] | 0
             this.mediumCount = res.data.severity[2] | 0
             this.lowCount = res.data.severity[1] | 0
             this.infoCount = res.data.severity[0] | 0
+            this.items = []
             for (const val of Object.values(res.data.results)) {
               // if (val.severity === 3) {
               //   this.highCount += 1
@@ -167,7 +174,13 @@ export default {
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
-          axios.get('/closedvul/org/' + this.org + '/?true=1&page=' + event.page)
+          if(this.selectedOption == 'Default View'){
+            var url ='/closedvul/org/' + this.org + '/?true=1&page=' + event.page
+          }
+          else{
+            var url = '/closedvul/org/' + this.org + '/?false=1&page=' + event.page
+          }
+          axios.get(url)
           .then(res => {
             this.totalVul = res.data.count
             this.isLoading = true

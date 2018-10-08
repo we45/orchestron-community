@@ -93,6 +93,7 @@ export default {
             localStorage.removeItem('org')
           }
         }).catch(error => {
+          console.log('error',error.response.data)
           localStorage.removeItem('username')
           localStorage.removeItem('token')
           localStorage.removeItem('superuser')

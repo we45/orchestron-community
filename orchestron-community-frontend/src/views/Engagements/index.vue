@@ -264,9 +264,11 @@
           this.isLoading = false
         }
         if (this.isPaginated){
+          // this.fetchData()
+          
           this.$nextTick(() => {
-            this.fetchData()
             this.engagementList = this.engagementPagnatedList
+            // console.log(this)
           })
           this.isPaginated = false
         }
@@ -357,6 +359,10 @@
           }
         },
         createEngagement() {
+          this.engagementName = ''
+          this.engagementDesc = ''
+          this.application = []
+          this.engagementDateRange = ''
           this.$refs.createEngagementModal.show()
         },
         closeCreateEngagement() {

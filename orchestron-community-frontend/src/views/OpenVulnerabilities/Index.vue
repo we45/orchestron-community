@@ -82,10 +82,17 @@ export default {
   methods: {
     fetchData() {
       if (this.org && this.token) {
-        axios.get('/openvul/org/' + this.org + '/?true=1')
+        if(this.selectedOption == 'Default View'){
+          var url ='/openvul/org/' + this.org + '/?true=1'
+        }
+        else{
+          var url = '/openvul/org/' + this.org + '/?false=1'
+        }
+        axios.get(url)
           .then(res => {
             this.headerTitle = 'Open Vulnerabilities'
             this.items = []
+            this.paginationItems = []
             this.totalVul = 0
             this.totalVul = res.data.count
             this.highCount = res.data.severity[3] | 0
@@ -162,7 +169,13 @@ export default {
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
-          axios.get('/openvul/org/' + this.org + '/?true=1&page=' + event.page)
+             if(this.selectedOption == 'Default View'){
+          var url ='/openvul/org/' + this.org + '/?true=1&page=' + event.page
+        }
+        else{
+          var url = '/openvul/org/' + this.org + '/?false=1&page='  + event.page
+        }
+          axios.get(url)
             .then(res => {
               this.headerTitle = 'Open Vulnerabilities'
               this.isLoading = true

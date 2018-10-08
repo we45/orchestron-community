@@ -16,7 +16,7 @@
                     <b-col sm="4">
                         <v-select  :options="selectOption"
                             v-model="selectedOption"
-                            v-on:input="onInput(selectedOption)">
+                            @input="onInput(selectedOption)">
                         </v-select>
                     </b-col>
                 </b-row>
@@ -89,21 +89,31 @@
     methods: {
       fetchDataOpenVul(param) {
         if (this.param && this.org && this.token) {
-          axios.get('/closedvul/app/' + param + '/?true=1')
+          if(this.selectedOption == 'Default View'){
+              var url ='/closedvul/app/' + param + '/?true=1'
+            }
+            else{
+              var url = '/closedvul/app/' + this.param + '/?false=1'
+            }
+          axios.get(url)
             .then(res => {
               this.totalVul = res.data.count
+              this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
               for (const val of Object.values(res.data.results)) {
-                if (val.severity === 3) {
-                  this.highCount += 1
-                } else if (val.severity === 2) {
-                  this.mediumCount += 1
-                } else if (val.severity === 1) {
-                  this.lowCount += 1
-                } else if (val.severity === 0) {
-                  this.infoCount += 1
-                } else {
-                  this.infoCount += 1
-                }
+                // if (val.severity === 3) {
+                //   this.highCount += 1
+                // } else if (val.severity === 2) {
+                //   this.mediumCount += 1
+                // } else if (val.severity === 1) {
+                //   this.lowCount += 1
+                // } else if (val.severity === 0) {
+                //   this.infoCount += 1
+                // } else {
+                //   this.infoCount += 1
+                // }
                 const splitVuls = val.names.split(',')
                 const cwe = val.cwe
                 const sev = val.severity
@@ -172,7 +182,13 @@
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
-          axios.get('/closedvul/app/' + this.param +  '/?true=1&page=' + event.page)
+          if(this.selectedOption == 'Default View'){
+              var url ='/closedvul/app/' + this.param +'/?true=1&page=' + event.page
+            }
+            else{
+              var url = '/closedvul/app/' + this.param + '/?false=1&page=' + event.page
+            }
+          axios.get(url)
           .then(res => {
             this.totalVul = res.data.count
             this.isLoading = true
@@ -254,7 +270,7 @@
             }
           })
         } else {
-          this.fetchDataOpenVul()
+          this.fetchDataOpenVul(this.param)
         }
       } else {
         notValidUser()
@@ -274,22 +290,22 @@
                 this.infoCount = 0
                 this.currentPage = 0
                 this.currentPage = res.data.count
-                // this.highCount = res.data.severity[3] | 0
-                // this.mediumCount = res.data.severity[2] | 0
-                // this.lowCount = res.data.severity[1] | 0
-                // this.infoCount = res.data.severity[0] | 0
-                for (const val of Object.values(res.data.results)) {
-                  if (val.severity === 3) {
-                    this.highCount += 1
-                  } else if (val.severity === 2) {
-                    this.mediumCount += 1
-                  } else if (val.severity === 1) {
-                    this.lowCount += 1
-                  } else if (val.severity === 0) {
-                    this.infoCount += 1
-                  } else {
-                    this.infoCount += 1
-                  }
+                this.highCount = res.data.severity[3] | 0
+                this.mediumCount = res.data.severity[2] | 0
+                this.lowCount = res.data.severity[1] | 0
+                this.infoCount = res.data.severity[0] | 0
+                for (const val of Object.values({}, res.data.results)) {
+                  // if (val.severity === 3) {
+                  //   this.highCount += 1
+                  // } else if (val.severity === 2) {
+                  //   this.mediumCount += 1
+                  // } else if (val.severity === 1) {
+                  //   this.lowCount += 1
+                  // } else if (val.severity === 0) {
+                  //   this.infoCount += 1
+                  // } else {
+                  //   this.infoCount += 1
+                  // }
                   const splitVuls = val.names.split(',')
                   const cwe = val.cwe
                   const sev = val.severity
@@ -314,7 +330,7 @@
                   }
                   const checkObjectEmpty = Object.keys(multipleVuls).length === 0
                   if (checkObjectEmpty) {
-                    this.items.push({
+                    this.paginationItems.push({
                       cwe: cwe,
                       sev: sev,
                       openFor: openFor,
@@ -326,7 +342,7 @@
                       vulName: vulName
                     })
                   } else {
-                    this.items.push({
+                    this.paginationItems.push({
                       cwe: cwe,
                       sev: sev,
                       openFor: openFor,
@@ -339,6 +355,7 @@
                     })
                   }
                 }
+                this.isLoading = true
                 // this.totalVul = this.items.length
               }).catch(error => {
                 if (error.res.status === 404) {
