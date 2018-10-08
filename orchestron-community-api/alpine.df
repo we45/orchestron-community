@@ -1,0 +1,18 @@
+FROM python:3.6-alpine
+
+RUN  apk update && apk add ca-certificates wget curl nmap vim supervisor mariadb-dev jpeg-dev zlib-dev g++ gcc libxslt-dev py-mysqldb && update-ca-certificates
+
+COPY requirements.txt /webapps/orchestron_community_api/requirements.txt
+COPY gunstart /webapps/orchestron_community_api/
+COPY orchy_api.conf /etc/supervisor/conf.d/
+
+RUN	chmod +x /webapps/orchestron_community_api/gunstart && mkdir /webapps/orchestron_community_api/logs
+
+RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && pip3 install -r /webapps/orchestron_community_api/requirements.txt && pip3 install gunicorn pillow
+COPY /orchy_project /webapps/orchestron_community_api
+
+COPY alpine-migrations.sh /webapps/orchestron_community_api/
+COPY wait-for /webapps/orchestron_community_api/
+WORKDIR /webapps/orchestron_community_api/
+
+CMD supervisord

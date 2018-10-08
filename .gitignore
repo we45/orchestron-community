@@ -4,3 +4,4 @@ orchestron-community-api/orchy_project/*.pyc
 orchestron-community-api/orchy_project/orchy_project/*.pyc
 orchestron-community-api/orchy_project/api/*.pyc
 orchestron-community-api/orchy_project/api/media/*
+._*
