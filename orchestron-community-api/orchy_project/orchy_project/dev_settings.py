@@ -85,6 +85,7 @@ CORS_ALLOW_METHODS = (
     'PUT',
 )
 
+JANATHA_CLASS = [16,200,295]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
