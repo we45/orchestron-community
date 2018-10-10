@@ -51,6 +51,7 @@ from django.utils import timezone
 from api.orl import get_open_vul_info_from_api, get_open_vul_name_from_api
 from api import jira_utils as jira
 from api.db_funcs import Aging
+from six import string_types
 
 
 class MediaServeView(APIView):
@@ -1331,9 +1332,12 @@ class RemediateOpenVulnerabilityView(viewsets.ModelViewSet):
         image_file_name = ''
         file = evid.get('file')
         if file:
-            name, ext = os.path.splitext(file.name)
-            image_file_name = '{0}{1}{2}'.format(settings.REMEDY_MEDIA_URL,str(uuid4()),ext)
-            MinioUtil().upload_file(image_file_name,file)
+            if isinstance(file,string_types):
+                image_file_name = file
+            else:
+                name, ext = os.path.splitext(file.name)
+                image_file_name = '{0}{1}{2}'.format(settings.REMEDY_MEDIA_URL,str(uuid4()),ext)
+                MinioUtil().upload_file(image_file_name,file)
         serializer.validated_data['file'] = image_file_name
         serializer.validated_data['remediated_by'] = self.request.user.id
         serializer.validated_data['remediated_on'] = timezone.now()        
