@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
-
-RUN apt-get update --fix-missing && apt-get install -y wget apt-transport-https && apt-get update --fix-missing && \
-	apt-get install -y git-core vim curl build-essential python2.7-dev libssl-dev libffi-dev \
+ 
+RUN apt-get update --fix-missing && apt-get install -y wget apt-transport-https git-core vim curl build-essential python2.7-dev libssl-dev libffi-dev \
 	libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev \
 	python3-tk libxml2-dev libxslt1-dev supervisor  libfontconfig1 chrpath libxft-dev \
 	libmysqlclient-dev python-software-properties software-properties-common libsasl2-dev python3-dev libldap2-dev \
