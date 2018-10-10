@@ -97,6 +97,7 @@
             }
           axios.get(url)
             .then(res => {
+              this.items = []
               this.totalVul = res.data.count
               this.highCount = res.data.severity[3] | 0
               this.mediumCount = res.data.severity[2] | 0
@@ -475,4 +476,3 @@
     line-height: 0.33;
   }
 </style>
-

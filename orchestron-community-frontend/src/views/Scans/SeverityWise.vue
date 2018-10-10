@@ -68,6 +68,7 @@ export default {
         axios.get('/scans/' + this.scanId + '/?severity=' + this.param)
           .then(res => {
             this.appId = res.data.application
+            this.sevData = []
             for (const vul of res.data.vuls) {
               for (const val of Object.values(vul)) {
                 this.sevData.push({

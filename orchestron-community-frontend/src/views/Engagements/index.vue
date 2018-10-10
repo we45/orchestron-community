@@ -279,6 +279,7 @@
             this.engagementList = []
             axios.get('/engagements/')
               .then(res => {
+                this.engagementList = []
                 this.engagementsCount = res.data.count
                 for (const value of res.data.results) {
 
