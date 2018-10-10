@@ -163,19 +163,20 @@ class OrganizationSerializer(serializers.ModelSerializer):
 		return obj.project_set.count()
 
 	def validate(self, data):
-		logo = data.get('logo')
-		name = data.get('name')
-		if not logo:
-			today = datetime.today()
-			file_path = "{0}{1}/{2}/{3}/".format(settings.ORGANIZATION_MEDIA_URL,today.year,today.month,today.day)
-			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
-			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
-			if not os.path.isdir(dir_path):
-				os.makedirs(dir_path)
-			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
-			draw_thumnail(name, full_path)
-			MinioUtil().upload_file_from_path(file_name,full_path)
-			data['logo'] = file_name
+		if not hasattr(self.instance,'logo'):
+			logo = data.get('logo')
+			name = data.get('name')
+			if not logo:
+				today = datetime.today()
+				file_path = "{0}{1}/{2}/{3}/".format(settings.ORGANIZATION_MEDIA_URL,today.year,today.month,today.day)
+				file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+				dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+				if not os.path.isdir(dir_path):
+					os.makedirs(dir_path)
+				full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+				draw_thumnail(name, full_path)
+				MinioUtil().upload_file_from_path(file_name,full_path)
+				data['logo'] = file_name
 		return data	
 
 
@@ -260,21 +261,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		read_only_fields = ['last_login']	
 
 	def validate(self, data):
-		img = data.get('img')
-		first_name = data.get('first_name')
-		last_name = data.get('last_name','')
-		name = '{0} {1}'.format(first_name.lstrip(),last_name.lstrip())
-		if not img:
-			today = datetime.today()
-			file_path = "{0}{1}/{2}/{3}/".format(settings.USER_MEDIA_URL,today.year,today.month,today.day)
-			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
-			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
-			if not os.path.isdir(dir_path):
-				os.makedirs(dir_path)
-			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
-			draw_thumnail(name, full_path)
-			MinioUtil().upload_file_from_path(file_name,full_path)
-			data['img'] = file_name
+		if not hasattr(self.instance,'img'):
+			img = data.get('img')
+			first_name = data.get('first_name')
+			last_name = data.get('last_name','')
+			name = '{0} {1}'.format(first_name.lstrip(),last_name.lstrip())
+			if not img:
+				today = datetime.today()
+				file_path = "{0}{1}/{2}/{3}/".format(settings.USER_MEDIA_URL,today.year,today.month,today.day)
+				file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+				dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+				if not os.path.isdir(dir_path):
+					os.makedirs(dir_path)
+				full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+				draw_thumnail(name, full_path)
+				MinioUtil().upload_file_from_path(file_name,full_path)
+				data['img'] = file_name
 		return data				
 
 
@@ -310,19 +312,20 @@ class ProjectSerializer(serializers.ModelSerializer):
 		super(ProjectSerializer, self).__init__(*args, **kwargs)
 
 	def validate(self, data):
-		logo = data.get('logo')
-		name = data.get('name')
-		if not logo:
-			today = datetime.today()
-			file_path = "{0}{1}/{2}/{3}/".format(settings.PROJECT_MEDIA_URL,today.year,today.month,today.day)
-			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
-			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
-			if not os.path.isdir(dir_path):
-				os.makedirs(dir_path)
-			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
-			draw_thumnail(name, full_path)
-			MinioUtil().upload_file_from_path(file_name,full_path)
-			data['logo'] = file_name
+		if not hasattr(self.instance,'logo'):
+			logo = data.get('logo')
+			name = data.get('name')
+			if not logo:
+				today = datetime.today()
+				file_path = "{0}{1}/{2}/{3}/".format(settings.PROJECT_MEDIA_URL,today.year,today.month,today.day)
+				file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+				dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+				if not os.path.isdir(dir_path):
+					os.makedirs(dir_path)
+				full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+				draw_thumnail(name, full_path)
+				MinioUtil().upload_file_from_path(file_name,full_path)
+				data['logo'] = file_name
 		return data
 
 
@@ -346,19 +349,20 @@ class ApplicationSerializer(serializers.ModelSerializer):
 		return OrganizationSerializer(obj.org,context=self.context).data
 
 	def validate(self, data):
-		logo = data.get('logo')
-		name = data.get('name')
-		if not logo:
-			today = datetime.today()
-			file_path = "{0}{1}/{2}/{3}/".format(settings.APPLICATION_MEDIA_URL,today.year,today.month,today.day)
-			file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
-			dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
-			if not os.path.isdir(dir_path):
-				os.makedirs(dir_path)
-			full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
-			draw_thumnail(name, full_path)
-			MinioUtil().upload_file_from_path(file_name,full_path)
-			data['logo'] = file_name
+		if not hasattr(self.instance,'logo'):
+			logo = data.get('logo')
+			name = data.get('name')
+			if not logo:
+				today = datetime.today()
+				file_path = "{0}{1}/{2}/{3}/".format(settings.APPLICATION_MEDIA_URL,today.year,today.month,today.day)
+				file_name = "{0}{1}".format(file_path,'{0}.png'.format(uuid.uuid4()))
+				dir_path = os.path.join(settings.MEDIA_ROOT,file_path)
+				if not os.path.isdir(dir_path):
+					os.makedirs(dir_path)
+				full_path = os.path.join(dir_path,'{0}.png'.format(uuid.uuid4()))
+				draw_thumnail(name, full_path)
+				MinioUtil().upload_file_from_path(file_name,full_path)
+				data['logo'] = file_name
 		return data		
 
 
