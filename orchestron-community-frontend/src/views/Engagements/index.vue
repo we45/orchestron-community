@@ -362,7 +362,7 @@
         createEngagement() {
           this.engagementName = ''
           this.engagementDesc = ''
-          this.application = []
+          this.application = null
           this.engagementDateRange = ''
           this.$refs.createEngagementModal.show()
         },

@@ -408,7 +408,7 @@
                 })
                   .then(res => {
                     this.$refs.addVulnerabilityModal.hide()
-                    this.$router.push('/projects/individual_application/'+ this.appId  + '/individual_scan/'+ this.scanId +'/' )
+                    this.$router.go('/projects/individual_application/'+ this.appId  + '/individual_scan/'+ this.scanId +'/' )
                     this.$notify({
                       group: 'foo',
                       type: 'success',

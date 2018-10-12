@@ -398,7 +398,7 @@
         parsingScanId: '',
         showConfig: false,
         appJiraProject: '',
-        appJiraProjectOptions: ''
+        appJiraProjectOptions: null
       }
     },
     validations: {
