@@ -573,7 +573,7 @@
                   .get('/organizations/' + this.org + '/jira/')
                   .then(res => {
                     axios
-                      .get('jira/projects/' + this.org + '/')
+                      .get('jira/projects/' + this.param + '/')
                       .then(res => {
                         this.appJiraProjectOptions = res.data
                         this.isLoading = false
