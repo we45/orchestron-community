@@ -137,7 +137,7 @@ export default {
                   multipleVuls[vulName] = appName
                 }
               }
-              if (commonName === null) {
+              if (commonName === '') {
                 if (val.common_name === null) {
                   commonName = vulName
                 } else {
@@ -221,7 +221,7 @@ export default {
                     multipleVuls[vulName] = appName
                   }
                 }
-                if (commonName === null) {
+                if (commonName === '') {
                   if (val.common_name === null) {
                     commonName = vulName
                   } else {

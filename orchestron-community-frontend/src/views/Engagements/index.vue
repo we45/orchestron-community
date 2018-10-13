@@ -279,6 +279,7 @@
             this.engagementList = []
             axios.get('/engagements/')
               .then(res => {
+                this.engagementList = []
                 this.engagementsCount = res.data.count
                 for (const value of res.data.results) {
 
@@ -361,7 +362,7 @@
         createEngagement() {
           this.engagementName = ''
           this.engagementDesc = ''
-          this.application = []
+          this.application = null
           this.engagementDateRange = ''
           this.$refs.createEngagementModal.show()
         },
