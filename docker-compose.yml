@@ -15,7 +15,7 @@ services:
         depends_on:
             - api
         environment:
-            - API_URL=http://192.168.1.122
+            - API_URL=api
         links:
             - api
     api:
