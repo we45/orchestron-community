@@ -3,6 +3,7 @@ from django.http import HttpResponseForbidden
 from django.core.exceptions import ObjectDoesNotExist
 from api.app_log import critical_debug_log
 from django.conf import settings
+from api.orchy_logger import log
 
 
 class ExceptionMiddleware(object):
@@ -10,13 +11,12 @@ class ExceptionMiddleware(object):
 		self.get_response = get_response
 
 	def __call__(self, request):
-		return self.get_response(request)
+		log.info('{0} has been accessed by {1}'.format(request.path,request.user))
+		return self.get_response(request)	
 
 	def process_exception(self, request, exception):
+		log.error('Exception {0} has been raised'.format(exception))
 		if isinstance(exception,ObjectDoesNotExist):
-			return JsonResponse({'Error':'Object does not exists'},status=404)
-		# elif isinstance(exception,BaseException):
-		# 	critical_debug_log(ip=request.get_host(), user=request.user.username, event=exception, status='failure')
-		# 	return JsonResponse({'Status':'Error'},status=500)			
+			return JsonResponse({'Error':'Object does not exists'},status=404)	
 
 		

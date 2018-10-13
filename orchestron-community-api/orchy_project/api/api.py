@@ -52,6 +52,7 @@ from api.orl import get_open_vul_info_from_api, get_open_vul_name_from_api
 from api import jira_utils as jira
 from api.db_funcs import Aging
 from six import string_types
+from api.orchy_logger import log
 
 
 class MediaServeView(APIView):
@@ -115,6 +116,7 @@ class BaseView(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(obj,context={'request':request})
+        log.info('Retrieved a single object of {0} with primary key {1}'.format(self.model_class.__name__,pk))
         return Response(serializer.data)       
 
     def list(self, request):
@@ -129,8 +131,10 @@ class BaseView(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True, context={'request':request})
+            log.info('Retrieved a list of objects from model {0} by {1}'.format(self.model_class.__name__,request.user))
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True,context={'request':request})
+        log.info('Retrieved a list of objects from model {0} by {1}'.format(self.model_class.__name__,request.user))
         return Response(serializer.data)
 
     def create(self, request):
@@ -143,6 +147,7 @@ class BaseView(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data,context={'request':request})
         if serializer.is_valid():
             serializer.save()
+            log.info('Created an instance of {0} by {1}'.format(self.model_class.__name__,request.user))
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -158,6 +163,7 @@ class BaseView(viewsets.ModelViewSet):
         serializer = self.serializer_class(obj, data=request.data,context={'request':request})
         if serializer.is_valid():
             serializer.save()
+            log.info('Updated an instance of {0} of primary key {1} by {2}'.format(self.model_class.__name__,pk,request.user))
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -171,6 +177,7 @@ class BaseView(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
+        log.info('Deleted an instance of {0} of primary key {1} by {2}'.format(self.model_class.__name__,pk,request.user))
         return Response({'name':obj.name, 'message':'Successfully Deleted'}, status=status.HTTP_200_OK) 
 
     def get_open_vuls(self, kwargs):
@@ -584,6 +591,7 @@ class OrganizationView(BaseView):
         return context                        
 
     def create(self, request):
+        log.info('Community will only allow single organization')
         raise Unauthorized
 
     def retrieve(self, request, pk=None):
