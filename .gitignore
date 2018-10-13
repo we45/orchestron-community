@@ -1,10 +1,11 @@
+._*
 orchestron-community-api/orchy_project/db.sqlite3
 *.pyc
 orchestron-community-api/orchy_project/*.pyc
 orchestron-community-api/orchy_project/orchy_project/*.pyc
 orchestron-community-api/orchy_project/api/*.pyc
 orchestron-community-api/orchy_project/api/media/*
-._*
 orchestron_community_mysql
 orchestron-community-minio
 orchestron-community_migrations
+

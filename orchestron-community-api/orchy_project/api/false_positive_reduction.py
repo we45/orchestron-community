@@ -114,7 +114,7 @@ def write_results_to_db(data):
         reduce the false positives. 
     """
     try:
-        vul_name = str(data.get('vulnerability',{}).get('name','')).strip().lower().title()
+        vul_name = str(data.get('vulnerability',{}).get('name',''))
 
         severity_dict = {4:3,3:3,2:2,1:1,0:0}   
         cvss_dict = {3:7.5,2:4.5,1:2.5,0:0}     

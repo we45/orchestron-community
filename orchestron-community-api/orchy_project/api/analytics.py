@@ -21,209 +21,221 @@ import math
 from api.tasks import webhook_upload, webhook_process_json, raise_jira_ticket
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.pagination import OrchyPagination
+from django.conf import settings
 
 
 class OpenVulnerabilityStatView(viewsets.ViewSet):
-	def get_open_vul_query(self, kwargs={}, exclude_kwargs={}):
-		return Vulnerability.objects.filter(is_remediated=False,is_false_positive=False).filter(**kwargs)\
-			.exclude(**exclude_kwargs)\
-			.values('cwe')\
-			.distinct()\
-			.order_by('cwe')
+    def get_open_vul_query(self, kwargs={}, exclude_kwargs={}):
+        new_kwargs = kwargs
+        new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
+        open_vuls = Vulnerability.objects.filter(is_remediated=False).filter(**new_kwargs)\
+            .exclude(**exclude_kwargs)\
+            .exclude(cwe__in=settings.JANATHA_CLASS)\
+            .values('cwe')\
+            .distinct()\
+            .order_by('cwe')
+        janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=False).filter(**new_kwargs)\
+            .exclude(**exclude_kwargs)\
+            .values('cwe')\
+            .distinct()\
+            .order_by('cwe') 
+        return open_vuls | janatha_vuls          
 
-	def vuls(self, kwargs={}, exclude_kwargs={}):
-		ReportProcedures.set_max_value()
-		raw_vuls = self.get_open_vul_query(kwargs, exclude_kwargs)
-		open_vuls = raw_vuls.annotate(tools=GroupConcat('tool',distinct=True),\
-				count=Count('name',distinct=True),\
-				severity=Max('severity'),\
-				bug_id=F('jira_id'),\
-				bug_status=F('jira_issue_status'),\
-				apps=GroupConcat('scan__application__name',distinct=True),\
-				common_name=GroupConcat('common_name',distinct=True),\
-				open_for=Aging('created_on'),\
-				names=GroupConcat(Concat('name',V('###'),'scan__application__name'),distinct=True))			
-		return open_vuls
+    def vuls(self, kwargs={}, exclude_kwargs={}):
+        ReportProcedures.set_max_value()
+        raw_vuls = self.get_open_vul_query(kwargs, exclude_kwargs)     
+        open_vuls = raw_vuls.annotate(tools=GroupConcat('tool',distinct=True),\
+                count=Count('name',distinct=True),\
+                apps=GroupConcat('scan__application__name',distinct=True),\
+                common_name=GroupConcat('common_name',distinct=True),\
+                open_for=Aging('created_on'),\
+                names=GroupConcat(Concat('name',V('###'),'scan__application__name',V('###'),'jira_id',V('###'),'jira_issue_status'),distinct=True))         
+        return open_vuls.values('tools','severity','apps','common_name','open_for','names','cwe','count').order_by('-severity')
 
-	def avg_ageing(self, kwargs={}, exclude_kwargs={}):
-		ReportProcedures.set_max_value()
-		raw_vuls = self.get_open_vul_query(kwargs, exclude_kwargs)
-		open_vuls = raw_vuls.annotate(open_for=Aging('created_on'))	
-		all_ageing_count = [v.get('open_for') for v in open_vuls]
-		avg_ageing_val = 0	
-		if all_ageing_count:
-			avg_ageing_val = math.ceil(sum(all_ageing_count)/len(all_ageing_count))
-		return avg_ageing_val		
+    def avg_ageing(self, kwargs={}, exclude_kwargs={}):
+        raw_vuls = self.get_open_vul_query(kwargs, exclude_kwargs)
+        open_vuls = raw_vuls.annotate(open_for=Aging('created_on')) 
+        avg_ageing_val = 0  
+        if open_vuls:
+            all_ageing_count = [v.get('open_for') for v in open_vuls]
+            if all_ageing_count:
+                avg_ageing_val = math.ceil(sum(all_ageing_count)/len(all_ageing_count))
+        return avg_ageing_val       
 
-	def count(self, kwargs={}, exclude_kwargs={}):
-		return self.get_open_vul_query(kwargs, exclude_kwargs).count()
+    def count(self, kwargs={}, exclude_kwargs={}):
+        vuls = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
+        return sum(dict(Counter(vuls)).values())
 
-	def max_min_cvss(self, kwargs={}, exclude_kwargs={}):
-		cvss = self.get_open_vul_query(kwargs, exclude_kwargs).aggregate(max_cvss=Max('cvss'),min_cvss=Min('cvss'))
-		return cvss
+    def max_min_cvss(self, kwargs={}, exclude_kwargs={}):
+        cvss = self.get_open_vul_query(kwargs, exclude_kwargs).aggregate(max_cvss=Max('cvss'),min_cvss=Min('cvss'))
+        return cvss
 
-	def risks(self, kwargs={}, exclude_kwargs={}):
-		cwes = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('scan__application__org','cwe')
-		risk_list = []
-		for org,cwe in cwes:
-			if org.orl_config_exists():
-				vul_info = get_open_vul_info_from_api(cwe,org)
-				risk_list.extend(vul_info.get('risk',[]))
-		return list(set(risk_list))
+    def risks(self, kwargs={}, exclude_kwargs={}):
+        cwes = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('scan__application__org','cwe')
+        risk_list = []
+        for org,cwe in cwes:
+            if org.orl_config_exists():
+                vul_info = get_open_vul_info_from_api(cwe,org)
+                risk_list.extend(vul_info.get('risk',[]))
+        return list(set(risk_list))
 
-	def severity_count(self, kwargs={}, exclude_kwargs={}):
-		severities = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(severity=Max('severity'))\
-		.values_list('severity',flat=True)
-		return dict(Counter(severities))
+    def severity_count(self, kwargs={}, exclude_kwargs={}):
+        sevs = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
+        return dict(Counter(sevs))
 
-	def cwe_severity_count(self, kwargs={}, exclude_kwargs={}):
-		cwes = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(severity=Max('severity'))\
-		.values_list('cwe','severity')
-		return self.process_list(cwes)
+    def cwe_severity_count(self, kwargs={}, exclude_kwargs={}):
+        cwes = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('cwe','severity')
+        return self.process_list(cwes)
 
-	def tool_severity_count(self, kwargs={}, exclude_kwargs={}):
-		tools = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(severity=Max('severity'))\
-		.values_list('tool','severity')
-		return self.process_list(tools)		
+    def tool_severity_count(self, kwargs={}, exclude_kwargs={}):
+        tools = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('tool','severity')
+        return self.process_list(tools)     
 
-	def owasp_severity_count(self, kwargs={}, exclude_kwargs={}):
-		owasps = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(severity=Max('severity'))\
-		.values_list('owasp','severity')
-		return self.process_list(owasps)
+    def owasp_severity_count(self, kwargs={}, exclude_kwargs={}):
+        owasps = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('owasp','severity')
+        return self.process_list(owasps)
 
-	def scan_severity_count(self, kwargs={}, exclude_kwargs={}):
-		scans = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(severity=Max('severity'))\
-		.values_list('scan__short_name','severity')
-		return self.process_list(scans)		
+    def scan_severity_count(self, kwargs={}, exclude_kwargs={}):
+        scans = self.get_open_vul_query(kwargs, exclude_kwargs)\
+        .values_list('scan__short_name','severity')
+        return self.process_list(scans)     
 
-	def application_severity_count(self, kwargs={}, exclude_kwargs={}):
-		applications = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(severity=Max('severity'))\
-		.values_list('scan__application__id','scan__application__name','severity')
-		return self.process_apps(applications)	
+    def application_severity_count(self, kwargs={}, exclude_kwargs={}):
+        applications = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('scan__application__id','scan__application__name','severity')
+        return self.process_apps(applications)
 
-	def months_count(self, kwargs={}, exclude_kwargs={}):
-		months = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(m=ExtractMonth('created_on'),y=ExtractYear('created_on'),month=Concat(V('01'),V('-'),'m',V('-'),'y'))\
-		.values_list('month',flat=True)
-		return dict(Counter(months))
+    def months_count(self, kwargs={}, exclude_kwargs={}):
+        months = self.get_open_vul_query(kwargs, exclude_kwargs)\
+        .annotate(m=ExtractMonth('created_on'),y=ExtractYear('created_on'),month=Concat(V('01'),V('-'),'m',V('-'),'y'))\
+        .values_list('month',flat=True)
+        return dict(Counter(months))
 
-	def month_severity_count(self, kwargs={}, exclude_kwargs={}):
-		months = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(m=ExtractMonth('created_on'),y=ExtractYear('created_on'),\
-			month=Concat(V('01'),V('-'),'m',V('-'),'y'),severity=Max('severity'))\
-		.values_list('month','severity')
-		return self.process_list(months)	
+    def month_severity_count(self, kwargs={}, exclude_kwargs={}):
+        months = self.get_open_vul_query(kwargs, exclude_kwargs)\
+        .annotate(m=ExtractMonth('created_on'),y=ExtractYear('created_on'),\
+            month=Concat(V('01'),V('-'),'m',V('-'),'y'),severity=F('severity'))\
+        .values_list('month','severity')
+        return self.process_list(months)    
 
-	def years_count(self, kwargs={}, exclude_kwargs={}):
-		years = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(year=ExtractYear('created_on'))\
-		.values_list('year',flat=True)
-		return dict(Counter(years))
+    def years_count(self, kwargs={}, exclude_kwargs={}):
+        years = self.get_open_vul_query(kwargs, exclude_kwargs)\
+        .annotate(year=ExtractYear('created_on'))\
+        .values_list('year',flat=True)
+        return dict(Counter(years))
 
-	def year_severity_count(self, kwargs={}, exclude_kwargs={}):
-		years = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(year=ExtractYear('created_on'),severity=Max('severity'))\
-		.values_list('year','severity')
-		return self.process_list(years)	
+    def year_severity_count(self, kwargs={}, exclude_kwargs={}):
+        years = self.get_open_vul_query(kwargs, exclude_kwargs)\
+        .annotate(year=ExtractYear('created_on'),severity=F('severity'))\
+        .values_list('year','severity')
+        return self.process_list(years) 
 
-	def grade(self, kwargs={}, exclude_kwargs={}):
-		cvss_dread_list = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('cvss','dread')
-		value = max([(y[0] or 0 + y[1] or 0) / 2 for y in cvss_dread_list] or [0])
-		if value >= 1 and value <= 29:
-			return 'F'
-		elif value >= 30 and value <= 44:
-			return 'E'
-		elif value >= 45 and value <= 59:
-			return 'D'
-		elif value >= 60 and value <= 74:
-			return 'C'
-		elif value >= 75 and value <= 89:
-			return 'B'
-		elif value >= 90 and value <= 100:
-			return 'A'
-		else:
-			return 'No Data'							
+    def grade(self, kwargs={}, exclude_kwargs={}):
+        cvss_dread_list = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('cvss','dread')
+        value = max([(y[0] or 0 + y[1] or 0) / 2 for y in cvss_dread_list] or [0])
+        if value >= 1 and value <= 29:
+            return 'F'
+        elif value >= 30 and value <= 44:
+            return 'E'
+        elif value >= 45 and value <= 59:
+            return 'D'
+        elif value >= 60 and value <= 74:
+            return 'C'
+        elif value >= 75 and value <= 89:
+            return 'B'
+        elif value >= 90 and value <= 100:
+            return 'A'
+        else:
+            return 'No Data'                            
 
-	def aging_count(self, kwargs={}, exclude_kwargs={}):
-		aging_list = self.get_open_vul_query(kwargs, exclude_kwargs)\
-		.annotate(open_for=Aging('created_on'))\
-		.values_list('open_for',flat=True)
-		days = dict(Counter(aging_list))
-		days_list = []
-		for day, count in days.items():
-			if day <= 5:
-				days_list.append(('0-5 days',count))
-			elif day > 5 and day <= 10: 
-				days_list.append(('6-10 days',count))
-			elif day > 10 and day <= 20: 
-				days_list.append(('11-20 days',count))
-			elif day > 20 and day <= 40: 
-				days_list.append(('21-40 days',count))
-			elif day > 40 and day <= 80: 
-				days_list.append(('41-80 days',count))
-			elif day > 80 and day <= 100: 
-				days_list.append(('81-100 days',count))
-			elif day > 100:
-				days_list.append(('More than 100 days',count))
-		return days_list
+    def aging_count(self, kwargs={}, exclude_kwargs={}):
+        aging_list = self.get_open_vul_query(kwargs, exclude_kwargs)\
+        .annotate(open_for=Aging('created_on'))\
+        .values_list('open_for',flat=True)
+        days = dict(Counter(aging_list))
+        days_list = []
+        for day, count in days.items():
+            if day <= 5:
+                days_list.append(('0-5 days',count))
+            elif day > 5 and day <= 10: 
+                days_list.append(('6-10 days',count))
+            elif day > 10 and day <= 20: 
+                days_list.append(('11-20 days',count))
+            elif day > 20 and day <= 40: 
+                days_list.append(('21-40 days',count))
+            elif day > 40 and day <= 80: 
+                days_list.append(('41-80 days',count))
+            elif day > 80 and day <= 100: 
+                days_list.append(('81-100 days',count))
+            elif day > 100:
+                days_list.append(('More than 100 days',count))
+        return days_list
 
-	def heatmap(self, user, kwargs={}):
-		scans = Scan.objects.filter(**kwargs).annotate(date=ExtractDate('created_on')).values('date').annotate(count=Count('id')).order_by('date').values_list('date','count')					
-		return scans
+    def heatmap(self, kwargs={}):
+        scans = Scan.objects.filter(**kwargs).annotate(date=ExtractDate('created_on')).values('date').annotate(count=Count('id')).order_by('date').values_list('date','count')                    
+        return scans
 
-	def process_list(self, data_list):
-		d = {}
-		for c,i in data_list:
-			if c not in d:
-				d[c] = {0:0,1:0,2:0,3:0}
-			d[c][i] = d[c][i] + 1				
-		return d
+    def process_list(self, data_list):
+        d = {}
+        for c,i in data_list:
+            if c not in d:
+                d[c] = {0:0,1:0,2:0,3:0}
+            d[c][i] = d[c][i] + 1               
+        return d
 
-	def process_apps(self, data_list):
-		d = {}
-		for id,app,sev in data_list:
-			if app not in d:
-				d[app] = {}
-				d[app]['id'] = id
-				d[app]['sev'] = {0:0,1:0,2:0,3:0}
-			d[app]['sev'][sev] = d[app]['sev'][sev] + 1				
-		return d		
+    def process_severites(self, normal, janatha):
+        dd = {1:0,2:0,3:0,0:0}
+        for d in (normal, janatha):
+            for key, value in d.items():
+                dd[key] = dd[key] + value
+        return dd       
+
+    def process_apps(self, data_list):
+        d = {}
+        for id,app,sev in data_list:
+            if app not in d:
+                d[app] = {}
+                d[app]['id'] = id
+                d[app]['sev'] = {0:0,1:0,2:0,3:0}
+            d[app]['sev'][sev] = d[app]['sev'][sev] + 1             
+        return d        
 
 
 class ClosedVulnerabilityStatView(viewsets.ViewSet):
-	def get_closed_vul_query(self, kwargs, exclude_kwargs):
-		return Vulnerability.objects.filter(is_remediated=True).filter(**kwargs)\
-			.exclude(**exclude_kwargs)\
-			.values('cwe')\
-			.distinct()\
-			.order_by('cwe')
+    def get_closed_vul_query(self, kwargs, exclude_kwargs):
+        new_kwargs = kwargs
+        new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
+        closed_vuls = Vulnerability.objects.filter(is_remediated=True).filter(**new_kwargs)\
+            .exclude(**exclude_kwargs)\
+            .exclude(cwe__in=settings.JANATHA_CLASS)\
+            .values('cwe')\
+            .distinct()\
+            .order_by('cwe')
+        janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=True).filter(**new_kwargs)\
+            .exclude(**exclude_kwargs)\
+            .values('cwe')\
+            .distinct()\
+            .order_by('cwe') 
+        return closed_vuls | janatha_vuls          
 
-	def vuls(self, kwargs={}, exclude_kwargs={}):
-		ReportProcedures.set_max_value()
-		raw_vuls = self.get_closed_vul_query(kwargs, exclude_kwargs)
-		closed_vuls = raw_vuls.annotate(tools=GroupConcat('tool',distinct=True),\
-				count=Count('name',distinct=True),\
-				severity=Max('severity'),\
-				apps=GroupConcat('scan__application__name',distinct=True),\
-				common_name=GroupConcat('common_name',distinct=True),\
-				created_on=Min('created_on'),\
-				closed_on=Min('vulnerabilityremediation__remediated_on'),\
-				names=GroupConcat(Concat('name',V('###'),'scan__application__name'),distinct=True))			
-		return closed_vuls
+    def vuls(self, kwargs={}, exclude_kwargs={}):
+        ReportProcedures.set_max_value()
+        raw_vuls = self.get_closed_vul_query(kwargs, exclude_kwargs)         
+        closed_vuls = raw_vuls.annotate(tools=GroupConcat('tool',distinct=True),\
+                count=Count('name',distinct=True),\
+                apps=GroupConcat('scan__application__name',distinct=True),\
+                common_name=GroupConcat('common_name',distinct=True),\
+                created_on=Min('created_on'),\
+                closed_on=Min('vulnerabilityremediation__remediated_on'),\
+                names=GroupConcat(Concat('name',V('###'),'scan__application__name',V('###'),'jira_id',V('###'),'jira_issue_status'),distinct=True))         
+        return closed_vuls.values('created_on','closed_on','tools','severity','apps','common_name','names','cwe','count').order_by('-severity')
 
-	def count(self, kwargs={}, exclude_kwargs={}):
-		return self.get_closed_vul_query(kwargs, exclude_kwargs).count()
+    def count(self, kwargs={}, exclude_kwargs={}):
+        vuls = self.get_closed_vul_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
+        return sum(dict(Counter(vuls)).values())
 
-	def severity_count(self, kwargs={}, exclude_kwargs={}):
-		severities = self.get_closed_vul_query(kwargs, exclude_kwargs).annotate(severity=Max('severity'))\
-		.values_list('severity',flat=True)
-		return dict(Counter(severities))		
+    def severity_count(self, kwargs={}, exclude_kwargs={}):
+        sevs = self.get_closed_vul_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
+        return dict(Counter(sevs))
 
 
 class BaseAnalyticsView(OrchyPagination,viewsets.ViewSet):

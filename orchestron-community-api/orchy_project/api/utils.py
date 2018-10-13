@@ -80,6 +80,7 @@ def get_single_vul_context(vuls):
         context[cwe]['tools'].add(v.tool)
         context[cwe]['names'].add((v.name,v.scan.application.name))
         context[cwe]['cvss'] = v.cvss
+        context[cwe]['app_languages'] = v.scan.application.platform_tags
         org_obj = v.scan.application.org
         if org_obj.orl_config_exists():
             vul_info = get_open_vul_info_from_api(cwe,org_obj)

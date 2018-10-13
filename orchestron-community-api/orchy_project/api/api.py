@@ -51,6 +51,7 @@ from django.utils import timezone
 from api.orl import get_open_vul_info_from_api, get_open_vul_name_from_api
 from api import jira_utils as jira
 from api.db_funcs import Aging
+from six import string_types
 
 
 class MediaServeView(APIView):
@@ -1331,9 +1332,12 @@ class RemediateOpenVulnerabilityView(viewsets.ModelViewSet):
         image_file_name = ''
         file = evid.get('file')
         if file:
-            name, ext = os.path.splitext(file.name)
-            image_file_name = '{0}{1}{2}'.format(settings.REMEDY_MEDIA_URL,str(uuid4()),ext)
-            MinioUtil().upload_file(image_file_name,file)
+            if isinstance(file,string_types):
+                image_file_name = file
+            else:
+                name, ext = os.path.splitext(file.name)
+                image_file_name = '{0}{1}{2}'.format(settings.REMEDY_MEDIA_URL,str(uuid4()),ext)
+                MinioUtil().upload_file(image_file_name,file)
         serializer.validated_data['file'] = image_file_name
         serializer.validated_data['remediated_by'] = self.request.user.id
         serializer.validated_data['remediated_on'] = timezone.now()        
@@ -1685,7 +1689,7 @@ class WebhookUploadView(APIView):
                 if webhook_scan_name:
                     scan_short_name = webhook_scan_name
                 else:
-                    scan_short_name = '{0}_{1}_webhook_{2}'.format(tool, application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
+                    scan_short_name = '{0}_{1}_webhook_{2}'.format(webhook_tool, application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
                 scan_name = self.create_scan(webhook_tool, scan_short_name, application, engagement_id)
                 init_json = {
                     'scan_reference':{
@@ -1721,7 +1725,7 @@ class WebhookUploadView(APIView):
             else:
                 return Response({'Error':'Sorry!!! Could not process the event'}, status=status.HTTP_403_FORBIDDEN)            
         except BaseException as e:
-            # print(e)
+            log_exception(e)
             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
 
 

@@ -85,6 +85,7 @@ CORS_ALLOW_METHODS = (
     'PUT',
 )
 
+JANATHA_CLASS = [16,200,295]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -232,6 +233,7 @@ WEBHOOK_TOOLS = {
     'AppScan - SAST':'html',
     'Xanitizer':'xml',
     'HP Fortify':'xml',
+    'FindSecBugs':'xml',
 }
 
 
@@ -245,7 +247,8 @@ HEADER_MAP = {
     'CxXMLResults':'Checkmarx',
     'analysis':'OWASP Dependency Checker',
     'ReportDefinition':'HP Fortify',
-    'XanitizerFindingsList':'Xanitizer'
+    'XanitizerFindingsList':'Xanitizer',
+    'BugCollection':'FindSecBugs'
 }
 
 

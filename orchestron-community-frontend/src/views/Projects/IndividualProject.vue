@@ -438,9 +438,9 @@
         if (this.param && this.org && this.token) {
           this.appName  = ''
           this.appLogo = ''
-          this.appHostType = []
+          this.appHostType = null
           this.appUrl = ''
-          this.appPlatformTags = []
+          this.appPlatformTags = null
           this.appIpv4 = ''
           this.appOsInfo =''
           this.$refs.fileinput.reset();

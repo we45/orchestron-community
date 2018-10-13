@@ -15,7 +15,7 @@ services:
         depends_on:
             - api
         environment:
-            - API_URL=http://<Server_IP>
+            - API_URL=api
         links:
             - api
     api:

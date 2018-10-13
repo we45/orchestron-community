@@ -5,27 +5,28 @@
             <b-row>
                 <b-col>
                     <b-tabs>
-                        <b-tab title="Request" active v-if="request">
+                        <b-tab title="Request" active v-if="req_res_log['req_status']">
                             <br>
-                            <template v-for="req in reqRespData">
+                            <template>
                               <div class="code-background">
-                                {{ req.request | decode | decode }}
+                                {{ req_res_log['req'] | decode | decode }}
                               </div>
                             </template>
                         </b-tab>
-                        <b-tab title="Response" v-if="response">
+                        <b-tab title="Response" v-if="req_res_log['res_status']">
                             <br>
-                          <template v-for="req in reqRespData">
+                          <template>
                             <div class="code-background">
-                              {{ req.response | decode | decode }}
+                              {{ req_res_log['res'] | decode | decode }}
                             </div>
                           </template>
                         </b-tab>
-                      <b-tab title="Log" v-if="log">
+                      <b-tab title="Log" v-if="req_res_log['log_status']">
                             <br>
-                          <template v-for="req in reqRespData">
+                          <template>
                             <div style="background-color: #2b2b2b; color: #ffb648;font-family: Monaco;margin: 2%;border-radius: 5px;padding: 2%;">
-                              {{ req.log | decode }}
+                              {{ req_res_log['log'] | decode }}
+                              
                             </div>
                           </template>
                         </b-tab>
@@ -55,7 +56,10 @@
         log: {
           type: Boolean,
           required: false
-        }
+        },
+        req_res_log:{
+          required:true
+        },
       }
     }
 </script>

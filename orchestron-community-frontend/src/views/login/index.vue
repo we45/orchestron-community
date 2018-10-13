@@ -111,7 +111,7 @@ export default {
       if (token) {
         validUserCheck.get('/user/profile/')
           .then(res => {
-            this.$router.push('/org/dashboard/')
+            this.$router.push('/org/dashboard')
           }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')
