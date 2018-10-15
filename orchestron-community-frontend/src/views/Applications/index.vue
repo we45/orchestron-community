@@ -618,7 +618,7 @@
           const formData = {
             "name": this.appJiraProject
           }
-          axios.put('/applications/' + this.param + '/jira', formData)
+          axios.put('/applications/' + this.param + '/jira/', formData)
             .then(res => {
               this.isLoading = true
               this.$router.push('/projects/individual_application/' + this.param)
