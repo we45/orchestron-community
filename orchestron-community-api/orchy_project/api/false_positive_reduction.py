@@ -164,7 +164,7 @@ def write_results_to_db(data):
 
             if tool == 'Burp' or tool == 'Bandit':
                 tool_vul_name = data.get('vulnerability',{}).get('name','')
-                json_path = os.path.join(settings.MEDIA_ROOT,'data.json')
+                json_path = os.path.join(settings.PARSERS_ROOT,'burp_db.json')
                 with open(json_path) as f:
                     json_data = json.load(f)
                     cwe = json_data.get(tool_vul_name,0)
