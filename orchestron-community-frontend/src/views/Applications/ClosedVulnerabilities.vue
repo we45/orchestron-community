@@ -284,6 +284,7 @@
             axios.get('/closedvul/app/' + this.param + '/?true=1')
               .then(res => {
                 this.items = []
+                this.paginationItems = []
                 this.totalVul = res.data.count
                 this.highCount = 0
                 this.mediumCount = 0
@@ -295,7 +296,7 @@
                 this.mediumCount = res.data.severity[2] | 0
                 this.lowCount = res.data.severity[1] | 0
                 this.infoCount = res.data.severity[0] | 0
-                for (const val of Object.values({}, res.data.results)) {
+                for (const val of  res.data.results) {
                   // if (val.severity === 3) {
                   //   this.highCount += 1
                   // } else if (val.severity === 2) {
@@ -387,7 +388,7 @@
                 this.mediumCount = res.data.severity[2] | 0
                 this.lowCount = res.data.severity[1] | 0
                 this.infoCount = res.data.severity[0] | 0
-                for (const val of Object.values(res.data.results)) {
+                for (const val of res.data.results) {
                   // if (val.severity === 3) {
                   //   this.highCount += 1
                   // } else if (val.severity === 2) {
@@ -448,7 +449,7 @@
                     })
                   }
                 }
-                this.totalVul = this.items.length
+                this.totalVul = res.data.count
               }).catch(error => {
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')

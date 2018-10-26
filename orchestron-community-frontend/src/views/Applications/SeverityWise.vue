@@ -90,7 +90,9 @@ export default {
               this.items= []
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                // const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
+
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
@@ -181,7 +183,7 @@ export default {
               this.infoCount = 0
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
@@ -261,7 +263,8 @@ export default {
                   this.paginationItems = []
                   this.isLoading = true
                   for (const val of Object.values(res.data.results)) {
-                    const splitVuls = val.names.split(',')
+                    // const splitVuls = val.names.split(',')
+                    const splitVuls = val.names.split('###,')
                     const cwe = val.cwe
                     const sev = val.severity
                     const openFor = val.open_for

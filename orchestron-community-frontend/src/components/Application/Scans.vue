@@ -56,10 +56,10 @@
                         </p>
                       <template>
                           <vul-progress-bar
-                          :high="row.item.sev[3]"
-                          :medium="row.item.sev[2]"
-                          :low="row.item.sev[1]"
-                          :info="row.item.sev[0]"
+                          :high="row.item.sev[3] || 0"
+                          :medium="row.item.sev[2] || 0"
+                          :low="row.item.sev[1] || 0"
+                          :info="row.item.sev[0] || 0"
                           :total="row.item.sev | checkSev"></vul-progress-bar>
                         </template>
                         <b-row>
