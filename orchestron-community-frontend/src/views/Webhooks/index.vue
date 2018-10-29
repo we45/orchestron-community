@@ -141,7 +141,7 @@
             <b-modal ref="copyWebhookModal" title="Copy Webhook" centered size="lg">
                 <b-row>
                   <b-col cols="12">
-                <div style="background-color:#2b2b2b; border-radius: 5px; height:50px;width: 100%;">
+                <div style="background-color:#2b2b2b; border-radius: 5px; height:60px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;" class="word-wrap">
                     <pre> <span class="webhook-label">Webhook Id : </span>  <span class='webhook'>{{ webhookId }}</span></pre>
                   </p>
@@ -160,7 +160,7 @@
               <br>
                     </b-col>
                 </b-row>
-              <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+              <div style="background-color: #2b2b2b; border-radius: 5px; height:150px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
                     <span class="webhook-label" style="padding:7px;">Curl Command (File Processing) : </span>
                     <span class='webhook'>
