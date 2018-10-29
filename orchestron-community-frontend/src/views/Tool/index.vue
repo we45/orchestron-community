@@ -120,7 +120,7 @@ export default {
               // } else {
               //   this.infoCount += 1
               // }
-              const splitVuls = val.names.split(',')
+              const splitVuls = val.names.split('###,')
               const cwe = val.cwe
               const sev = val.severity
               const openFor = val.open_for
@@ -204,7 +204,7 @@ export default {
               this.paginationItems = []
               this.items = []
               for (const val of res.data.results) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
@@ -313,7 +313,7 @@ export default {
                   // } else {
                   //   this.infoCount += 1
                   // }
-                  const splitVuls = val.names.split(',')
+                  const splitVuls = val.names.split('###,')
                   const cwe = val.cwe
                   const sev = val.severity
                   const openFor = val.open_for
@@ -407,7 +407,7 @@ export default {
                   // } else {
                   //   this.infoCount += 1
                   // }
-                  const splitVuls = val.names.split(',')
+                  const splitVuls = val.names.split('###,')
                   const cwe = val.cwe
                   const sev = val.severity
                   const openFor = val.open_for

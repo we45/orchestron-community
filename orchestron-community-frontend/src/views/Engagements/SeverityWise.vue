@@ -81,7 +81,7 @@ export default {
               this.totalVul = res.data.count
 
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.aging
@@ -156,7 +156,7 @@ export default {
             // if (res.status === 200) {
               this.items = []
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.aging
@@ -250,7 +250,7 @@ export default {
               this.infoCount = 0
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.aging
