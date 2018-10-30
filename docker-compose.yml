@@ -9,32 +9,32 @@ services:
         links:
             - api
     frontend:
-        image: we45/orchestron-community-frontend:latest
+        image: frontend:latest
         expose:
             - "5000"
         depends_on:
             - api
         environment:
-            - API_URL=api
+            - API_URL='http://192.168.32.174'
         links:
             - api
     api:
-        image: we45/orchestron-community-api:1.2.0
+        image: api:latest
         expose:
             - "8000"
         environment:
             - MYSQL_USER=root
-            - MYSQL_PASSWORD=STRONG_MYSQL_PASSWORD
+            - MYSQL_PASSWORD=Test@1234
             - DB_IP=mysqldb
             - MINIO_URL=minio
             - MINIO_PORT=9000
-            - MINIO_ACCESS_KEY=RANDOM_ACCESS_KEY
-            - MINIO_SECRET_KEY=RANDOM_SECRET_KEY
+            - MINIO_ACCESS_KEY=Test@1234
+            - MINIO_SECRET_KEY=Test@1234
             - MINIO_BUCKET_NAME=storage
             - ENC_KEY=RANDOM_ENC_KEY
             - JWT_SECRET_KEY=110a2242c46e4348b78f8adf31587feb
             - ADMIN_USER_EMAIL=admin@organization.com
-            - ADMIN_USER_PASS=Str0ngP@ssw0rd
+            - ADMIN_USER_PASS=Test@1234
         links:
             - mysqldb
             - minio
@@ -47,7 +47,7 @@ services:
     mysqldb:
         image: mysql:5.7
         environment:
-            - MYSQL_ROOT_PASSWORD=STRONG_MYSQL_PASSWORD
+            - MYSQL_ROOT_PASSWORD=Test@1234
             - MYSQL_DATABASE=orchy_community
         expose:
             - "3306"
@@ -58,8 +58,8 @@ services:
         expose:
             - "9000"
         environment:
-            - MINIO_ACCESS_KEY=RANDOM_ACCESS_KEY
-            - MINIO_SECRET_KEY=RANDOM_SECRET_KEY
+            - MINIO_ACCESS_KEY=Test@1234
+            - MINIO_SECRET_KEY=Test@1234
         volumes:
             - ./orchestron-community-minio:/data
         command: server /data
