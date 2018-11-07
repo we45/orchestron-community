@@ -17,6 +17,7 @@ COPY /orchy_project /webapps/orchestron_community_api
 
 COPY migrations.sh /webapps/orchestron_community_api/
 COPY wait-for /webapps/orchestron_community_api/
+RUN chmod +x /webapps/orchestron_community_api/wait-for && chmod +x /webapps/orchestron_community_api/migrations.sh
 WORKDIR /webapps/orchestron_community_api/
 
 CMD supervisord
