@@ -378,9 +378,19 @@
           { label: 'Info', value: 0 }
         ],
         manualSeverity: 0,
-        manualOwaspList: ['Injection', 'Broken Authentication', 'Sensitive Data Exposure', 'XML External Entities (XXE)',
-          'Broken Access Control', 'Security Misconfiguration', 'Cross-Site Scripting (XSS)', 'Insecure Deserialization',
-          'Using Components with Known Vulnerabilities', 'Insufficient Logging&Monitoring', 'Uncategorized'],
+        manualOwaspList: [
+            'Injection',
+            'Broken Authentication and Session Management',
+            'Cross-Site Scripting',
+            'Insecure Direct Object References',
+            'Security Misconfiguration',
+            'Sensitive Data Exposure',
+            'Missing Function Level Access Control',
+            'Cross-Site Request Forgery',
+            'Using Components with Known Vulnerabilities',
+            'Unvalidated Redirects and Forwards',
+            'Uncategorized'
+        ],
         manualOwasp: '',
         manualStepOne: false,
         manualStepTwo: false,

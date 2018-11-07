@@ -94,7 +94,7 @@ export default {
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
+                  if (splitVuls.length > 1) {
                     multipleVuls[vulName] = appName
                   }
                 }
@@ -169,7 +169,7 @@ export default {
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
+                  if (splitVuls.length > 1) {
                     multipleVuls[vulName] = appName
                   }
                 }
@@ -263,7 +263,7 @@ export default {
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
+                  if (splitVuls.length > 1) {
                     multipleVuls[vulName] = appName
                   }
                 }
