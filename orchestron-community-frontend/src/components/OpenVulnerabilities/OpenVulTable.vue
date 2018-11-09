@@ -69,9 +69,42 @@
                             {{ row.detailsShowing ? 'Hide' : 'Show' }}-Details
                         </b-button>
                     </template>
-                    <template slot="row-details" slot-scope="row" v-if="row.item.multiple">
+                    <template slot="row-details" slot-scope="row" v-if="row.item.multiple" >
                         <b-card >
-                            <template v-for="(value, key) in row.item.name">
+                              <b-row  v-model="cwe_val_multiple = row.item.cwe">
+                                  <b-col cols="12">
+                                    <b-pagination  size="md" align="right" :total-rows="Object.keys(row.item.name).length"  v-model="currentPage_multiple" :per-page="5">
+                                    </b-pagination>
+                                  </b-col>
+                              </b-row>
+                              <b-table 
+                                show-empty
+                                stacked="sm"
+                                :current-page="currentPage_multiple"
+                                :fields="multipleFields"
+                                :items="Object.keys(row.item.name)"
+                                :per-page="5"
+                                :filter="filter_inside"
+                                :sort-by.sync="sortBy"
+                                class="m2_top"
+                              >
+                                  <template slot="name_multiple" slot-scope="row" v-for="(value, key) in row.item.name" >
+                                      <b-row>
+                                            <b-col>
+                                                <b-list-group>
+                                                    <b-list-group-item class="d-flex justify-content-between align-items-center">
+                                                        {{ row.item }}
+                                                        <b-button size="sm" @click="viewIndividualVul(value, row.item, cwe_val_multiple)" class="mr-1 btn-orange">
+                                                        {{ value }}
+                                                        </b-button>
+                                                    </b-list-group-item>
+                                                    <br>
+                                                </b-list-group>
+                                            </b-col>
+                                        </b-row>
+                                  </template>
+                              </b-table>
+                           <!--  <template  v-for="(value, key) in row.item.name">
                                 <b-row>
                                     <b-col>
                                         <b-list-group>
@@ -85,7 +118,7 @@
                                         </b-list-group>
                                     </b-col>
                                 </b-row>
-                            </template>
+                            </template> -->
                         </b-card>
                     </template>
                 </b-table>
@@ -95,8 +128,8 @@
 </template>
 
 <script>
+// const items = []
 const items = []
-
 export default {
   name: 'OpenVulTable',
   data() {
@@ -109,14 +142,23 @@ export default {
         { key: 'name', label: 'Vulnerability Name', sortable: true, 'class': 'title' },
         { key: 'actions', label: ' ', 'class': 'title', sortable: false }
       ],
+      multipleFields: [
+        { key: 'name_multiple', label: 'Multiple Vulnerabilities', sortable: false, 'class': 'title' },
+      ],
       currentPage: 0,
+      currentPage_multiple:1,
       perPage: 5,
       totalRows: 0,
       pageOptions: [5, 10, 15],
+      pageOptions_multiple: [5, 10, 15, 20, 25],
       sortBy: null,
+      filter_inside: null,
       sortDesc: false,
       filter: null,
-      numPages: 0
+      numPages: 0,
+      selected: {},
+      multiple_perPage: 5,
+      cwe_val_multiple: 0
     }
   },
   props: {

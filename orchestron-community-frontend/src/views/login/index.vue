@@ -79,6 +79,8 @@ export default {
           localStorage.setItem('admin', res.data.admin)
           localStorage.setItem('email', res.data.email)
           localStorage.setItem('org', res.data.org)
+          localStorage.removeItem('breadCum')
+
           const token = localStorage.getItem('token')
           if (token && token!=='undifined') {
             this.$router.go('/org/dashboard')
@@ -91,6 +93,7 @@ export default {
             localStorage.removeItem('admin')
             localStorage.removeItem('email')
             localStorage.removeItem('org')
+            localStorage.removeItem('breadCum')
           }
         }).catch(error => {
           console.log('error',error.response.data)
@@ -100,6 +103,7 @@ export default {
           localStorage.removeItem('admin')
           localStorage.removeItem('email')
           localStorage.removeItem('org')
+           localStorage.removeItem('breadCum')
           this.$router.push({ path: '/' })
           this.isFormInvalid = true
         })
