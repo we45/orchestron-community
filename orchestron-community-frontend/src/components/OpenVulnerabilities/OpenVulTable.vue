@@ -65,7 +65,7 @@
                                 {{ row.item.app }}
                             </b-button>
                         </p>
-                        <b-button size="sm" @click.stop="row.toggleDetails" class="btn-orange" v-if="row.item.multiple">
+                        <b-button size="sm" @click.stop="row.toggleDetails"  @click="accordian_close($event)"  id="multipleClose" class="btn-orange" v-if="row.item.multiple">
                             {{ row.detailsShowing ? 'Hide' : 'Show' }}-Details
                         </b-button>
                     </template>
@@ -194,6 +194,18 @@ export default {
     },
     paginationClick(currentPage) {
       this.$emit('clickPagination', { page: currentPage })
+    },
+    accordian_close(evt){
+        var buttonClick = document.querySelectorAll('[id^="multipleClose"]');
+        var xy =  Array.from(buttonClick).indexOf(evt.target)
+         for(var i =0; i< buttonClick.length; i++){
+            if(xy != i){
+              var split_txt = buttonClick[i].innerText.split('-')[0]
+              if(split_txt == 'Hide'){
+                buttonClick[i].click()
+               } 
+            }
+         }
     }
   }
 }
