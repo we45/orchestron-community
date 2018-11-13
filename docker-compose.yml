@@ -9,7 +9,7 @@ services:
         links:
             - api
     frontend:
-        image: docker.io/we45/orchestron-community-frontend:latest
+        image: we45/orchestron-community-frontend:latest
         expose:
             - "5000"
         depends_on:
