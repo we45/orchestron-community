@@ -110,7 +110,7 @@
                       <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeCreateApplication() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -218,7 +218,7 @@
                       <br>
                     </form>
                 </div>
-              <b-col col="12" slot="modal-footer">
+              <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeUpdateApplication() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -241,7 +241,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" beforeCloseDeleteApplication() ">No</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -265,7 +265,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeDeleteApplication() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -529,10 +529,10 @@
           this.$router.push('/')
         }
       },
-      updateApplication(event) {
+     async updateApplication(event) {
         if (event.show && event.id && this.param && this.org && this.token) {
           this.$refs.updateApplicationModal.show()
-          axios.get('/applications/' + event.id + '/')
+         await axios.get('/applications/' + event.id + '/')
             .then(res => {
                 this.appUpdateName = res.data.name
                 this.updateApplicationId = event.id
@@ -544,10 +544,69 @@
                 const updatelogoSplit = res.data.logo.split('/')
                 const logoSplit = updatelogoSplit.pop()
                 this.appUpdateOldLogoName = logoSplit
+                // this.updateTags = []
+                // for (const lan of lang){
+                //   this.updateTags.push({text : lan})
+                // }
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
+            })
+          await axios.get('/platforms/')
+            .then(res => {
+              this.appPlatformOption = res.data
+            }).catch(error => {
+              if (error.res.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.res.status === 404) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
+            })
+          // await axios.get('/applications/' + event.id + '/')
+          //   .then(res => {
+          //     this.appUpdateName = res.data.name
+          //     this.updateApplicationId = event.id
+          //     this.appUpdateHostType = res.data.host_type
+          //     this.appUpdateUrl = res.data.url
+          //     const lang =  res.data.languages.split(",")
+          //     this.updateTags = []
+          //     for (const lan of lang){
+          //       this.updateTags.push({text : lan})
+          //     }
+          //     this.appUpdateIpv4 = res.data.ipv4
+          //     this.appUpdateOsInfo = res.data.os_info
+          //     for (const value of this.appGroupsOption) {
+          //       if (value.value === res.data.group[0]) {
+          //         this.appUpdateGroup = { 'value': res.data.group[0], 'label': value.label }
+          //       }
+          //     }
+          //     const updatelogoSplit = res.data.logo.split('/')
+          //     const logoSplit = updatelogoSplit.pop()
+          //     this.appUpdateOldLogoName = logoSplit
+          //   }).catch(error => {
+          //     // if (error.response.status === 404) {
+          //     //   this.$router.push('/not_found')
+          //     // } else if (error.response.status === 403) {
+          //     //   this.$router.push('/forbidden')
+          //     // } else {
+          //     //   this.$router.push('/error')
+          //     // }
+          //   })
+          this.appTargetOption = []
+          axios.get('/hosttypes/')
+            .then(res => {
+              this.appTargetOption = res.data
+            }).catch(error => {
+              if (error.response.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.response.status === 403) {
                 this.$router.push('/forbidden')
               } else {
                 this.$router.push('/error')

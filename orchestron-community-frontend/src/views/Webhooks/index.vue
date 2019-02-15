@@ -55,7 +55,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateWebhook() "> Close</button>
                         <button type="button"
@@ -107,7 +107,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateWebhook() "> Close</button>
                         <button type="button"
@@ -127,7 +127,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeDeleteWebhook() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -179,7 +179,7 @@
                   </p>
                   <br>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p>
                 </b-col>
             </b-modal>

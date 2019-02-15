@@ -65,7 +65,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateEngagement() "> Close</button>
                         <button type="button"
@@ -136,7 +136,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateEngagement() "> Close</button>
                         <button type="button"
@@ -158,7 +158,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeDeleteEngagement() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"

@@ -103,9 +103,7 @@ export default {
       sortDesc: false,
       filter: null,
       numPages: 0,
-      showModal: true,
-      createButton: true,
-      deleteButton: true
+      showModal: true
     }
   },
   props: {

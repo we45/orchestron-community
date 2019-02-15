@@ -41,7 +41,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateProject() "> Close</button>
                         <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" submitCreateProject() " v-if="!$v.projectName.$invalid && !$v.projectLogo.$invalid">
@@ -75,12 +75,15 @@
                                 <br>
                                 <br>
                                 <p>{{ updateLogoName }}</p>
+                                <template v-if="logo">
+                                  <b-img-lazy :src="'data:image/png;base64,' + logo" rounded="circle" blank width="250" height="200"  alt="img" />
+                                </template>
                             </b-col>
                         </b-row>
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeUpdateProject() "> Close</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -100,7 +103,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" beforeCloseDeleteProject() ">No</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -126,7 +129,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeDeleteProject() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -168,7 +171,8 @@ export default {
         typeDelete: '',
         deleteProjectId: '',
         isLoading: false,
-        projectCount: 0
+        projectCount: 0,
+        logo: '',
       }
     },
     validations: {
@@ -303,6 +307,9 @@ export default {
               const updatelogoSplit = res.data.logo.split('/')
               const logoSplit = updatelogoSplit.pop()
               this.updateLogoName = logoSplit
+               axios.get(res.data.logo).then(res=>{
+                          this.logo = res.data
+                        })                      
             }).catch(error => {
               
               if (error.res.status === 404) {

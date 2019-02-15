@@ -88,7 +88,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateOrganization() "> Close</button>
                         <button type="button"
@@ -139,7 +139,8 @@
           orgTypeOption: [],
           updateOrgId: '',
           createButton: true,
-          deleteButton: true
+          deleteButton: true,
+          updateOrgName: '',
         }
       },
       validations: {

@@ -106,7 +106,7 @@
                                 </b-row>
                                 <br>
                             </form>
-                            <b-col col="12" >
+                            <b-col cols="12" >
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"
@@ -180,7 +180,7 @@
                                 </b-row>
                                 <br>
                                 <br>
-                              <b-col col="12" >
+                              <b-col cols="12" >
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"

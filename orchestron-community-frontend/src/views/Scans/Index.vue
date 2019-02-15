@@ -73,7 +73,7 @@
                                 </b-row>
                                 <br>
                                 <br>
-                              <b-col col="12" >
+                              <b-col cols="12" >
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"
@@ -191,7 +191,7 @@
                             </form>
                             <br>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateProject() "> Close</button>
                         <!--<button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" submitAddVulnerabilities() " v-if="!$v.projectName.$invalid && !$v.projectLogo.$invalid">-->

@@ -60,7 +60,7 @@ class MediaServeView(APIView):
     def get(self, request, path):
         try:
             if path.startswith(settings.USER_MEDIA_URL):
-                assert request.user.img != path
+                assert request.user.img == path
             elif path.startswith(settings.ORGANIZATION_MEDIA_URL):
                 orgs = Organization.objects.filter(logo=path)
                 assert orgs.exists()

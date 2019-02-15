@@ -39,7 +39,7 @@
                 </b-col>
             </b-row>
             <br>
-          <b-col col="12" slot="modal-footer">
+          <b-col cols="12" slot="modal-footer">
               <div class="pull-right" style="float: right;">
                   <button type="button" class="btn btn-orange"
                       data-dismiss="modal" @click=" submitChangePassword() " v-if="!$v.oldPassword.$invalid && !$v.newPassword.$invalid && !$v.confirmPassword.$invalid">
