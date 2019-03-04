@@ -17,10 +17,20 @@
                <p class="wordwrap"> <span class="app-created-on">App Platform</span>  <span class="app-divider">:</span> <span class="app-value">{{ platform }}</span></p>
             </b-col>
           </b-row>
-          <hr>
-          <b-btn @click="configureApplication" class="btn-orange">Configure</b-btn>
+          
+          <!-- <b-btn @click="configureApplication" class="btn-orange">Configure</b-btn> -->
         </b-col>
       </b-row>
+      <hr>
+      <b-row>
+        <b-col cols="10">
+            <b-btn @click="configureApplication" class="btn-orange" id="app_config">configure</b-btn>
+        </b-col>
+        <b-col cols="2">
+          <b-btn @click="configureWebhook" class="btn-orange">webhook</b-btn>
+        </b-col>
+      </b-row>
+
       <br>
 
     </b-container>
@@ -59,6 +69,9 @@
         this.fetchData()
       },
       methods: {
+        configureWebhook() {
+          this.$emit('configureWebhooks', {webhook: true})
+        },
         fetchData() {
           if (this.logo) {
             axios.get(this.logo)

@@ -5,7 +5,9 @@
             <common-table :pageCount="projectCount" :dataItems="projectsList"  :headerTitle="headerTitles"
             @createModal="createProject"
             @updateModal="updateProject($event)"
-            @deleteModal="beforeDeleteModal($event)"></common-table>
+            @deleteModal="beforeDeleteModal($event)"
+            @clickPagination="clickPaginations($event)"
+            ></common-table>
 
             <b-modal
                 ref="createProjectModal"
@@ -173,6 +175,8 @@ export default {
         isLoading: false,
         projectCount: 0,
         logo: '',
+        full_Data: [],
+        isLoadingPage: false,
       }
     },
     validations: {
@@ -200,6 +204,10 @@ export default {
           this.fetchData()
           this.isLoading = false
         }
+        if(this.isLoadingPage){
+
+          this.isLoadingPage = false
+        }
       })
     },
     methods: {
@@ -207,15 +215,17 @@ export default {
         if (this.org && this.token) {
           axios.get('/organizations/' + this.org + '/?projects=1')
             .then(res => {
+              this.full_Data = []
               this.projectCount = res.data.projects_count
               for (const value of res.data.projects) {
-                this.projectsList.push({
+                this.full_Data.push({
                   name: { vul_name: value.fields.name },
                   sev: value.stats.severity_count.severity,
                   id: value.fields.id,
                   url: 'individual_project/' + value.fields.id + '/'
                 })
               }
+            this.projectsList = this.full_Data.slice(0, 5)
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -401,6 +411,21 @@ export default {
       beforeSubmitDeleteProject() {
         this.$refs.deleteProjectModal.show()
       },
+      clickPaginations(event) {
+          if (event.page) {
+            if (event.page > 1) {
+                var page_no = event.page
+                this.projectsList = this.full_Data.slice(5*(page_no-1), 5*(page_no))
+                this.isLoadingPage = true
+            } else {
+              this.fetchData()
+            }
+          }
+          else {
+            // notValidUser()
+            // this.$router.push('/')
+          }
+        },
       submitDeleteProject() {
         if (this.org && this.token) {
           axios.delete('/projects/' + this.deleteProjectId + '/')

@@ -27,6 +27,10 @@
                                     placeholder="Enter Engagement Name" :state="!$v.engagementName.$invalid"></b-form-input>
                             </b-col>
                         </b-row>
+                        <b-col sm="12">
+                            <br>
+                            <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                        </b-col>
                         <br>
                       <b-row class="my-1">
                             <b-col sm="2"><label class="label">Description:</label></b-col>
@@ -60,6 +64,10 @@
                                   format="yyyy-MM-dd"
                                   lang="en" width="100%"
                                   :not-before="today" :state="!$v.engagementDateRange.$invalid"></date-picker>
+                            </b-col>
+                            <b-col sm="12">
+                              <br>
+                               <p  v-if="error_msgs['date']" style="text-align: left;" class="error"> * {{ error_msgs['date_msg'] }}</p>
                             </b-col>
                         </b-row>
                         <br>
@@ -98,6 +106,11 @@
                                 <!--<p v-if="!$v.projectName.required">The name field is required!</p>-->
                                 <!--<p v-if="!$v.projectName.minLength">The name field is minimum 3!</p>-->
                             </b-col>
+
+                            <b-col sm="12">
+                              <br>
+                              <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                            </b-col>
                         </b-row>
                         <br>
                       <b-row class="my-1">
@@ -131,6 +144,10 @@
                                   format="yyyy-MM-dd"
                                   lang="en" width="100%"
                                   :not-before="today" :state="!$v.updateEngagementDateRange.$invalid"></date-picker>
+                            </b-col>
+                            <b-col sm="12">
+                              <br>
+                               <p  v-if="error_msgs['date']" style="text-align: left;" class="error"> * {{ error_msgs['date_msg'] }}</p>
                             </b-col>
                         </b-row>
                         <br>
@@ -209,6 +226,7 @@
           engagementsCount: 0,
           isPaginated: false,
           today: new Date(),
+          error_msgs : {"name": false,"date": false,"name_msg":"", "date_msg":""},
           shortcuts: [
             {
               // text: 'Today',
@@ -360,6 +378,7 @@
           }
         },
         createEngagement() {
+          this.error_msgs = {"name": false,"date": false,"name_msg":"", "date_msg":""}
           this.engagementName = ''
           this.engagementDesc = ''
           this.application = null
@@ -399,11 +418,30 @@
                   position: 'top right'
                 })
               }).catch(error => {
-                if (error.res.status === 404) {
+                if (error.response.status === 404) {
                   this.$router.push('/not_found')
-                } else if (error.res.status === 404) {
+                } 
+                else if (error.response.status === 403) {
                   this.$router.push('/forbidden')
-                } else {
+                } 
+                else if (error.response.status === 400) {
+                  if(error.response.data.name){
+                      this.error_msgs['name'] = true
+                      this.error_msgs['name_msg'] = 'engagement with this name already exists.'
+                    }
+                    else{
+                         this.error_msgs['name'] = false
+                    }
+                    if(error.response.data.non_field_errors){
+                      this.error_msgs['date'] = true
+                      this.error_msgs['date_msg'] = 'Stop date must occur after start date'
+                    } 
+                    else{
+                         this.error_msgs['date'] = false
+                    }
+                  // this.$router.push('/forbidden')
+                } 
+                else {
                   this.$router.push('/error')
                 }
               })
@@ -414,6 +452,7 @@
         },
         updateEngagement(event) {
           this.engagementId = event.id
+          this.error_msgs = {"name": false,"date": false,"name_msg":"", "date_msg":""}
           if (this.org && this.token && this.engagementId) {
             this.$refs.updateEngagementModal.show()
             axios.get('/engagements/' + this.engagementId + '/')
@@ -476,11 +515,30 @@
                 })
                 this.engagementId = ''
               }).catch(error => {
-                if (error.res.status === 404) {
+                if (error.response.status === 404) {
                   this.$router.push('/not_found')
-                } else if (error.res.status === 404) {
+                } 
+                else if (error.response.status === 403) {
                   this.$router.push('/forbidden')
-                } else {
+                } 
+                else if (error.response.status === 400) {
+                  if(error.response.data.name){
+                      this.error_msgs['name'] = true
+                      this.error_msgs['name_msg'] = 'engagement with this name already exists.'
+                    }
+                    else{
+                         this.error_msgs['name'] = false
+                    }
+                    if(error.response.data.non_field_errors){
+                      this.error_msgs['date'] = true
+                      this.error_msgs['date_msg'] = 'Stop date must occur after start date'
+                    } 
+                    else{
+                         this.error_msgs['date'] = false
+                    }
+                  // this.$router.push('/forbidden')
+                } 
+                else {
                   this.$router.push('/error')
                 }
               })
@@ -628,5 +686,13 @@
     line-height: 0.99;
     text-align: center;
     color: #232325;
+  }
+  .error{
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

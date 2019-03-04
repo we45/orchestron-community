@@ -61,6 +61,15 @@
                                         :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
             </template>
         </b-col>
+        <!-- <b-col cols="6">
+          <b-container fluid style="background-color: #FFFFFF;">
+            <app-bar-chart :barChartData="appSevData" :barChartTitle="'Application-wise Vulnerabilities'"></app-bar-chart>
+            <br>
+            <br>
+            <br>
+            <br>
+          </b-container>
+        </b-col> -->
         <b-col cols="6">
            <template v-if="taxanomyData.length > 0">
               <orchy-donut-chart
@@ -98,7 +107,7 @@
         </b-col>
       </b-row>
        </b-container> -->
-        <br>
+        <!-- <br> -->
         <!-- <b-tabs style="background-color: #FFFFFF;">
           <b-tab title="Applications" small>
             <div>
@@ -114,8 +123,8 @@
             </div>
           </b-tab>
         </b-tabs> -->
-      <br>
-      <br>
+      <!-- <br> -->
+      <!-- <br> -->
     </b-container>
   </div>
 </template>
@@ -135,6 +144,7 @@ import orchyPieChart from '@/components/Charts/orchyPieChart'
 import orchyStackedBarChart from '@/components/Charts/orchyStackedBarChart'
 import orchyDonutChart from '@/components/Charts/orchyDonutChart'
 
+
 export default {
   name: 'dashboard',
   components: {
@@ -147,7 +157,7 @@ export default {
     orchyDonutSeverityChart,
     orchyPieChart,
     orchyStackedBarChart,
-    orchyDonutChart
+    orchyDonutChart,
   },
   data() {
     return {
@@ -182,6 +192,10 @@ export default {
       taxanomyData: [],
       toolVulnerabilityChart: [],
       toolVulChartTitle: 'Vulnerabilities by tool',
+      highLable: 'High',
+      mediumLable: 'Medium',
+      lowLable: 'Low',
+      infoLable: 'Info',
     }
   },
   created() {
@@ -215,6 +229,10 @@ export default {
             )
             this.appVulnerabilityChart = []
             
+            // for (const ageing of res.data.ageing) {
+            //     this.appSevData.push(ageing)
+            //   }
+
             for (const [key, val] of Object.entries(res.data.applications)) {
               this.appData.push({
                 name: key,
@@ -225,7 +243,7 @@ export default {
                 total: val.sev[3] + val.sev[2] + val.sev[1] + val.sev[0],
                 id: val.id
               })
-              this.appSevData.push([key, (val.sev[3] + val.sev[2] + val.sev[1] + val.sev[0])])
+              // this.appSevData.push([key, (val.sev[3] + val.sev[2] + val.sev[1] + val.sev[0])])
 
               this.appVulnerabilityChart.push({
                   name: key,
@@ -285,13 +303,15 @@ export default {
               
 
 
-
+      
             const highAgeingSevCount = []
             const mediumAgeingSevCount = []
             const lowAgeingSevCount = []
             const infoAgeingSevCount = []
             for (const [key, value] of Object.entries(res.data.ageing)) {
                 for (const [keys, values] of Object.entries(value)) {
+                console.log("value", values)
+
                 this.dashboardCategories.push(keys)
                   highAgeingSevCount.push(values[3])
                   mediumAgeingSevCount.push(values[2])

@@ -88,20 +88,35 @@
               let tools = []
               tools.push(res.data.tool)
               this.basicInfo.push({
-                'appName': 'appName',
-                'appUrl': 'AppURL',
+                'appName': res.data.app_details.name,
+                'appUrl': res.data.app_details.url,
                 'tool': tools,
                 'owasp': res.data.owasp,
                 'cwe': res.data.cwe,
                 'openFor': null,
                 'languages': [],
-                'bugStatus': 'BUG Status',
-                'bugId': 'Bug ID',
+                'bugStatus': res.data.jira_issue_status,
+                'bugId': res.data.jira_id,
                 'dread': null,
                 'dreadValues': 'Damage: ' + 0 + '\n' + 'Reproducibility: ' + 0 +
                 '\n' + 'Exploitability: ' + 0 + '\n' + 'Affected Users: ' + 0 +
                 '\n' + 'Discoverability: ' + 0
               })
+              // this.basicInfo.push({
+              //   'appName': 'appName',
+              //   'appUrl': 'AppURL',
+              //   'tool': tools,
+              //   'owasp': res.data.owasp,
+              //   'cwe': res.data.cwe,
+              //   'openFor': null,
+              //   'languages': [],
+              //   'bugStatus': 'BUG Status',
+              //   'bugId': 'Bug ID',
+              //   'dread': null,
+              //   'dreadValues': 'Damage: ' + 0 + '\n' + 'Reproducibility: ' + 0 +
+              //   '\n' + 'Exploitability: ' + 0 + '\n' + 'Affected Users: ' + 0 +
+              //   '\n' + 'Discoverability: ' + 0
+              // })
               this.vulInfo.push({
                 desc: res.data.description
               })

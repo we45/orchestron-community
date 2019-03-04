@@ -33,6 +33,8 @@ import individualEngagement from '../views/Engagements/individualEngagement'
 import EngagementSeverityWise from '../views/Engagements/SeverityWise'
 import Settings from '../views/Settings/index'
 import IndividualOrg from '../views/Settings/IndividualOrg'
+import AllApplicationsData from '../views/Projects/AllApplication'
+
 
 export const constantRouterMap = [
   { path: '/', component: Login, hidden: true },
@@ -199,17 +201,39 @@ export const constantRouterMap = [
     ]
   },
   {
-    path: '/webhooks',
+    path: '/all_applications',
     component: Layout,
+    // isReportReq: true,
+    meta: {
+      title: 'Application',
+      icon: 'webhook',
+      requiresAuth: true
+    },
     children: [
       {
         path: '',
-        name: 'Webhook',
-        component: WebHook,
-        meta: { title: 'Webhooks', icon: 'webhook' }
+        name: 'Applications',
+        component: AllApplicationsData,
+        meta: {
+          title: 'Applications',
+          icon: 'webhook',
+          requiresAuth: true
+        }
       }
     ]
   },
+  // {
+  //   path: '/webhooks',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'Webhook',
+  //       component: WebHook,
+  //       meta: { title: 'Webhooks', icon: 'webhook' }
+  //     }
+  //   ]
+  // },
   {
     path: '/engagements',
     component: Layout,
