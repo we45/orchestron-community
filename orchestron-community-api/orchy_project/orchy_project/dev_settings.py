@@ -349,6 +349,7 @@ LOGGING = {
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'api/media/')
+PARSERS_ROOT = os.path.join(BASE_DIR, 'parsers/')
 FONT_ROOT = os.path.join(BASE_DIR, 'api/fonts/')
 MEDIA_URL = '/media/'
 PROJECT_MEDIA_URL = 'project_logo/'

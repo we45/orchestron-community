@@ -103,7 +103,9 @@
               this.infoCount = res.data.severity[0] | 0
               this.items = []
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                // const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
+                console.log(splitVuls)
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
@@ -116,7 +118,7 @@
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
+                  if (splitVuls.length > 1) {
                     multipleVuls[vulName] = appName
                   }
                 }
@@ -183,7 +185,8 @@
                 this.lowCount = res.data.severity[1] | 0
                 this.infoCount = res.data.severity[0] | 0
                 for (const val of Object.values(res.data.results)) {
-                  const splitVuls = val.names.split(',')
+                  // const splitVuls = val.names.split(',')
+                  const splitVuls = val.names.split('###,')
                   const cwe = val.cwe
                   const sev = val.severity
                   const openFor = val.open_for
@@ -196,7 +199,7 @@
                     const vulDetail = actualVul.split('###')
                     vulName = vulDetail[0]
                     appName = vulDetail[1]
-                    if (splitVuls.length > 2) {
+                    if (splitVuls.length > 1) {
                       multipleVuls[vulName] = appName
                     }
                   }
@@ -262,7 +265,8 @@
                 this.lowCount = res.data.severity[1] | 0
                 this.infoCount = res.data.severity[0] | 0
                 for (const val of Object.values(res.data.results)) {
-                  const splitVuls = val.names.split(',')
+                  // const splitVuls = val.names.split(',')
+                  const splitVuls = val.names.split('###,')
                   const cwe = val.cwe
                   const sev = val.severity
                   const openFor = val.open_for
@@ -275,7 +279,7 @@
                     const vulDetail = actualVul.split('###')
                     vulName = vulDetail[0]
                     appName = vulDetail[1]
-                    if (splitVuls.length > 2) {
+                    if (splitVuls.length > 1) {
                       multipleVuls[vulName] = appName
                     }
                   }
@@ -352,7 +356,8 @@
                 this.lowCount = res.data.severity[1] | 0
                 this.infoCount = res.data.severity[0] | 0
                 for (const val of Object.values(res.data.results)) {
-                  const splitVuls = val.names.split(',')
+                  // const splitVuls = val.names.split(',')
+                  const splitVuls = val.names.split('###,')
                   const cwe = val.cwe
                   const sev = val.severity
                   const openFor = val.open_for
@@ -365,7 +370,7 @@
                     const vulDetail = actualVul.split('###')
                     vulName = vulDetail[0]
                     appName = vulDetail[1]
-                    if (splitVuls.length > 2) {
+                    if (splitVuls.length > 1) {
                       multipleVuls[vulName] = appName
                     }
                   }

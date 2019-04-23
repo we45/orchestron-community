@@ -333,11 +333,12 @@ class ApplicationSerializer(serializers.ModelSerializer):
 	parser_classes = (MultiPartParser,JSONParser)
 	# project_details = serializers.SerializerMethodField()
 	# org_details = serializers.SerializerMethodField()
+	stats = serializers.SerializerMethodField()
 
 	class Meta:
 		model = Application
-		fields = ['id','name','ipv4','os_info','host_type','org','project','url','logo','platform_tags','created_on','edited_on','created_by']
-		read_only_fields = ['created_on','edited_on','created_by']
+		fields = ['id','name','ipv4','os_info','host_type','org','project','url','logo','platform_tags','created_on','edited_on','created_by', 'stats']
+		read_only_fields = ['created_on','edited_on','created_by','stats']
 
 	def __init__(self, *args, **kwargs):
 		super(ApplicationSerializer, self).__init__(*args, **kwargs)
@@ -347,6 +348,16 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 	def get_org_details(self, obj):
 		return OrganizationSerializer(obj.org,context=self.context).data
+
+	def get_stats(self, obj):
+		from api.analytics import OpenVulnerabilityStatView
+		kwargs = {
+			'scan__application':obj
+		}
+		data = {
+			'severity_count':OpenVulnerabilityStatView().severity_count(kwargs=kwargs)
+		}
+		return data
 
 	def validate(self, data):
 		if not hasattr(self.instance,'logo'):

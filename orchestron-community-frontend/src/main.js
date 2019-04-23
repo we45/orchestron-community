@@ -20,6 +20,17 @@ import router from './router'
 import store from './store'
 import '@/utils/filters.js'
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faHourglass, faHourglassEnd, faHourglassHalf, faHistory
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faHourglass)
+library.add(faHourglassEnd)
+library.add(faHourglassHalf)
+library.add(faHistory)
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.use(BootstrapVue)
 Vue.use(Vue2Filters)
 Vue.use(VueChartkick, { Chartkick })

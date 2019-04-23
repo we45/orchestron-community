@@ -89,7 +89,7 @@ export default {
               this.items = []
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
@@ -102,7 +102,7 @@ export default {
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
+                  if (splitVuls.length > 1) {
                     multipleVuls[vulName] = appName
                   }
                 }
@@ -180,7 +180,7 @@ export default {
               this.infoCount = 0
               this.totalVul = res.data.count
               for (const val of Object.values(res.data.results)) {
-                const splitVuls = val.names.split(',')
+                const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
@@ -193,7 +193,7 @@ export default {
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
+                  if (splitVuls.length > 1) {
                     multipleVuls[vulName] = appName
                   }
                 }
@@ -259,7 +259,7 @@ export default {
                   this.paginationItems = []
                   this.isLoading = true
                   for (const val of Object.values(res.data.results)) {
-                    const splitVuls = val.names.split(',')
+                    const splitVuls = val.names.split('###,')
                     const cwe = val.cwe
                     const sev = val.severity
                     const openFor = val.open_for
@@ -272,7 +272,7 @@ export default {
                       const vulDetail = actualVul.split('###')
                       vulName = vulDetail[0]
                       appName = vulDetail[1]
-                      if (splitVuls.length > 2) {
+                      if (splitVuls.length > 1) {
                         multipleVuls[vulName] = appName
                       }
                     }

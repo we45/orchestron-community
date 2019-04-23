@@ -60,7 +60,7 @@ def parse_arachni(json_file,user_name,init_es):
 					'is_deleted':False,
 					'tool':'Arachni',
 					'severity':sev_dict.get(d[3],0),
-					'description':'',
+					# 'description':'',
 					'remediation':d[2],                
 					'created_on':timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
 					'cwe':{

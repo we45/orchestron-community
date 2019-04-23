@@ -60,7 +60,7 @@ class MediaServeView(APIView):
     def get(self, request, path):
         try:
             if path.startswith(settings.USER_MEDIA_URL):
-                assert request.user.img != path
+                assert request.user.img == path
             elif path.startswith(settings.ORGANIZATION_MEDIA_URL):
                 orgs = Organization.objects.filter(logo=path)
                 assert orgs.exists()
@@ -932,6 +932,8 @@ class ApplicationView(BaseView):
         ageing = query_serializer.validated_data.get('ageing',False)
         avg_ageing = query_serializer.validated_data.get('avg_ageing',False)
         months = query_serializer.validated_data.get('months',False)
+        webhook = Webhook.objects.get(application=obj)
+        context['webhook_id'] = webhook.hook_id
         kwargs = {
             'scan__application':obj, 
         }

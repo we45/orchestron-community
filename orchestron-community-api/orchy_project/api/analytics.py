@@ -147,28 +147,59 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         else:
             return 'No Data'                            
 
+    # def aging_count(self, kwargs={}, exclude_kwargs={}):
+    #     aging_list = self.get_open_vul_query(kwargs, exclude_kwargs)\
+    #     .annotate(open_for=Aging('created_on'))\
+    #     .values_list('open_for',flat=True)
+    #     days = dict(Counter(aging_list))
+    #     days_list = []
+    #     for day, count in days.items():
+    #         if day <= 5:
+    #             days_list.append(('0-5 days',count))
+    #         elif day > 5 and day <= 10: 
+    #             days_list.append(('6-10 days',count))
+    #         elif day > 10 and day <= 20: 
+    #             days_list.append(('11-20 days',count))
+    #         elif day > 20 and day <= 40: 
+    #             days_list.append(('21-40 days',count))
+    #         elif day > 40 and day <= 80: 
+    #             days_list.append(('41-80 days',count))
+    #         elif day > 80 and day <= 100: 
+    #             days_list.append(('81-100 days',count))
+    #         elif day > 100:
+    #             days_list.append(('More than 100 days',count))
+    #     return days_list
+
     def aging_count(self, kwargs={}, exclude_kwargs={}):
         aging_list = self.get_open_vul_query(kwargs, exclude_kwargs)\
         .annotate(open_for=Aging('created_on'))\
-        .values_list('open_for',flat=True)
+        .values_list('open_for','severity')
         days = dict(Counter(aging_list))
-        days_list = []
-        for day, count in days.items():
+        days_dict = {
+			1:{'0-5 days':{0:0,1:0,2:0,3:0}},
+			2:{'6-10 days':{0:0,1:0,2:0,3:0}},
+			3:{'11-20 days':{0:0,1:0,2:0,3:0}},
+			4:{'21-40 days':{0:0,1:0,2:0,3:0}},
+			5:{'41-80 days':{0:0,1:0,2:0,3:0}},
+			6:{'81-100 days':{0:0,1:0,2:0,3:0}},
+			7:{'More than 100 days':{0:0,1:0,2:0,3:0}},
+		}
+        for day, severity in aging_list:
             if day <= 5:
-                days_list.append(('0-5 days',count))
-            elif day > 5 and day <= 10: 
-                days_list.append(('6-10 days',count))
-            elif day > 10 and day <= 20: 
-                days_list.append(('11-20 days',count))
-            elif day > 20 and day <= 40: 
-                days_list.append(('21-40 days',count))
-            elif day > 40 and day <= 80: 
-                days_list.append(('41-80 days',count))
-            elif day > 80 and day <= 100: 
-                days_list.append(('81-100 days',count))
+              days_dict[1]['0-5 days'][severity] = days_dict[1]['0-5 days'][severity] + 1
+            elif day > 5 and day <= 10:
+              days_dict[2]['6-10 days'][severity] = days_dict[2]['6-10 days'][severity] + 1
+            elif day > 10 and day <= 20:
+              days_dict[3]['11-20 days'][severity] = days_dict[3]['11-20 days'][severity] + 1
+            elif day > 20 and day <= 40:
+              days_dict[4]['21-40 days'][severity] = days_dict[4]['21-40 days'][severity] + 1
+            elif day > 40 and day <= 80:
+              days_dict[5]['41-80 days'][severity] = days_dict[5]['41-80 days'][severity] + 1
+            elif day > 80 and day <= 100:
+              days_dict[6]['81-100 days'][severity] = days_dict[6]['81-100 days'][severity] + 1
             elif day > 100:
-                days_list.append(('More than 100 days',count))
-        return days_list
+                days_dict[7]['More than 100 days'][severity] = days_dict[7]['More than 100 days'][severity] + 1
+        return days_dict
 
     def heatmap(self, kwargs={}):
         scans = Scan.objects.filter(**kwargs).annotate(date=ExtractDate('created_on')).values('date').annotate(count=Count('id')).order_by('date').values_list('date','count')                    

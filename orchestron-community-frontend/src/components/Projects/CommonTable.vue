@@ -6,7 +6,7 @@
           <hr>
             <b-col cols="12">
 
-              <b-btn @click="createModal" class="btn-orange" v-if="!createButton">Create</b-btn>
+              <b-btn @click="createModal" class="btn-orange" v-if="!createButton && create">Create</b-btn>
               <br>
               <br>
                 <b-row>
@@ -103,9 +103,7 @@ export default {
       sortDesc: false,
       filter: null,
       numPages: 0,
-      showModal: true,
-      createButton: true,
-      deleteButton: true
+      showModal: true
     }
   },
   props: {
@@ -127,11 +125,19 @@ export default {
     deleteButton: {
       type: Boolean,
       required: false
+    },
+    create:{
+        type: Boolean,
+        required: false,
+        default: true
     }
   },
   beforeUpdate() {
+    // this.items = this.dataItems
+    // this.numPages = this.pageCount
     this.items = this.dataItems
     this.numPages = this.pageCount
+    this.currentPage = this.pageCurrent
   },
   computed: {
     sortOptions() {

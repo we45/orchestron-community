@@ -55,7 +55,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateWebhook() "> Close</button>
                         <button type="button"
@@ -107,7 +107,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateWebhook() "> Close</button>
                         <button type="button"
@@ -127,7 +127,7 @@
                         <br>
                     </form>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right;">
                         <button type="button" class="btn btn-orange-close" @click=" closeDeleteWebhook() ">Cancel</button>
                         <button type="button" class="btn btn-orange-submit"
@@ -141,7 +141,7 @@
             <b-modal ref="copyWebhookModal" title="Copy Webhook" centered size="lg">
                 <b-row>
                   <b-col cols="12">
-                <div style="background-color:#2b2b2b; border-radius: 5px; height:50px;width: 100%;">
+                <div style="background-color:#2b2b2b; border-radius: 5px; height:60px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;" class="word-wrap">
                     <pre> <span class="webhook-label">Webhook Id : </span>  <span class='webhook'>{{ webhookId }}</span></pre>
                   </p>
@@ -160,7 +160,7 @@
               <br>
                     </b-col>
                 </b-row>
-              <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+              <div style="background-color: #2b2b2b; border-radius: 5px; height:150px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
                     <span class="webhook-label" style="padding:7px;">Curl Command (File Processing) : </span>
                     <span class='webhook'>
@@ -179,7 +179,7 @@
                   </p>
                   <br>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p>
                 </b-col>
             </b-modal>

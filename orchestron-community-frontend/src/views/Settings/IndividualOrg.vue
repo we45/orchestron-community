@@ -112,7 +112,7 @@
                             <br>
                         </form>
                     </div>
-                    <b-col col="12" slot="modal-footer">
+                    <b-col cols="12" slot="modal-footer">
                         <div class="pull-right" style="float: right">
                             <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateUser() "> Close</button>
                             <button type="button" class="btn btn-orange-submit pull-right"
@@ -167,7 +167,7 @@
                             <br>
                         </form>
                     </div>
-                    <b-col col="12" slot="modal-footer">
+                    <b-col cols="12" slot="modal-footer">
                         <div class="pull-right" style="float: right">
                             <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateUser() "> Close</button>
                             <button type="button" class="btn btn-orange-submit pull-right"
@@ -188,7 +188,7 @@
                             <br>
                         </form>
                     </div>
-                    <b-col col="12" slot="modal-footer">
+                    <b-col cols="12" slot="modal-footer">
                         <div class="pull-right" style="float: right;">
                             <button type="button" class="btn btn-orange-close" @click=" deleteCloseSubmitUser() ">No</button>
                             <button type="button" class="btn btn-orange-submit"
@@ -255,7 +255,7 @@
                                         placeholder="Enter JIRA Password" :state="!$v.jiraPassword.$invalid"></b-form-input>
                                 </b-col>
                             </b-row>
-                            <b-col col="12" slot="modal-footer">
+                            <b-col cols="12" slot="modal-footer">
                                 <br>
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
@@ -360,7 +360,7 @@
                                     <v-select v-model="emailTlsSsl" :options="transportLayerOption" placeholder="Select Transport Layer" :state="!$v.emailTlsSsl.$invalid"></v-select>
                                 </b-col>
                             </b-row>
-                            <b-col col="12">
+                            <b-col cols="12">
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"

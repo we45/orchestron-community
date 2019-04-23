@@ -5,12 +5,12 @@
         <p> <strong> {{ reqResp.url | decode }} </strong></p>
         <hr>
         <b-row>
-          <b-col col="6">
+          <b-col cols="6">
             <p> <span class="app-created-on">Application</span>  <span class="app-divider">:</span> <strong class="app-value">{{ reqResp.appName }}</strong></p>
             <p> <span class="app-created-on">CWE</span>  <span class="app-divider">:</span> <span class="app-value">{{ reqResp.cwe }}</span></p>
             <p> <span class="app-created-on">Tool</span>  <span class="app-divider">:</span> <span class="app-value">{{ reqResp.tool }}</span></p>
           </b-col>
-          <b-col col="6">
+          <b-col cols="6">
             <p> <span class="app-created-on">OWASP</span>  <span class="app-divider">:</span> <span class="app-value">{{ reqResp.owasp }}</span></p>
             <p> <span class="app-created-on">Scan Name</span>  <span class="app-divider">:</span> <span class="app-value">{{ reqResp.scanName }}</span></p>
           </b-col>

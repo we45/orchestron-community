@@ -7,7 +7,7 @@
                 :logo="appLogo"
                 :url="appUrl"
                 :osInfo="appOsInfo"
-                :platform="appPlatform" @configureApplication="applicationConfigure()"></app-headers>
+                :platform="appPlatform" @configureApplication="applicationConfigure()" @configureWebhooks="copyWebhook($event)"></app-headers>
 
           <b-container v-if="showConfig" fluid style="background-color: #FFFFFF;">
             <br>
@@ -47,8 +47,16 @@
                             :lowCount="lowCount"
                             :infoCount="infoCount"></donut-chart>
                     </b-col>
-                    <b-col cols="6">
+                    <!-- <b-col cols="6">
                         <app-bar-chart :barChartData="appSevData" :barChartTitle="'Application-wise Vulnerabilities'"></app-bar-chart>
+                    </b-col> -->
+
+                     <b-col cols="6">
+                        <template v-if="basicBarDashboardChartData.length > 0">
+                            <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
+                                                    :chartCategories="dashboardCategories"
+                                                    :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
+                        </template>
                     </b-col>
                 </b-row>
             </b-container>
@@ -106,7 +114,7 @@
                                 </b-row>
                                 <br>
                             </form>
-                            <b-col col="12" >
+                            <b-col cols="12" >
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"
@@ -180,7 +188,7 @@
                                 </b-row>
                                 <br>
                                 <br>
-                              <b-col col="12" >
+                              <b-col cols="12" >
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"
@@ -318,6 +326,54 @@
                     </form>
                 </div>
             </b-modal>
+
+            <!--Copy-->
+            <b-modal ref="copyWebhookModal" title="Copy Webhook" centered size="lg">
+                <b-row>
+                  <b-col cols="12">
+                <div style="background-color:#2b2b2b; border-radius: 5px; height:50px;width: 100%;">
+                  <p style="text-align:left;vertical-align: middle;padding-top: 2%;" class="word-wrap">
+                    <pre> <span class="webhook-label">Webhook Id : </span>  <span class='webhook'>{{ webhookId }}</span></pre>
+                  </p>
+                  <br>
+                </div>
+              <br>
+                  </b-col>
+                  <b-col cols="12">
+              <div style="background-color: #2b2b2b; border-radius: 5px; height:50px;display: table;width: 100%;">
+                  <p style="vertical-align: middle;width: 100%;padding-top: 2%;" class="word-wrap">
+                    <span class="webhook-label" style="padding:7px;">User Token : </span>
+                   <span class='webhook'><label style="word-break: break-all;padding:7px;">{{ userToken }}</label></span>
+                  </p>
+                  <br>
+                </div>
+              <br>
+                    </b-col>
+                </b-row>
+              <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+                  <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
+                    <span class="webhook-label" style="padding:7px;">Curl Command (File Processing) : </span>
+                    <span class='webhook'>
+                       {{curlCmd}}<label>{{ webhookId }}/</label>
+                    </span>
+                  </p>
+                  <br>
+                </div>
+              <br>
+              <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;display: table;width: 100%;">
+                  <p style="text-align:left;vertical-align: middle;padding-top: 2%;">
+                   <span class="webhook-label" style="padding:7px;"> Curl Command (JSON Processing) : </span>
+                    <span class='webhook'>
+                      {{jsonCmd}}<label>{{ webhookId }}/</label>
+                    </span>
+                  </p>
+                  <br>
+                </div>
+                <b-col cols="12" slot="modal-footer">
+                    <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p>
+                </b-col>
+            </b-modal>
+
         </b-container>
     </div>
 </template>
@@ -333,6 +389,7 @@
   import Loading from 'vue-loading-overlay'
   import 'vue-loading-overlay/dist/vue-loading.min.css'
   import { notValidUser } from '@/utils/checkAuthUser'
+  import orchyStackedBarChart from '@/components/Charts/orchyStackedBarChart'
 
   export default {
     name: 'IndividualApplication',
@@ -342,10 +399,17 @@
       VulCountSection,
       DonutChart,
       AppBarChart,
-      Loading
+      Loading,
+      orchyStackedBarChart
     },
     data() {
       return {
+        basicBarDashboardChartData: [],
+        dashboardCategories: [],
+        highLable: 'High',
+        mediumLable: 'Medium',
+        lowLable: 'Low',
+        infoLable: 'Info',
         isLoading: false,
         vulnerabilitiesList: [],
         appname: '',
@@ -378,9 +442,19 @@
           { label: 'Info', value: 0 }
         ],
         manualSeverity: 0,
-        manualOwaspList: ['Injection', 'Broken Authentication', 'Sensitive Data Exposure', 'XML External Entities (XXE)',
-          'Broken Access Control', 'Security Misconfiguration', 'Cross-Site Scripting (XSS)', 'Insecure Deserialization',
-          'Using Components with Known Vulnerabilities', 'Insufficient Logging&Monitoring', 'Uncategorized'],
+        manualOwaspList: [
+            'Injection',
+            'Broken Authentication and Session Management',
+            'Cross-Site Scripting',
+            'Insecure Direct Object References',
+            'Security Misconfiguration',
+            'Sensitive Data Exposure',
+            'Missing Function Level Access Control',
+            'Cross-Site Request Forgery',
+            'Using Components with Known Vulnerabilities',
+            'Unvalidated Redirects and Forwards',
+            'Uncategorized'
+        ],
         manualOwasp: '',
         manualStepOne: false,
         manualStepTwo: false,
@@ -398,7 +472,12 @@
         parsingScanId: '',
         showConfig: false,
         appJiraProject: '',
-        appJiraProjectOptions: null
+        appJiraProjectOptions: null,
+        webhookId : '',
+        api_site_url: '',
+        userToken: '',
+        curlCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> http://127.0.0.1/api/webhook/post/',
+        jsonCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -H "Scan-Name: <scan_name>" -d \'{"vuls":<json_dictionary>}\' http://127.0.0.1/api/webhook/post/'
       }
     },
     validations: {
@@ -493,13 +572,23 @@
       })
     },
     methods: {
+      copyWebhook() {
+        this.$refs.copyWebhookModal.show()
+        this.userToken = localStorage.getItem('token')
+      },
       fetchData() {
         if (this.param && this.org && this.token) {
           axios.get('/applications/' + this.param + '/?scans=1&opened=1&ageing=1&closed=1&avg_ageing=1&severity=1')
             .then(res => {
-              for (const ageing of res.data.ageing) {
-                this.appSevData.push(ageing)
-              }
+              console.log("webhook ID", res.data)
+              console.log("webhook ID", res.data)
+              console.log("webhook ID", res.data)
+              console.log("webhook ID", res.data)
+              this.webhookId = res.data.webhook_id
+            
+              // for (const ageing of res.data.ageing) {
+              //   this.appSevData.push(ageing)
+              // }
               this.openVulCount = res.data.open_vul_count
               this.closeVulCount = res.data.closed_vul_count
               this.appGrade = res.data.avg_ageing
@@ -544,6 +633,54 @@
                   appDashboard: true
                 })
               }
+
+
+              const highAgeingSevCount = []
+              const mediumAgeingSevCount = []
+              const lowAgeingSevCount = []
+              const infoAgeingSevCount = []
+              for (const [key, value] of Object.entries(res.data.ageing)) {
+                for (const [keys, values] of Object.entries(value)) {
+                this.dashboardCategories.push(keys)
+                  highAgeingSevCount.push(values[3])
+                  mediumAgeingSevCount.push(values[2])
+                  lowAgeingSevCount.push(values[1])
+                  infoAgeingSevCount.push(values[0])
+              }
+              }
+              this.basicBarDashboardChartData.push(
+                {
+                  name: this.highLable,
+                  data: highAgeingSevCount,
+                  color: '#d11d55'
+                }
+              )
+
+              this.basicBarDashboardChartData.push(
+                {
+                  name: this.mediumLable,
+                  data: mediumAgeingSevCount,
+                  color: '#ff9c2c'
+                }
+              )
+
+              this.basicBarDashboardChartData.push(
+                {
+                  name: this.lowLable,
+                  data: lowAgeingSevCount,
+                  color: '#008b8f'
+                }
+              )
+
+              this.basicBarDashboardChartData.push(
+                {
+                  name: this.infoLable,
+                  data: infoAgeingSevCount,
+                  color: '#1d1e52'
+                }
+              )
+
+
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -618,7 +755,7 @@
           const formData = {
             "name": this.appJiraProject
           }
-          axios.put('/applications/' + this.param + '/jira', formData)
+          axios.put('/applications/' + this.param + '/jira/', formData)
             .then(res => {
               this.isLoading = true
               this.$router.push('/projects/individual_application/' + this.param)
@@ -838,8 +975,8 @@
     padding: 3px 12px;
     margin-bottom: 0;
     font-size: 14px;
-
   }
+
   .btn-orange-close:focus,
   .btn-orange-close.focus {
     color: #ff542c;
@@ -862,6 +999,7 @@
     margin-bottom: 0;
     font-size: 14px;
   }
+
   .btn-orange-submit {
     color: #FFFFFF;
     background-color: #ff542c;
@@ -871,7 +1009,6 @@
     padding: 3px 12px;
     margin-bottom: 0;
     font-size: 14px;
-
   }
 
   .btn-orange-submit:focus,
@@ -895,6 +1032,49 @@
     padding: 3px 12px;
     margin-bottom: 0;
     font-size: 14px;
+  }
+.vsts_flow_active{
+    font-family: 'Avenir';
+    font-size: 14px;
+    color: green;
+    background: #DAD8D1;
+}
+.vsts_flowfr{
+    font-family: 'Avenir';
+    font-size: 14px;
+    color: grey;
+}
+
+.webhook{
+    color: #ffb648;
+    word-wrap:break-word;
+    font-family: 'Avenir';
+    font-size: 14px;
+    white-space: pre-wrap;
+   white-space: -moz-pre-wrap;
+   white-space: -pre-wrap;
+   white-space: -o-pre-wrap;
+   word-wrap: break-word;
+  }
+  .webhook-label{
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 0.99;
+    text-align: left;
+    color: #ffb648;
+
+  }
+  .word-wrap {
+   white-space: pre-wrap;
+   white-space: -moz-pre-wrap;
+   white-space: -pre-wrap;
+   white-space: -o-pre-wrap;
+   word-wrap: break-word;
+}
+  .importent-text{
+    color: #ff542c;
+    text-align: center;
   }
 
 

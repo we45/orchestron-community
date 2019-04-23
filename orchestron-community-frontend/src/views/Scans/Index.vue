@@ -73,7 +73,7 @@
                                 </b-row>
                                 <br>
                                 <br>
-                              <b-col col="12" >
+                              <b-col cols="12" >
                                 <div class="pull-right" style="float: right">
                                     <button type="button"
                                         class="btn btn-orange-close pull-right"
@@ -191,7 +191,7 @@
                             </form>
                             <br>
                 </div>
-                <b-col col="12" slot="modal-footer">
+                <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateProject() "> Close</button>
                         <!--<button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" submitAddVulnerabilities() " v-if="!$v.projectName.$invalid && !$v.projectLogo.$invalid">-->
@@ -238,9 +238,19 @@
           manualCwe: '',
           manualSeverityList: [{ label: 'High', value: 3 }, { label: 'Medium', value: 2 }, { label: 'Low', value: 1 }, { label: 'Info', value: 0 }],
           manualSeverity: '',
-          manualOwaspList: ['Injection', 'Broken Authentication', 'Sensitive Data Exposure', 'XML External Entities (XXE)',
-            'Broken Access Control', 'Security Misconfiguration', 'Cross-Site Scripting (XSS)', 'Insecure Deserialization',
-            'Using Components with Known Vulnerabilities', 'Insufficient Logging&Monitoring', 'Uncategorized'],
+          manualOwaspList: [
+            'Injection',
+            'Broken Authentication and Session Management',
+            'Cross-Site Scripting',
+            'Insecure Direct Object References',
+            'Security Misconfiguration',
+            'Sensitive Data Exposure',
+            'Missing Function Level Access Control',
+            'Cross-Site Request Forgery',
+            'Using Components with Known Vulnerabilities',
+            'Unvalidated Redirects and Forwards',
+            'Uncategorized'
+        ],
           manualOwasp: '',
           manualStepOne: false,
           manualStepTwo: false,
