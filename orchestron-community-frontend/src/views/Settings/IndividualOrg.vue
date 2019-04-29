@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-          <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="true"></loading>
+          <loading :active.sync="reloadPage" :can-cancel="true" :is-full-page="true"></loading>
             <settings-org-header :settingsHeader="headerData" :logoOrg="orgLogo" @configureSettings="configureOrgSettings"></settings-org-header>
             <b-container fluid v-if="showConfig" style="background-color: #FFFFFF;">
                 <br>
@@ -398,6 +398,7 @@ export default {
   data() {
     return {
       isLoading: false,
+      reloadPage: false,
       headerData: [],
       userData: [],
       userId: '',
@@ -429,7 +430,8 @@ export default {
       enableEmail: false,
       isConfCreated: false,
       jiraTestStatus: '',
-      orgLogo: ''
+      orgLogo: '',
+      post_jira_method: false
     }
   },
   validations: {
@@ -537,6 +539,7 @@ export default {
   },
   methods: {
     fetchData() {
+        this.reloadPage = true
       if (this.param && this.org && this.token) {
         axios
           .get('/organizations/' + this.param + '/?users=1&groups=1')
@@ -610,8 +613,13 @@ export default {
                   this.jiraURL = res.data.url
                   this.jiraUserName = '****'
                   this.jiraPassword = ''
+                  this.post_jira_method = true
                 })
                 .catch(error => {
+        this.reloadPage = false
+
+          
+
                   if (error.res.status === 404) {
                     this.$router.push('/not_found')
                   } else if (error.res.status === 403) {
@@ -621,8 +629,11 @@ export default {
                   }
                 })
             }
+            this.reloadPage = false
           })
           .catch(error => {
+        this.reloadPage = false
+
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {
@@ -631,6 +642,8 @@ export default {
               this.$router.push('/error')
             }
           })
+        // this.reloadPage = false
+
       } else {
         notValidUser()
         this.$router.push('/')
@@ -901,10 +914,40 @@ export default {
           username: this.jiraUserName,
           password: this.jiraPassword
         }
+        if(this.post_jira_method){
+
         axios
+          .post('/organizations/' + this.param + '/jira/', form_data)
+          .then(res => {
+            // if (res.status === 200) {
+              this.$refs.userCreateModal.hide()
+              this.isLoading = true
+              this.$router.go('/settings/individual_org/' + this.param + '/')
+              this.$notify({
+                group: 'foo',
+                type: 'success',
+                title: 'JIRA',
+                text: 'The JIRA has been updated Successfully!',
+                position: 'top right'
+              })
+              this.isLoading = false
+            // }
+          })
+          .catch(error => {
+            if (error.res.status === 404) {
+              this.$router.push('/not_found')
+            } else if (error.res.status === 403) {
+              this.$router.push('/forbidden')
+            } else {
+              this.$router.push('/error')
+            }
+          })
+        }
+        else{
+             axios
           .put('/organizations/' + this.param + '/jira/', form_data)
           .then(res => {
-            if (res.status === 200) {
+            // if (res.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
               this.$router.go('/settings/individual_org/' + this.param + '/')
@@ -916,7 +959,7 @@ export default {
                 position: 'top right'
               })
               this.isLoading = false
-            }
+            // }
           })
           .catch(error => {
             if (error.res.status === 404) {
@@ -927,6 +970,7 @@ export default {
               this.$router.push('/error')
             }
           })
+        }
       } else {
         notValidUser()
         this.$router.push('/')

@@ -1,6 +1,7 @@
 <template>
     <div>
         <b-container fluid>
+           <loading :active.sync="reloadPage" :can-cancel="true"></loading>
             <scan-header :scanHeader="headerData" @addVulnerabilities="addVulnerabilities($event)"></scan-header>
             <br>
             <b-container fluid>
@@ -15,7 +16,8 @@
                             :infoCount="infoCount"></donut-chart>
                     </b-col>
                     <b-col cols="6">
-                      <app-bar-chart :barChartData="cweChart" :barChartTitle="'CWE-wise Details'"></app-bar-chart>
+                      <!-- <app-bar-chart :barChartData="cweChart" :barChartTitle="'CWE-wise Details'"></app-bar-chart> -->
+                       <app-bar-chart v-if="cweListData.length > 0"  :title="'Vulnerabilities by cwe'" :cweData="cweListData" :cweDataRange="cweListDataCounts"></app-bar-chart>
                     </b-col>
                 </b-row>
             </b-container>
@@ -206,13 +208,14 @@
 </template>
 
 <script>
-    import DonutChart from '@/components/Dashboard/Charts/DonutChart'
-    import AppBarChart from '@/components/Dashboard/Charts/BarChart'
+    import DonutChart from '@/components/Charts/orchyDonutSeverityChart'
+    import AppBarChart from '@/components/Charts/chart3DCWE'
     import ScanHeader from '@/components/Scans/Header'
     import VulTable from '@/components/Scans/VulTable'
     import { required, minLength, url } from 'vuelidate/lib/validators'
     import axios from '@/utils/auth'
     import { notValidUser } from '@/utils/checkAuthUser'
+    import Loading from 'vue-loading-overlay'
 
     export default {
       name: 'IndividualScan',
@@ -220,7 +223,8 @@
         DonutChart,
         AppBarChart,
         ScanHeader,
-        VulTable
+        VulTable,
+        Loading
       },
       data() {
         return {
@@ -234,6 +238,8 @@
           infoCount: 0,
           chartData: [],
           scanVulData: [],
+          cweListData: [],
+          cweListDataCounts: [],
           manualVulName: '',
           manualCwe: '',
           manualSeverityList: [{ label: 'High', value: 3 }, { label: 'Medium', value: 2 }, { label: 'Low', value: 1 }, { label: 'Info', value: 0 }],
@@ -254,6 +260,7 @@
           manualOwasp: '',
           manualStepOne: false,
           manualStepTwo: false,
+          reloadPage: false,
           manualVulDesc: '',
           manualVulRemedy: '',
           manualStepThree: false,
@@ -314,9 +321,12 @@
       },
       methods: {
         fetchData() {
+          this.reloadPage = true
           if (this.org && this.token) {
             axios.get('/scans/' + this.param + '/?stats=1&vuls=1')
               .then(res => {
+                this.cweListData = []
+                this.cweListDataCounts = []
                 this.headerData.push({
                   'scanCreatedBy': res.data.triggered_by,
                   'appName': res.data.application_name,
@@ -326,6 +336,8 @@
                 })
                 for (const [key, val] of Object.entries(res.data.cwe)) {
                   this.cweChart.push([key, val])
+                  this.cweListData.push(parseInt(val))
+                  this.cweListDataCounts.push(parseInt(key))
                 }
                 this.highCount = res.data.severity[3] | 0
                 this.mediumCount = res.data.severity[2] | 0
@@ -351,7 +363,11 @@
                     })
                   }
                 }
+                this.reloadPage = false
+                
               }).catch(error => {
+                this.reloadPage = false
+
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {

@@ -1,7 +1,7 @@
 <template>
     <div>
       <b-container fluid>
-        <loading :active.sync="isLoading" :can-cancel="true"></loading>
+        <loading :active.sync="reloadPage" :can-cancel="true"></loading>
         <common-table :pageCount="engagementsCount" :dataItems="engagementList" :headerTitle="headerTitles"
             @createModal="createEngagement"
             @updateModal="updateEngagement($event)"
@@ -25,12 +25,13 @@
                                     type="text"
                                     class="inline-form-control"
                                     placeholder="Enter Engagement Name" :state="!$v.engagementName.$invalid"></b-form-input>
+                                     <p v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
                             </b-col>
                         </b-row>
-                        <b-col sm="12">
+                      <!--   <b-col sm="12">
                             <br>
                             <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
-                        </b-col>
+                        </b-col> -->
                         <br>
                       <b-row class="my-1">
                             <b-col sm="2"><label class="label">Description:</label></b-col>
@@ -40,6 +41,7 @@
                                    placeholder="Enter Description"
                                    :rows="3"
                                    :max-rows="6" :state="!$v.engagementDesc.$invalid">
+                                     <p v-if="error_msgs['desc']" style="text-align: left;" class="error"> * {{ error_msgs['desc_msg'] }}</p>
                                 </b-form-textarea>
                             </b-col>
                         </b-row>
@@ -52,6 +54,7 @@
                                   placeholder="Select Application"
                                   v-model="application"
                                   :state="!$v.application.$invalid"></v-select>
+                                    <p v-if="error_msgs['app']" style="text-align: left;" class="error"> * {{ error_msgs['app_msg'] }}</p>
                             </b-col>
                         </b-row>
                         <br>
@@ -64,11 +67,12 @@
                                   format="yyyy-MM-dd"
                                   lang="en" width="100%"
                                   :not-before="today" :state="!$v.engagementDateRange.$invalid"></date-picker>
+                                     <p v-if="error_msgs['date']" style="text-align: left;" class="error"> * {{ error_msgs['date_msg'] }}</p>
                             </b-col>
-                            <b-col sm="12">
+                           <!--  <b-col sm="12">
                               <br>
                                <p  v-if="error_msgs['date']" style="text-align: left;" class="error"> * {{ error_msgs['date_msg'] }}</p>
-                            </b-col>
+                            </b-col> -->
                         </b-row>
                         <br>
                     </form>
@@ -103,14 +107,15 @@
                                     type="text"
                                     class="inline-form-control"
                                     placeholder="Enter Engagement Name" :state="!$v.updateEngagementName.$invalid"></b-form-input>
+                                     <p v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
                                 <!--<p v-if="!$v.projectName.required">The name field is required!</p>-->
                                 <!--<p v-if="!$v.projectName.minLength">The name field is minimum 3!</p>-->
                             </b-col>
 
-                            <b-col sm="12">
+                           <!--  <b-col sm="12">
                               <br>
                               <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
-                            </b-col>
+                            </b-col> -->
                         </b-row>
                         <br>
                       <b-row class="my-1">
@@ -122,6 +127,7 @@
                                    :rows="3"
                                    :max-rows="6" :state="!$v.updateEngagementDesc.$invalid">
                                 </b-form-textarea>
+                                <p v-if="error_msgs['desc']" style="text-align: left;" class="error"> * {{ error_msgs['desc_msg'] }}</p>
                             </b-col>
                         </b-row>
                         <br>
@@ -132,6 +138,7 @@
                                   :options="applicationOption"
                                   v-model="updateApplication"
                                   :state="!$v.updateApplication.$invalid"></v-select>
+                                   <p v-if="error_msgs['app']" style="text-align: left;" class="error"> * {{ error_msgs['app_msg'] }}</p>
                             </b-col>
                         </b-row>
                         <br>
@@ -144,11 +151,12 @@
                                   format="yyyy-MM-dd"
                                   lang="en" width="100%"
                                   :not-before="today" :state="!$v.updateEngagementDateRange.$invalid"></date-picker>
+                                <p v-if="error_msgs['date']" style="text-align: left;" class="error"> * {{ error_msgs['date_msg'] }}</p>
                             </b-col>
-                            <b-col sm="12">
+                          <!--   <b-col sm="12">
                               <br>
                                <p  v-if="error_msgs['date']" style="text-align: left;" class="error"> * {{ error_msgs['date_msg'] }}</p>
-                            </b-col>
+                            </b-col> -->
                         </b-row>
                         <br>
                     </form>
@@ -225,6 +233,7 @@
           engagementId: '',
           engagementsCount: 0,
           isPaginated: false,
+          reloadPage: false,
           today: new Date(),
           error_msgs : {"name": false,"date": false,"name_msg":"", "date_msg":""},
           shortcuts: [
@@ -271,6 +280,43 @@
         this.token = localStorage.getItem('token')
         this.fetchData()
       },
+      watch: {
+        'engagementName': function(value_name) {
+          if (value_name.length > 255) {
+            this.error_msgs['name'] = true
+            this.error_msgs['name_msg'] = 'Max Length is 255 Characters'
+          } else {
+            this.error_msgs['name'] = false
+          }
+        },
+        'updateEngagementName': function(value_name) {
+          if (value_name.length > 255) {
+            this.error_msgs['name'] = true
+            this.error_msgs['name_msg'] = 'Max Length is 255 Characters'
+          } else {
+            this.error_msgs['name'] = false
+          }
+        },
+        'application': function(value_name) {
+          this.error_msgs['app'] = false
+        },
+        'updateApplication': function(value_name) {
+          this.error_msgs['app'] = false
+        },
+        'updateEngagementDateRange': function(value_name) {
+          this.error_msgs['date'] = false
+        },
+      
+        'engagementDateRange': function(value_name) {
+          this.error_msgs['date'] = false
+        },
+        'updateEngagementDesc': function(value_name) {
+          this.error_msgs['date'] = false
+        },
+        'engagementDesc': function(value_name) {
+          this.error_msgs['date'] = false
+        }
+      },
       updated() {
         if (this.isLoading) {
           this.$nextTick(() => {
@@ -294,6 +340,7 @@
       methods: {
         fetchData() {
           if (this.org && this.token) {
+            this.reloadPage = true
             this.engagementList = []
             axios.get('/engagements/')
               .then(res => {
@@ -311,6 +358,8 @@
                   })
                 }
               }).catch(error => {
+            this.reloadPage = false
+
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 404) {
@@ -326,7 +375,9 @@
                     for (const value of res.data) {
                       this.applicationOption.push({ value: value.id, label: value.name })
                     }
+                      this.reloadPage = false
                   }).catch(error => {
+                     this.reloadPage = false
                     if (error.response.status === 404) {
                       this.$router.push('/not_found')
                     } else if (error.response.status === 404) {
@@ -344,6 +395,8 @@
         clickPagination(event) {
           if (event.page) {
             if (event.page > 1) {
+            this.reloadPage = true
+
               axios.get('/engagements/?page=' + event.page)
                   .then(res => {
                     this.engagementPagnatedList = []
@@ -359,7 +412,11 @@
                   })
                     }
                     this.engagementList = this.engagementPagnatedList
+            this.reloadPage = false
+
                   }).catch(error => {
+            this.reloadPage = false
+
                     if (error.response.status === 404) {
                       this.$router.push('/not_found')
                     } else if (error.response.status === 404) {
@@ -369,6 +426,8 @@
                     }
                   })
                this.isPaginated = true
+            this.reloadPage = false
+               
             } else {
               this.fetchData()
             }
@@ -379,6 +438,7 @@
         },
         createEngagement() {
           this.error_msgs = {"name": false,"date": false,"name_msg":"", "date_msg":""}
+          this.clearErrorMsgs()
           this.engagementName = ''
           this.engagementDesc = ''
           this.application = null
@@ -388,6 +448,13 @@
         closeCreateEngagement() {
           this.$refs.createEngagementModal.hide()
         },
+         clearErrorMsgs() {
+            this.error_msgs['name'] = false
+            this.error_msgs['date'] = false
+            this.error_msgs['app'] = false
+            this.error_msgs['type'] = false
+            this.error_msgs['desc'] = false
+          },
         submitCreateEngagement() {
           if (this.org && this.token) {
             const dayOne = new Date(this.engagementDateRange[0])
@@ -425,21 +492,43 @@
                   this.$router.push('/forbidden')
                 } 
                 else if (error.response.status === 400) {
-                  if(error.response.data.name){
+                  // if(error.response.data.name){
+                  //     this.error_msgs['name'] = true
+                  //     this.error_msgs['name_msg'] = 'engagement with this name already exists.'
+                  //   }
+                  //   else{
+                  //        this.error_msgs['name'] = false
+                  //   }
+                  //   if(error.response.data.non_field_errors){
+                  //     this.error_msgs['date'] = true
+                  //     this.error_msgs['date_msg'] = 'Stop date must occur after start date'
+                  //   } 
+                  //   else{
+                  //        this.error_msgs['date'] = false
+                  //   }
+
+                  // this.$router.push('/forbidden')
+
+
+                     if (error.response.data['name']) {
                       this.error_msgs['name'] = true
-                      this.error_msgs['name_msg'] = 'engagement with this name already exists.'
+                      this.error_msgs['name_msg'] = error.response.data['name'][0]
                     }
-                    else{
-                         this.error_msgs['name'] = false
-                    }
-                    if(error.response.data.non_field_errors){
+                    if (error.response.data['start_date'] || error.response.data['stop_date'] || error.response.data['non_field_errors']) {
                       this.error_msgs['date'] = true
                       this.error_msgs['date_msg'] = 'Stop date must occur after start date'
-                    } 
-                    else{
-                         this.error_msgs['date'] = false
+                      if (error.response.data['start_date'][0] || error.response.data['stop_date'][0]) {
+                        this.error_msgs['date_msg'] = error.response.data['start_date'][0] + '\n' + error.response.data['stop_date'][0]
+                      }
                     }
-                  // this.$router.push('/forbidden')
+                    if (error.response.data['description']) {
+                      this.error_msgs['desc'] = true
+                      this.error_msgs['desc_msg'] = error.response.data['description'][0]
+                    }
+                    if (error.response.data['application']) {
+                      this.error_msgs['app'] = true
+                      this.error_msgs['app_msg'] = error.response.data['application'][0]
+                    }
                 } 
                 else {
                   this.$router.push('/error')
@@ -451,6 +540,7 @@
           }
         },
         updateEngagement(event) {
+          this.clearErrorMsgs()
           this.engagementId = event.id
           this.error_msgs = {"name": false,"date": false,"name_msg":"", "date_msg":""}
           if (this.org && this.token && this.engagementId) {
@@ -522,20 +612,46 @@
                   this.$router.push('/forbidden')
                 } 
                 else if (error.response.status === 400) {
-                  if(error.response.data.name){
+
+                   if (error.response.data['name']) {
                       this.error_msgs['name'] = true
-                      this.error_msgs['name_msg'] = 'engagement with this name already exists.'
+                      this.error_msgs['name_msg'] = error.response.data['name'][0]
                     }
-                    else{
-                         this.error_msgs['name'] = false
-                    }
-                    if(error.response.data.non_field_errors){
+                    if (error.response.data['start_date'] || error.response.data['stop_date'] || error.response.data['non_field_errors']) {
                       this.error_msgs['date'] = true
                       this.error_msgs['date_msg'] = 'Stop date must occur after start date'
-                    } 
-                    else{
-                         this.error_msgs['date'] = false
+                      if (error.response.data['start_date'][0] || error.response.data['stop_date'][0]) {
+                        this.error_msgs['date_msg'] = error.response.data['start_date'][0] + '\n' + error.response.data['stop_date'][0]
+                      }
                     }
+                    if (error.response.data['description']) {
+                      this.error_msgs['desc'] = true
+                      this.error_msgs['desc_msg'] = error.response.data['description'][0]
+                    }
+                    if (error.response.data['application']) {
+                      this.error_msgs['app'] = true
+                      this.error_msgs['app_msg'] = error.response.data['application'][0]
+                    }
+                    if (error.response.data['bucket']) {
+                      this.error_msgs['type'] = true
+                      this.error_msgs['type_msg'] = error.response.data['bucket'][0]
+                    }
+
+
+                  // if(error.response.data.name){
+                  //     this.error_msgs['name'] = true
+                  //     this.error_msgs['name_msg'] = 'engagement with this name already exists.'
+                  //   }
+                  //   else{
+                  //        this.error_msgs['name'] = false
+                  //   }
+                  //   if(error.response.data.non_field_errors){
+                  //     this.error_msgs['date'] = true
+                  //     this.error_msgs['date_msg'] = 'Stop date must occur after start date'
+                  //   } 
+                  //   else{
+                  //        this.error_msgs['date'] = false
+                  //   }
                   // this.$router.push('/forbidden')
                 } 
                 else {

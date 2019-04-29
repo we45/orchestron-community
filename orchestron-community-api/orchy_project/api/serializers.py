@@ -32,6 +32,16 @@ class OpenVulSerializer(serializers.Serializer):
 	bug_status = serializers.CharField(required=False)
 	severity = serializers.IntegerField(required=False)
 
+class UnCategorisedSerializer(serializers.Serializer):
+	open_for = serializers.IntegerField(required=False)
+	cwe = serializers.IntegerField(required=False)
+	tools = serializers.CharField(required=False)
+	apps = serializers.CharField(required=False)
+	common_name = serializers.CharField(required=False)
+	names = serializers.CharField(required=False)
+	bug_id = serializers.CharField(required=False)
+	bug_status = serializers.CharField(required=False)
+	severity = serializers.IntegerField(required=False)
 
 class ClosedVulSerializer(serializers.Serializer):
 	cwe = serializers.IntegerField(required=False)
@@ -105,6 +115,7 @@ class BaseQueryParamSerializer(serializers.Serializer):
 	heatmap = serializers.BooleanField(required=False)
 	ageing = serializers.BooleanField(required=False)
 	avg_ageing = serializers.BooleanField(required=False)
+	uncategorized = serializers.BooleanField(required=False)
 
 
 class OrganizationQueryParamSerializer(BaseQueryParamSerializer):
@@ -381,12 +392,13 @@ class EngagementSerializer(serializers.ModelSerializer):
 	severity = serializers.SerializerMethodField()
 	parser_classes = (JSONParser,)
 	app_details = serializers.SerializerMethodField()
+	ageing = serializers.SerializerMethodField()
 
 	class Meta:
 		model = Engagement
 		fields = ['id','name','application','description','start_date','stop_date','closed_on','closed_by',\
-		'created_on','edited_on','created_by','severity','uniq_id','app_details']
-		read_only_fields = ['created_on','edited_on','created_by','uniq_id','closed_on','closed_by','severity','app_details']
+		'created_on','edited_on','created_by','severity','uniq_id','app_details','ageing']
+		read_only_fields = ['created_on','edited_on','created_by','uniq_id','closed_on','closed_by','severity','app_details', 'ageing']
 
 	def __init__(self, *args, **kwargs):
 		super(EngagementSerializer, self).__init__(*args, **kwargs)
@@ -407,7 +419,17 @@ class EngagementSerializer(serializers.ModelSerializer):
 	def validate(self, data):
 		if data.get('start_date') >= data.get('stop_date'):
 			raise serializers.ValidationError(ENG_START_DATE_END_DATE_VALIDATION)
-		return data				
+		return data
+
+	def get_ageing(self,obj):
+		from api.analytics import OpenVulnerabilityStatView
+		kwargs = {
+			'scan__engagements':obj
+		}
+		data = {
+			'ageing':OpenVulnerabilityStatView().aging_count(kwargs=kwargs),
+		}
+		return data					
 
 
 class ScanSerializer(serializers.ModelSerializer):
@@ -603,7 +625,37 @@ class VulnerabilityEvidenceRemediationSerializer(serializers.ModelSerializer):
 
 
 
+class ReportSerializer(serializers.Serializer):
+	apps = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	proj = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	eng = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	sev = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	tools = serializers.ListField(required=False,child=serializers.CharField(),min_length=0)
 
+	def __init__(self, *args, **kwargs):
+		super(ReportSerializer, self).__init__(*args, **kwargs)
+		self.user = self.context.get('request').user
+
+	def validate_apps(self, data):
+		if data:
+			applications = Application.objects.filter(id__in=data)
+			if not applications.exists():
+				raise serializers.ValidationError('Not Found')
+		return data
+
+	def validate_eng(self, data):
+		if data:
+			engagements = Engagement.objects.filter(id__in=data)
+			if not engagements.exists():
+				raise serializers.ValidationError('Not Found')
+		return data
+
+	def validate_proj(self, data):
+		if data:
+			projects = Project.objects.filter(id__in=data)
+			if not projects.exists():
+				raise serializers.ValidationError('Not Found')
+		return data
 			
 
 

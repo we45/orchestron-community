@@ -84,6 +84,8 @@ export default {
           const token = localStorage.getItem('token')
           if (token && token!=='undifined') {
             this.$router.go('/org/dashboard')
+            this.$router.push('/org/dashboard')
+
           } else {
             this.$router.push({ path: '/' })
             this.isFormInvalid = true

@@ -1,6 +1,7 @@
 <template>
     <div>
         <b-container fluid>
+          <loading :active.sync="reloadPage" :can-cancel="true"></loading>
             <b-card>
                 <p class="title">Closed Vulnerabilities by Severity</p>
                 <hr>
@@ -42,17 +43,20 @@ import ClosedVulTable from '@/components/ClosedVulnerability/ClosedVulTable.vue'
 import VulProgressBar from '@/components/OpenVulnerabilities/VulProgressBar'
 import axios from '@/utils/auth'
 import { notValidUser } from '@/utils/checkAuthUser'
+import Loading from 'vue-loading-overlay'
 
 export default {
   name: 'OpenVulnerabilities',
   components: {
     ClosedVulTable,
-    VulProgressBar
+    VulProgressBar,
+    Loading
   },
   data() {
     return {
       items: [],
       isLoading: false,
+      reloadPage: false,
       paginationItems: [],
       totalVul: 0,
       highCount: 0,
@@ -80,6 +84,7 @@ export default {
   },
   methods: {
     fetchDataOpenVul() {
+      this.reloadPage = true
       if (this.org && this.token) {
         if(this.selectedOption == 'Default View'){
           var url ='/closedvul/org/' + this.org + '/?true=1'
@@ -155,8 +160,12 @@ export default {
                 })
               }
             }
+      this.reloadPage = false
+
             this.totalVul = res.data.count
           }).catch(error => {
+      this.reloadPage = false
+
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {
@@ -171,6 +180,8 @@ export default {
       }
     },
      clickPagination(event) {
+      this.reloadPage = true
+
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
@@ -251,7 +262,10 @@ export default {
                 })
               }
             }
+            this.reloadPage = false
           }).catch(error => {
+            this.reloadPage = false
+
             if (error.response.status === 404) {
               this.$router.push('/not_found')
             } else if (error.response.status === 403) {
@@ -269,6 +283,8 @@ export default {
       }
     },
     onInput(value) {
+            this.reloadPage = true
+
       if (value === 'Default View') {
         if (this.org && this.token) {
           axios.get('/closedvul/org/' + this.org + '/?true=1')
@@ -345,7 +361,11 @@ export default {
                 }
               }
               this.totalVul = res.data.count
+            this.reloadPage = false
+
             }).catch(error => {
+            this.reloadPage = false
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -434,11 +454,15 @@ export default {
                     })
                   }
                 }
+            this.reloadPage = false
+
                 this.totalVul = res.data.count
               } else {
                 this.$router.push('/forbidden')
               }
             }).catch(error => {
+            this.reloadPage = false
+              
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {

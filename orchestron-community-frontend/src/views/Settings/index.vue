@@ -1,6 +1,6 @@
 <template>
     <b-container fluid>
-      <loading :active.sync="isLoading" :can-cancel="true"></loading>
+      <loading :active.sync="reloadPage" :can-cancel="true"></loading>
       <common-table :dataItems="orgList" :headerTitle="headerTitles"
             @updateModal="updateOrganization($event)" :pageCount="orgCount" :createButton="createButton" :deleteButton="deleteButton"></common-table>
       <!--Update-->
@@ -122,6 +122,7 @@
       data() {
         return {
           isLoading: false,
+          reloadPage: false,
           orgCount: 0,
           orgList: [],
           headerTitles: 'List of Organizations',
@@ -180,6 +181,7 @@
       },
       methods: {
         fetchData() {
+            this.reloadPage = true
           if (this.org && this.token) {
             axios.get('/organizations/')
               .then(res => {
@@ -192,6 +194,7 @@
                   })
                 }
               }).catch(error => {
+                this.reloadPage = false
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
@@ -209,7 +212,11 @@
               for (const value of res.data.industry) {
                 this.orgTypeOption.push({ value: value[0], label: value[1] })
               }
+                this.reloadPage = false
+              
             }).catch(error => {
+                this.reloadPage = false
+
               if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
@@ -266,8 +273,11 @@
             const y = orgEndDate.getFullYear()
             const endDate = y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d)
             const form_data = new FormData()
+              if (this.updateOrgLogo) {
+              form_data.append('logo', this.updateOrgLogo)
+            }
             form_data.append('name', this.updateOrgName)
-            form_data.append('logo', this.updateOrgLogo)
+            // form_data.append('logo', this.updateOrgLogo)
             form_data.append('location', this.updateOrgLocation)
             form_data.append('industry', this.updateOrgType.value)
             form_data.append('timezone', this.updateOrgTimezone)

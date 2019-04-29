@@ -56,6 +56,34 @@
                             </p>
                     </center>
                 </b-col>
+
+                <b-col v-if="uncategorisedVul > 0">
+                    <center>
+                        <br/>
+                        <p class="title">Uncategorised Vulnerabilities</p>
+                        <br>
+                        <router-link :to="uncategorisedVulUrl">
+                            <p>
+                                <strong class="uncategorised-vul-count">
+                                {{ uncategorisedVul }}
+                                </strong>
+                            </p>
+                        </router-link>
+                    </center>
+                </b-col>
+                <b-col v-else>
+                    <center>
+                        <br/>
+                        <p class="title">Uncategorised Vulnerabilities</p>
+                        <br>
+                            <p>
+                                <strong class="uncategorised-vul-count">
+                                {{ uncategorisedVul }}
+                                </strong>
+                            </p>
+                    </center>
+                </b-col>
+
                 <b-col>
                     <center>
                         <br/>
@@ -81,6 +109,10 @@
           type: Number,
           required: true
         },
+        uncategorisedVul: {
+          type: Number,
+          required: true
+        },
         grade: {
           required: true
         },
@@ -89,6 +121,10 @@
           required: true
         },
         closedVulUrl: {
+          type: String,
+          required: true
+        },
+        uncategorisedVulUrl: {
           type: String,
           required: true
         }
@@ -115,6 +151,13 @@
   .closed-vul-count {
     font-family: 'Avenir';
     color: #00AB69;
+    font-size: 54px;
+    font-weight: 300;
+    line-height: 0.33;
+  }
+  .uncategorised-vul-count {
+    font-family: 'Avenir';
+    color: #FA9C30;
     font-size: 54px;
     font-weight: 300;
     line-height: 0.33;

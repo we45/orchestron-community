@@ -150,7 +150,16 @@ export default {
         }
         i = i + 1
       }
-      if (first.name === 'Dashboard') {
+      // if (first.name === 'Dashboard') {
+      //   this.levelList = []
+      //   this.breadCrumbList = []
+      //   this.breadCrumbList.push(
+      //     { title: first.name, path: path_data }
+      //   )
+      //   this.levelList = this.breadCrumbList
+      // }
+
+        if (first.name === 'Dashboard') {
         this.levelList = []
         this.breadCrumbList = []
         this.breadCrumbList.push(
@@ -158,6 +167,48 @@ export default {
         )
         this.levelList = this.breadCrumbList
       }
+      if (first.name === 'Projects') {
+        this.levelList = []
+        this.breadCrumbList = []
+        this.breadCrumbList.push(
+          { title: first.name, path: path_data }
+        )
+        this.levelList = this.breadCrumbList
+      }
+      if (first.name === 'Applications') {
+        this.levelList = []
+        this.breadCrumbList = []
+        this.breadCrumbList.push(
+          { title: first.name, path: path_data }
+        )
+        this.levelList = this.breadCrumbList
+      }
+      if (first.name === 'Engagements') {
+        this.levelList = []
+        this.breadCrumbList = []
+        this.breadCrumbList.push(
+          { title: first.name, path: path_data }
+        )
+        this.levelList = this.breadCrumbList
+      }
+      if (first.name === 'Reports') {
+        this.levelList = []
+        this.breadCrumbList = []
+        this.breadCrumbList.push(
+          { title: first.name, path: path_data }
+        )
+        this.levelList = this.breadCrumbList
+      }
+      if (first.name === 'Settings') {
+        this.levelList = []
+        this.breadCrumbList = []
+        this.breadCrumbList.push(
+          { title: first.name, path: path_data }
+        )
+        this.levelList = this.breadCrumbList
+      }
+      
+
       localStorage.setItem('breadcrumbs', JSON.stringify(this.levelList))
       if (this.levelList === null) {
         this.levelList = []

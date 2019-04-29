@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-          <loading :active.sync="isLoading" :can-cancel="true"></loading>
+          <loading :active.sync="reloadPage" :can-cancel="true"></loading>
           <app-headers
                 :name="appname"
                 :logo="appLogo"
@@ -30,10 +30,13 @@
             <br>
             <vul-count-section
                 :openVul="openVulCount"
+                :uncategorisedVul="unCategorisedVulCount"
                 :closedVul="closeVulCount"
                 :grade="appGrade"
                 :openVulUrl=" '/projects/individual_application/open_vul/'+ appId  "
-                :closedVulUrl=" '/projects/individual_application/closed_vul/' + appId  "></vul-count-section>
+                :closedVulUrl=" '/projects/individual_application/closed_vul/' + appId  "
+                :uncategorisedVulUrl=" '/projects/individual_application/uncategorized/'+ appId  "
+                ></vul-count-section>
             <br>
 
             <b-container fluid>
@@ -360,7 +363,7 @@
                   <br>
                 </div>
               <br>
-              <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;display: table;width: 100%;">
+             <!--  <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;display: table;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;">
                    <span class="webhook-label" style="padding:7px;"> Curl Command (JSON Processing) : </span>
                     <span class='webhook'>
@@ -368,7 +371,7 @@
                     </span>
                   </p>
                   <br>
-                </div>
+                </div> -->
                 <b-col cols="12" slot="modal-footer">
                     <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p>
                 </b-col>
@@ -382,7 +385,7 @@
   import AppHeaders from '../../components/Application/Headers'
   import Scans from '../../components/Application/Scans'
   import VulCountSection from '@/components/Dashboard/VulCountSection'
-  import DonutChart from '@/components/Dashboard/Charts/DonutChart'
+  import DonutChart from '@/components/Charts/orchyDonutSeverityChart'
   import AppBarChart from '@/components/Dashboard/Charts/BarChart'
   import axios from '@/utils/auth'
   import { required, minLength, url } from 'vuelidate/lib/validators'
@@ -411,6 +414,7 @@
         lowLable: 'Low',
         infoLable: 'Info',
         isLoading: false,
+        reloadPage: false,
         vulnerabilitiesList: [],
         appname: '',
         appId: '',
@@ -427,6 +431,8 @@
         infoCount: 0,
         openVulCount: 0,
         closeVulCount: 0,
+        unCategorisedVulCount: 0,
+
         appGrade: 0,
         uploadName: '',
         uploadFile: '',
@@ -476,6 +482,7 @@
         webhookId : '',
         api_site_url: '',
         userToken: '',
+        update_app_wise_jira: false,
         curlCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> http://127.0.0.1/api/webhook/post/',
         jsonCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -H "Scan-Name: <scan_name>" -d \'{"vuls":<json_dictionary>}\' http://127.0.0.1/api/webhook/post/'
       }
@@ -558,6 +565,7 @@
         if (this.isLoading) {
           this.vulnerabilitiesList = []
           this.openVulCount = 0
+          this.unCategorisedVulCount = 0
           this.closeVulCount = 0
           this.appGrade = 0
           this.highCount = 0
@@ -577,18 +585,18 @@
         this.userToken = localStorage.getItem('token')
       },
       fetchData() {
+        this.reloadPage = true
+
         if (this.param && this.org && this.token) {
-          axios.get('/applications/' + this.param + '/?scans=1&opened=1&ageing=1&closed=1&avg_ageing=1&severity=1')
+          axios.get('/applications/' + this.param + '/?scans=1&opened=1&ageing=1&closed=1&avg_ageing=1&severity=1&uncategorized=1')
             .then(res => {
-              console.log("webhook ID", res.data)
-              console.log("webhook ID", res.data)
-              console.log("webhook ID", res.data)
-              console.log("webhook ID", res.data)
               this.webhookId = res.data.webhook_id
-            
               // for (const ageing of res.data.ageing) {
               //   this.appSevData.push(ageing)
               // }
+              console.log("res data", res.data)
+              console.log("rrssssss", res.data.uncategorized)
+              this.unCategorisedVulCount = res.data.uncategorized
               this.openVulCount = res.data.open_vul_count
               this.closeVulCount = res.data.closed_vul_count
               this.appGrade = res.data.avg_ageing
@@ -680,8 +688,11 @@
                 }
               )
 
+        this.reloadPage = false
 
             }).catch(error => {
+        this.reloadPage = false
+                
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -767,6 +778,20 @@
                 position: 'top right'
               })
             }).catch(error => {
+                // if(error.res.status === 400) {
+                     axios.post('/applications/' + this.param + '/jira/', formData)
+                    .then(res => {
+                      this.isLoading = true
+                      this.$router.push('/projects/individual_application/' + this.param)
+                      this.$notify({
+                        group: 'foo',
+                        type: 'success',
+                        title: 'Project',
+                        text: 'The project has been updated Successfully!',
+                        position: 'top right'
+                      })
+                    })
+                // }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {

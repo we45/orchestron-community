@@ -63,7 +63,6 @@ export default {
     return {
       headerTitle: '',
       items: [],
-      reloadPage: false,
       paginationItems: [],
       totalVul: 0,
       highCount: 0,
@@ -74,7 +73,8 @@ export default {
       selectedOption: 'Default View',
       isLoading: false,
       currentPage: 0,
-      checkAppNames: []
+      checkAppNames: [],
+      reloadPage: false
     }
   },
   created() {
@@ -97,14 +97,14 @@ export default {
       this.reloadPage = true
       if (this.org && this.token) {
         if(this.selectedOption == 'Default View'){
-          var url ='/openvul/org/' + this.org + '/?true=1'
+          var url ='/uncategorize/org/' + this.org + '/?true=1'
         }
         else{
-          var url = '/openvul/org/' + this.org + '/?false=1'
+          var url = '/uncategorize/org/' + this.org + '/?false=1'
         }
         axios.get(url)
           .then(res => {
-            this.headerTitle = 'Open Vulnerabilities'
+            this.headerTitle = 'Uncategorised Vulnerabilities'
             this.items = []
             this.paginationItems = []
             this.totalVul = 0
@@ -165,10 +165,9 @@ export default {
                 })
               }
             }
-            this.reloadPage = false
+          this.reloadPage = false
 
           }).catch(error => {
-
           this.reloadPage = false
 
             if (error.res.status === 404) {
@@ -186,19 +185,19 @@ export default {
     },
     clickPagination(event) {
       if (event.page) {
-            this.reloadPage = true
-
         this.currentPage = event.page
         if (this.currentPage > 1) {
+          this.reloadPage = true
+
              if(this.selectedOption == 'Default View'){
-          var url ='/openvul/org/' + this.org + '/?true=1&page=' + event.page
+          var url ='/uncategorize/org/' + this.org + '/?true=1&page=' + event.page
         }
         else{
-          var url = '/openvul/org/' + this.org + '/?false=1&page='  + event.page
+          var url = '/uncategorize/org/' + this.org + '/?false=1&page='  + event.page
         }
           axios.get(url)
             .then(res => {
-              this.headerTitle = 'Open Vulnerabilities'
+              this.headerTitle = 'UnCategorised Vulnerabilities'
               this.isLoading = true
               this.totalVul = 0
               this.items = []
@@ -263,11 +262,10 @@ export default {
                   })
                 }
               }
-            this.reloadPage = false
+          this.reloadPage = false
 
             }).catch(error => {
-            this.reloadPage = false
-              
+              this.reloadPage = false
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {
@@ -291,15 +289,17 @@ export default {
     },
     fetchDataDash() {
       if (this.org && this.token) {
+              this.reloadPage = true
+
         if(this.selectedOption == 'Default View'){
-          var url ='/openvul/org/' + this.org + '/?true=1'
+          var url ='/uncategorize/org/' + this.org + '/?true=1'
         }
         else{
-          var url = '/openvul/org/' + this.org + '/?false=1'
+          var url = '/uncategorize/org/' + this.org + '/?false=1'
         }
         axios.get(url)
           .then(res => {
-            // this.headerTitle = 'Open Vulnerabilities'
+            // this.headerTitle = 'UnCategorised Vulnerabilities'
             // this.items = []
             // this.paginationItems = []
             // this.totalVul = 0
@@ -362,7 +362,7 @@ export default {
             // }
 
 
-            this.headerTitle = "Open Vulnerabilities";
+            this.headerTitle = "Uncategorised Vulnerabilities";
               this.items = [];
               this.totalVul = 0;
               this.totalVul = res.data.count;
@@ -432,7 +432,11 @@ export default {
                   });
                 }
               }
+              this.reloadPage = false
+
           }).catch(error => {
+              this.reloadPage = false
+
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {
@@ -450,15 +454,17 @@ export default {
          if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
+              this.reloadPage = true
+
              if(this.selectedOption == 'Default View'){
-          var url ='/openvul/org/' + this.org + '/?true=1&page=' + event.page
+          var url ='/uncategorize/org/' + this.org + '/?true=1&page=' + event.page
         }
         else{
-          var url = '/openvul/org/' + this.org + '/?false=1&page='  + event.page
+          var url = '/uncategorize/org/' + this.org + '/?false=1&page='  + event.page
         }
           axios.get(url)
             .then(res => {
-             this.headerTitle = 'Open Vulnerabilities'
+             this.headerTitle = 'UnCategorised Vulnerabilities'
               this.isLoading = true
               this.totalVul = 0
               this.items = []
@@ -533,7 +539,11 @@ export default {
                   });
                 }
               }
+              this.reloadPage = false
+
             }).catch(error => {
+              this.reloadPage = false
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {
@@ -552,11 +562,13 @@ export default {
 
     },
     onInput(value) {
+
+              this.reloadPage = true
       if (value === 'Default View' || value === null) {
         if (this.org && this.token) {
-          axios.get('/openvul/org/' + this.org + '/?true=1&page=1')
+          axios.get('/uncategorize/org/' + this.org + '/')
             .then(res => {
-              this.headerTitle = 'Open Vulnerabilities'
+              this.headerTitle = 'UnCategorised Vulnerabilities'
               this.items = []
               this.totalVul = 0
               this.highCount = 0
@@ -623,7 +635,11 @@ export default {
                   })
                 }
               }
+              this.reloadPage = false
+
             }).catch(error => {
+              this.reloadPage = false
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {
@@ -638,7 +654,7 @@ export default {
         }
       } else {
         if (this.org && this.token) {
-          axios.get('/openvul/org/' + this.org + '/?false=1')
+          axios.get('/uncategorize/org/' + this.org + '/?false=1')
             .then(res => {
               this.headerTitle = 'False Positives'
               this.items = []
@@ -706,7 +722,11 @@ export default {
                   })
                 }
               }
+              this.reloadPage = false
+
             }).catch(error => {
+              this.reloadPage = false
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {

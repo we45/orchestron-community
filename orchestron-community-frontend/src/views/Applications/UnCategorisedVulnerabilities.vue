@@ -86,14 +86,14 @@
     },
     methods: {
       fetchDataOpenVul(param) {
-        this.reloadPage = true
         if (this.org && this.token && this.param) {
-          this.headerTitle = 'Open Vulnerabilities'
+          this.reloadPage = true
+          this.headerTitle = 'Uncategorised Vulnerabilities'
           if(this.selectedOption == 'Default View'){
-              var url ='/openvul/app/' + param + '/?true=1'
+              var url ='/uncategorize/app/' + param + '/?true=1'
             }
             else{
-              var url = '/openvul/app/' + this.param + '/?false=1'
+              var url = '/uncategorize/app/' + this.param + '/?false=1'
             }
           axios.get(url)
             .then(res => {
@@ -159,10 +159,10 @@
                   })
                 }
               }
-        this.reloadPage = false
+          this.reloadPage = false
 
             }).catch(error => {
-        this.reloadPage = false
+          this.reloadPage = false
 
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -178,12 +178,12 @@
         }
       },
       onInput(value) {
-        this.reloadPage = true
+          this.reloadPage = true
 
         if (value === 'Default View' || value === null) {
           if (this.org && this.token && this.param) {
-            this.headerTitle = 'Open Vulnerabilities'
-            axios.get('/openvul/app/' + this.param + '/?true=1')
+            this.headerTitle = 'UnCategorised Vulnerabilities'
+            axios.get('/uncategorize/app/' + this.param + '/?true=1')
               .then(res => {
                 this.items = []
                 this.totalVul = 0
@@ -246,12 +246,11 @@
                     })
                   }
                 }
-        this.reloadPage = false
-
+          this.reloadPage = false
 
                 this.totalVul = res.data.count
               }).catch(error => {
-        this.reloadPage = false
+          this.reloadPage = false
 
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
@@ -268,7 +267,7 @@
         } else {
           if (this.org && this.token && this.param) {
             this.headerTitle = 'False Positives'
-            axios.get('/openvul/app/' + this.param + '/?false=1')
+            axios.get('/uncategorize/app/' + this.param + '/?false=1')
               .then(res => {
                 this.items = []
                 this.totalVul = 0
@@ -331,11 +330,11 @@
                     })
                   }
                 }
-        this.reloadPage = false
+          this.reloadPage = false
 
                 this.totalVul = res.data.count
               }).catch(error => {
-        this.reloadPage = false
+          this.reloadPage = false
 
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
@@ -352,17 +351,17 @@
         }
       },
       clickPagination(event) {
-
         if (event.page) {
+          this.reloadPage = true
+
           this.currentPage = event.page
           if (this.currentPage > 1) {
-        this.reloadPage = true
             this.headerTitle = 'Open Vulnerabilities'
              if(this.selectedOption == 'Default View'){
-              var url ='/openvul/app/' + this.param + '/?true=1&page=' + event.page
+              var url ='/uncategorize/app/' + this.param + '/?true=1&page=' + event.page
             }
             else{
-              var url = '/openvul/app/' + this.param + '/?false=1&page=' + event.page
+              var url = '/uncategorize/app/' + this.param + '/?false=1&page=' + event.page
             }
             axios.get(url)
               .then(res => {
@@ -428,12 +427,10 @@
                     })
                   }
                 }
-        this.reloadPage = false
+          this.reloadPage = false
 
               }).catch(error => {
                 if (error.res.status === 404) {
-        this.reloadPage = false
-                  
                   this.$router.push('/not_found/')
                 } else if (error.res.status === 403) {
                   this.$router.push('/forbidden/')

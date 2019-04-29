@@ -2,6 +2,7 @@
   <div>
     <b-container fluid>
       <loading :active.sync="isLoading" :can-cancel="true"></loading>
+      <loading :active.sync="isLoading" :can-cancel="true"></loading>
       <!-- <b-row>
         <b-col>
           <vul-count-section
@@ -15,7 +16,7 @@
 
       <b-row>
         <b-col id="vul_count_section">
-          <header-count-section
+          <!-- <header-count-section
             :openVul="openVulCount"
                 :closedVul="closedVulCount"
                 :grade="grade"
@@ -23,7 +24,17 @@
                 :closedVulUrl="closedVulUrl"
             :unCategorised="unCategorisedCount"
             :uncategorized_vul="uncategorized_vul"
-          ></header-count-section>
+          ></header-count-section> -->
+
+           <vul-count-section
+                :openVul="openVulCount"
+                :uncategorisedVul="unCategorisedCount"
+                :closedVul="closedVulCount"
+                :grade="grade"
+                :openVulUrl=" openVulUrl "
+                :closedVulUrl=" closedVulUrl "
+                :uncategorisedVulUrl=" uncategorized_vul"
+                ></vul-count-section>
         </b-col>
       </b-row>
       <!-- <br> -->
@@ -136,13 +147,14 @@ import VulProgressBarStats from '@/components/Dashboard/VulProgressBarStats'
 import VulCountSection from '@/components/Dashboard/VulCountSection'
 import axios from '@/utils/auth'
 import { notValidUser } from '@/utils/checkAuthUser'
-import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.min.css'
 import headerCountSection from '@/components/Dashboard/headerCountSection'
 import orchyDonutSeverityChart from '@/components/Charts/orchyDonutSeverityChart'
 import orchyPieChart from '@/components/Charts/orchyPieChart'
 import orchyStackedBarChart from '@/components/Charts/orchyStackedBarChart'
 import orchyDonutChart from '@/components/Charts/orchyDonutChart'
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/vue-loading.min.css'
 
 
 export default {
@@ -196,6 +208,7 @@ export default {
       mediumLable: 'Medium',
       lowLable: 'Low',
       infoLable: 'Info',
+      isLoading: false
     }
   },
   created() {
@@ -206,7 +219,8 @@ export default {
   methods: {
     fetchData() {
       if (this.org && this.token) {
-        axios.get('/organizations/' + this.org + '/?apps=1&tool=1&ageing=1&severity=1&&opened=1&closed=1&avg_ageing=1&owasp=1')
+        this.isLoading = true
+        axios.get('/organizations/' + this.org + '/?apps=1&tool=1&ageing=1&severity=1&&opened=1&closed=1&avg_ageing=1&owasp=1&uncategorized=1')
           .then(res => {
             this.isLoading = true
             this.closedVulCount = res.data.closed_vul_count
@@ -220,6 +234,8 @@ export default {
             this.severityChartData = []
             this.appData = []
             this.grade = res.data.avg_ageing
+            console.log("un unCategorised", res.data.uncategorized)
+            this.unCategorisedCount = res.data.uncategorized
 
             this.severityChartData.push(
               ['High', this.high],

@@ -9,7 +9,7 @@ from api.api import OrganizationView, ProjectView, ApplicationView, ScanView, En
     ClosedVulnerabilityView, UserUtilityView, UserProfileView, MediaServeView, OrganizationOptionView, \
     OptionsListView, ParserView, JiraConnectionTestView, \
     ORLConfigView, ScanResultView, JiraProjectsView, JIRAListView, \
-    ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView
+    ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView, ExecutiveReportView
 from rest_framework_jwt.views import obtain_jwt_token
 from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, ApplicationAnalyticsView, \
     EngagementAnalyticsView, ScanAnalyticsView, VulnerabilityAnalyticsView
@@ -118,6 +118,9 @@ urlpatterns = [
     
     re_path(r'^api/closedvul/(?P<app_name>.*)/(?P<vul_name>.*)/(?P<cwe>.*)/$', ClosedVulnerabilityView.as_view({'get':'retrieve'}),name='app_ind_closedvul'),
     
+    re_path(r'^api/report/executive/$', ExecutiveReportView.as_view(),name='executive_report'),
+    re_path(r'^api/uncategorize/org/(?P<pk>\d+)/$', OrganizationAnalyticsView.as_view({'get':'retrieve_uncategorized'}),name='org_uncategorize_openvul'),
+    re_path(r'^api/uncategorize/app/(?P<pk>\d+)/$', ApplicationAnalyticsView.as_view({'get':'retrieve_uncategorized'}),name='app_uncategorised'),
 ]
 
 # handler404 = page_not_found

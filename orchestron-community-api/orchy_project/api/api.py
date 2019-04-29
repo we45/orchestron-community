@@ -28,7 +28,7 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
-    JiraProjectsSerializer
+    JiraProjectsSerializer, ReportSerializer
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
@@ -44,7 +44,7 @@ from django.http import FileResponse
 import mimetypes
 from django.utils.http import http_date, parse_http_date
 from django.db.models import Q
-from api.analytics import OpenVulnerabilityStatView, ClosedVulnerabilityStatView
+from api.analytics import OpenVulnerabilityStatView, ClosedVulnerabilityStatView, UnCategorisedVulnerabilityStatView
 from api.signals import *
 import pytz
 from django.utils import timezone
@@ -53,7 +53,8 @@ from api import jira_utils as jira
 from api.db_funcs import Aging
 from six import string_types
 from api.orchy_logger import log
-
+from api.stats import StatView
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 class MediaServeView(APIView):
 
@@ -363,6 +364,21 @@ class BaseView(viewsets.ModelViewSet):
         return {'closed_vul_count':ClosedVulnerabilityStatView().count(kwargs=kwargs)}   
 
 
+    def get_uncategorized_vul_stats(self, kwargs):
+        """
+        This view returns a count of the uncategorized vulnerability
+
+        Parameters:
+            - kwargs
+                type : json
+        
+        return type :
+            json
+        """
+
+        return {'uncategorized':UnCategorisedVulnerabilityStatView().count(kwargs=kwargs)}
+
+
 class UserView(BaseView):
     serializer_class = UserSerializer
     model_class = User
@@ -615,6 +631,7 @@ class OrganizationView(BaseView):
         heatmap = query_serializer.validated_data.get('heatmap',False)
         ageing = query_serializer.validated_data.get('ageing',False)
         avg_ageing = query_serializer.validated_data.get('avg_ageing',False)
+        uncategorized = query_serializer.validated_data.get('uncategorized', False)
         kwargs = {
             'scan__application__project__org':obj, 
         }
@@ -639,6 +656,8 @@ class OrganizationView(BaseView):
                 context.update(self.get_ageing_stats(kwargs))
             if avg_ageing:
                 context.update(self.get_avg_ageing_stats(kwargs))
+        if uncategorized:
+            context.update(self.get_uncategorized_vul_stats(kwargs))
         if heatmap:
             scan_kwargs = {'application__org':obj}
             context.update(self.get_heatmap_stats(request.user,scan_kwargs))            
@@ -933,6 +952,7 @@ class ApplicationView(BaseView):
         avg_ageing = query_serializer.validated_data.get('avg_ageing',False)
         months = query_serializer.validated_data.get('months',False)
         webhook = Webhook.objects.get(application=obj)
+        uncategorized = query_serializer.validated_data.get('uncategorized',False)
         context['webhook_id'] = webhook.hook_id
         kwargs = {
             'scan__application':obj, 
@@ -958,6 +978,8 @@ class ApplicationView(BaseView):
                 context.update(self.get_ageing_stats(kwargs))
             if avg_ageing:
                 context.update(self.get_avg_ageing_stats(kwargs))
+        if uncategorized:
+            context.update(self.get_uncategorized_vul_stats(kwargs))
         if heatmap:
             scan_kwargs = {'application':obj}
             context.update(self.get_heatmap_stats(request.user,scan_kwargs))
@@ -1823,3 +1845,62 @@ class WebhookUploadView(APIView):
 #             log_exception(e)
 #             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
    
+
+
+
+import sys
+class ExecutiveReportView(APIView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    serializer_class = ReportSerializer
+
+    def post(self, request):
+        try:
+            serializer = self.serializer_class(context={'request': request},data=request.data)
+            if serializer.is_valid():
+                apps = serializer.validated_data.get('apps')
+                proj = serializer.validated_data.get('proj')
+                eng = serializer.validated_data.get('eng')
+                sev = serializer.validated_data.get('sev')
+                tools = serializer.validated_data.get('tools')
+                kwargs = {}
+                if apps:
+                    kwargs['scan__application__in'] = apps
+                if proj:
+                    kwargs['scan__application__project__in'] = proj
+                if eng:
+                    kwargs['scan__engagements__in'] = eng
+                if sev:
+                    kwargs['severity__in'] = sev
+                if tools:
+                    kwargs['tool__in'] = tools
+                if kwargs:
+                    user = request.user
+                    s = StatView()
+                    open_vuls = s.get_open_vuls_abstract(user,kwargs=kwargs)
+                    paginator = Paginator(open_vuls, 5)
+                    page = request.GET.get('page')
+                    try:
+                        vuls_dict = paginator.page(page)
+                    except PageNotAnInteger:
+                        vuls_dict = paginator.page(1)
+                    except EmptyPage:
+                        vuls_dict = paginator.page(paginator.num_pages)
+                    data_dict = dict()
+                    data_dict.update({'open_vuls':list(vuls_dict)})
+                    data_dict.update(s.get_vul_entry_date(user,kwargs=kwargs))
+                    data_dict.update(s.get_severity_stats(user,kwargs=kwargs))
+                    data_dict.update(s.get_owasp_stats(user,kwargs=kwargs))
+                    data_dict.update(s.get_ageing_stats(user,kwargs=kwargs))
+                    # data_dict.update(s.get_avg_ageing_stats(user,kwargs=kwargs))
+                    data_dict.update(s.get_open_vul_stats(user,kwargs=kwargs))
+                    data_dict.update(s.get_closed_vuls_stats(user,kwargs=kwargs))
+                    data_dict.update(s.get_false_positive_stats(user,kwargs=kwargs))
+                    # data_dict.update(s.get_months_stats(user,kwargs=kwargs))
+                    # info_log('Executive report generated',request)
+                    return Response(data_dict, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        except BaseException as e:
+            # log_exception(e, request=request, module_name=inspect.stack()[0][3])
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print("Line no :{0} Exception {1}".format(exc_traceback.tb_lineno,e))

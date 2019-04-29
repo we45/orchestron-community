@@ -17,9 +17,9 @@
               <br>
               <row>
                 <!-- <br> -->
-                  <p style="color: #7a7a8c;cursor: pointer;" v-b-modal.modal1>
-                    Change Password
-                  </p>
+                  <btn class="btn btn-success btn-sm" style="color: #FFFFFF;cursor: pointer;" v-b-modal.modal1>
+                        Change Password
+                  </btn>
 
                   <p>
                     <!-- <b-badge 

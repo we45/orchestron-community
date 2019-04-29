@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-            <loading :active.sync="isLoading" :can-cancel="true"></loading>
+            <loading :active.sync="reloadPage" :can-cancel="true"></loading>
             <headers :name="projectName" :createdOn="projectCreatedOn" :logo="projectLogo"></headers>
             <br>
             <common-table
@@ -10,6 +10,7 @@
               :headerTitle="headerTitles"
               @createModal="createApplication"
               @updateModal="updateApplication($event)"
+              @clickPagination="clickPagination($event)"
               @deleteModal="beforeDeleteModal($event)"></common-table>
             <b-modal ref="createApplicationModal" title="Create Application" centered size="lg">
                 <div>
@@ -326,7 +327,10 @@
         updateApplicationId: '',
         deleteApplicationId: '',
         typeDelete: '',
-        applicationCount: 0
+        applicationCount: 0,
+        reloadPage : false,
+        paginatedVulnerabilitiesList: []
+
       }
     },
     validations: {
@@ -393,6 +397,7 @@
     },
     methods: {
       fetchData() {
+        this.reloadPage = true
         if (this.param && this.org && this.token) {
           axios.get('/projects/' + this.param + '/?&severity=1&applications=1')
             .then(res => {
@@ -420,7 +425,10 @@
                   url: '/projects/individual_application/' + value.fields.id + '/'
                 })
               }
+              this.reloadPage = false
+              
             }).catch(error => {
+              this.reloadPage = false
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -432,6 +440,43 @@
         } else {
           notValidUser()
           this.$router.push('/')
+        }
+      },
+       clickPagination(event) {
+        if (event.page) {
+          if (event.page > 1) {
+            axios.get('/projects/' + this.param + '/applications/?page=' + event.page)
+              .then(res => {
+                this.paginatedVulnerabilitiesList = []
+                for (const value of res.data.results) {
+                   this.paginatedVulnerabilitiesList.push({
+                      name: { vul_name: value.fields.name },
+                      sev: value.stats.severity_count.severity,
+                      id: value.fields.id,
+                      url: '/projects/individual_application/' + value.fields.id + '/'
+                    })
+                }
+                this.vulnerabilitiesList = []
+                this.vulnerabilitiesList = this.paginatedVulnerabilitiesList
+              }).catch(error => {
+                console.log("error", error)
+                // if (error.response.data.detail === 'Signature has expired.'){
+                //   notValidUser()
+                //   this.$router.push('/')
+                // }
+                // if (error.response.status === 404) {
+                //   this.$router.push('/not_found')
+                // } else if (error.response.status === 403) {
+                //   this.$router.push('/forbidden')
+                // } else {
+                //   this.$router.push('/error')
+                // }
+              })
+          } else {
+            this.fetchData()
+          }
+        } else {
+         this.fetchData()
         }
       },
       createApplication() {
