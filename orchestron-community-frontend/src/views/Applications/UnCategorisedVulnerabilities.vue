@@ -1,112 +1,108 @@
 <template>
-  <div>
-    <b-container fluid>
-      <loading :active.sync="reloadPage" :can-cancel="true"></loading>
-      <b-card>
-        <p class="title">{{ headerTitle }}</p>
-        <hr>
-        <br>
-        <b-row>
-          <b-col sm="8" class="m2-top">
-            <p class="text-left">
+    <div>
+        <b-container fluid>
+          <loading :active.sync="reloadPage" :can-cancel="true"></loading>
+            <b-card>
+                <p class="title">{{ headerTitle }}</p>
+                <hr>
+                <br>
+                <b-row>
+                    <b-col sm="8" class="m2-top">
+                        <p class="text-left">
                             <span class="vul-count">
                             {{ totalVul }}
                             </span>
-            </p>
-          </b-col>
-          <b-col sm="4">
-            <v-select :options="selectOption"
-                      v-model="selectedOption"
-                      v-on:input="onInput(selectedOption)" style="font-family: Avenir;">
-            </v-select>
-          </b-col>
-        </b-row>
-        <br>
-        <vul-progress-bar
-          :high="highCount"
-          :medium="mediumCount"
-          :low="lowCount"
-          :info="infoCount"
-          :total="totalVul"></vul-progress-bar>
-        <br>
-        <open-vul-table :pageNumberCount="totalVul"
-                        :currentPage="currentPage"
-                        :dataItems="items"
-                        @updateUncategorized="updateUncategorized($event)"
-                        @clickPagination="clickPagination($event)"></open-vul-table>
-      </b-card>
-      <!--Update Uncategorized-->
+                        </p>
+                    </b-col>
+                    <b-col sm="4">
+                        <v-select  :options="selectOption"
+                            v-model="selectedOption"
+                            v-on:input="onInput(selectedOption)" style="font-family: Avenir;">
+                        </v-select>
+                    </b-col>
+                </b-row>
+                <br>
+                <vul-progress-bar
+                    :high="highCount"
+                    :medium="mediumCount"
+                    :low="lowCount"
+                    :info="infoCount"
+                    :total="totalVul"></vul-progress-bar>
+                <br>
+                <open-vul-table :pageNumberCount="totalVul"
+                    :currentPage="currentPage"
+                    :dataItems="items"
+                                @updateUncategorized="updateUncategorized($event)"
+                    @clickPagination="clickPagination($event)"></open-vul-table>
+            </b-card>
+                   <!--Update Uncategorized-->
       <b-modal ref="UpdateuncategorizedModal" title="Update Uncategorized Vulnerability" size="lg" centered>
-        <template>
-          <div>
-            <form @submit.prevent="promptUncategorizedUpdateVul">
-              <b-row class="my-1">
-                <b-col sm="2"><label class="label">Name:</label></b-col>
-                <b-col sm="10">
-                  <b-form-input v-model="updateUncategorizedVulName" type="text" readonly></b-form-input>
-                </b-col>
-              </b-row>
-              <br>
-              <b-row class="my-1">
-                <b-col sm="2"><label class="label">CWE:</label></b-col>
-                <b-col sm="8">
-                  <b-form-input
-                    id="input-1"
-                    v-model="updateUncategorizedVulCWE"
-                    type="number"
-                    placeholder="Enter CWE"
-                  ></b-form-input>
-                </b-col>
-                <b-col cols="2">
+              <template>
+                <div>
+                    <form @submit.prevent="promptUncategorizedUpdateVul">
+                        <b-row class="my-1">
+                            <b-col sm="2"><label class="label">Name:</label></b-col>
+                            <b-col sm="10">
+                                <b-form-input v-model="updateUncategorizedVulName" type="text" readonly></b-form-input>
+                            </b-col>
+                        </b-row>
+                        <br>
+                        <b-row class="my-1">
+                            <b-col sm="2"><label class="label">CWE:</label></b-col>
+                            <b-col sm="8">
+                              <b-form-input
+          id="input-1"
+          v-model="updateUncategorizedVulCWE"
+          type="number"
+          placeholder="Enter CWE"
+        ></b-form-input>
+                            </b-col>
+                          <b-col cols="2">
 
+                          </b-col>
+                        </b-row>
+                        <br>
+                    </form>
+                </div>
+                <b-col cols="12" slot="modal-footer">
+                    <div class="pull-right" style="float: right">
+                        <button type="button" class="btn btn-orange-close pull-right" @click=" closeUncategorizedUpdateVul() ">Close</button>
+                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" promptUncategorizedUpdateVul() "
+                              >
+                        Submit
+                        </button>
+                    </div>
                 </b-col>
-              </b-row>
-              <br>
-            </form>
-          </div>
-          <b-col cols="12" slot="modal-footer">
-            <div class="pull-right" style="float: right">
-              <button type="button" class="btn btn-orange-close pull-right" @click=" closeUncategorizedUpdateVul() ">
-                Close
-              </button>
-              <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal"
-                      @click=" promptUncategorizedUpdateVul() "
-              >
-                Submit
-              </button>
-            </div>
-          </b-col>
-        </template>
-      </b-modal>
+              </template>
+            </b-modal>
 
       <!--Uncategorized Prompt Modal-->
       <b-modal ref="beforeSubmitUncategorizedModal" title="Update Uncategorized Vulnerability" centered size="lg">
-        <div>
-          <form @submit.prevent="submitUncategorizedUpdateVul">
-            <p class="prompt-header">* Vulnerability will be categorized to CWE {{ updateUncategorizedVulCWE }}</p>
-            <br>
-          </form>
-        </div>
-        <b-col cols="12" slot="modal-footer">
-          <div class="pull-right" style="float: right;">
-            <button type="button" class="btn btn-orange-close" @click=" submitUncategorizedUpdateVulClose() ">No
-            </button>
-            <button type="button" class="btn btn-orange-submit"
-                    data-dismiss="modal" @click=" submitUncategorizedUpdateVul() ">
-              Yes
-            </button>
-          </div>
-        </b-col>
-      </b-modal>
-    </b-container>
-  </div>
+                <div>
+                    <form @submit.prevent="submitUncategorizedUpdateVul">
+                        <p class="prompt-header">* Vulnerability will be categorized to CWE {{ updateUncategorizedVulCWE }}</p>
+                        <br>
+                    </form>
+                </div>
+                <b-col cols="12" slot="modal-footer">
+                    <div class="pull-right" style="float: right;">
+                        <button type="button" class="btn btn-orange-close" @click=" submitUncategorizedUpdateVulClose() ">No</button>
+                        <button type="button" class="btn btn-orange-submit"
+                            data-dismiss="modal" @click=" submitUncategorizedUpdateVul() ">
+                        Yes
+                        </button>
+                    </div>
+                </b-col>
+            </b-modal>
+        </b-container>
+    </div>
 </template>
 
 <script>
   import OpenVulTable from '@/components/OpenVulnerabilities/OpenVulTable.vue'
   import VulProgressBar from '@/components/OpenVulnerabilities/VulProgressBar'
   import axios from '@/utils/auth'
-  import {notValidUser} from '@/utils/checkAuthUser'
+  import { notValidUser } from '@/utils/checkAuthUser'
   import Loading from 'vue-loading-overlay'
 
   export default {
@@ -152,15 +148,15 @@
     },
     methods: {
       fetchDataOpenVul(param) {
-        this.reloadPage = true
         if (this.org && this.token && this.param) {
-          this.headerTitle = 'Open Vulnerabilities'
-          if (this.selectedOption == 'Default View') {
-            var url = '/openvul/app/' + param + '/?true=1'
-          }
-          else {
-            var url = '/openvul/app/' + this.param + '/?false=1'
-          }
+          this.reloadPage = true
+          this.headerTitle = 'Uncategorised Vulnerabilities'
+          if(this.selectedOption == 'Default View'){
+              var url ='/uncategorize/app/' + param + '/?true=1'
+            }
+            else{
+              var url = '/uncategorize/app/' + this.param + '/?false=1'
+            }
           axios.get(url)
             .then(res => {
               this.totalVul = res.data.count
@@ -225,31 +221,31 @@
                   })
                 }
               }
-              this.reloadPage = false
+          this.reloadPage = false
 
             }).catch(error => {
-            this.reloadPage = false
+          this.reloadPage = false
 
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
-          })
+              if (error.res.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.res.status === 403) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
+            })
         } else {
           notValidUser()
           this.$router.push('/')
         }
       },
       onInput(value) {
-        this.reloadPage = true
+          this.reloadPage = true
 
         if (value === 'Default View' || value === null) {
           if (this.org && this.token && this.param) {
-            this.headerTitle = 'Open Vulnerabilities'
-            axios.get('/openvul/app/' + this.param + '/?true=1')
+            this.headerTitle = 'UnCategorised Vulnerabilities'
+            axios.get('/uncategorize/app/' + this.param + '/?true=1')
               .then(res => {
                 this.items = []
                 this.totalVul = 0
@@ -312,21 +308,20 @@
                     })
                   }
                 }
-                this.reloadPage = false
-
+          this.reloadPage = false
 
                 this.totalVul = res.data.count
               }).catch(error => {
-              this.reloadPage = false
+          this.reloadPage = false
 
-              if (error.res.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.res.status === 403) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
+                if (error.res.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.res.status === 403) {
+                  this.$router.push('/forbidden')
+                } else {
+                  this.$router.push('/error')
+                }
+              })
           } else {
             notValidUser()
             this.$router.push('/')
@@ -334,7 +329,7 @@
         } else {
           if (this.org && this.token && this.param) {
             this.headerTitle = 'False Positives'
-            axios.get('/openvul/app/' + this.param + '/?false=1')
+            axios.get('/uncategorize/app/' + this.param + '/?false=1')
               .then(res => {
                 this.items = []
                 this.totalVul = 0
@@ -397,20 +392,20 @@
                     })
                   }
                 }
-                this.reloadPage = false
+          this.reloadPage = false
 
                 this.totalVul = res.data.count
               }).catch(error => {
-              this.reloadPage = false
+          this.reloadPage = false
 
-              if (error.res.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.res.status === 403) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
+                if (error.res.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.res.status === 403) {
+                  this.$router.push('/forbidden')
+                } else {
+                  this.$router.push('/error')
+                }
+              })
           } else {
             notValidUser()
             this.$router.push('/')
@@ -418,17 +413,17 @@
         }
       },
       clickPagination(event) {
-
         if (event.page) {
+          this.reloadPage = true
+
           this.currentPage = event.page
           if (this.currentPage > 1) {
-            this.reloadPage = true
             this.headerTitle = 'Open Vulnerabilities'
-            if (this.selectedOption == 'Default View') {
-              var url = '/openvul/app/' + this.param + '/?true=1&page=' + event.page
+             if(this.selectedOption == 'Default View'){
+              var url ='/uncategorize/app/' + this.param + '/?true=1&page=' + event.page
             }
-            else {
-              var url = '/openvul/app/' + this.param + '/?false=1&page=' + event.page
+            else{
+              var url = '/uncategorize/app/' + this.param + '/?false=1&page=' + event.page
             }
             axios.get(url)
               .then(res => {
@@ -494,75 +489,73 @@
                     })
                   }
                 }
-                this.reloadPage = false
+          this.reloadPage = false
 
               }).catch(error => {
-              if (error.res.status === 404) {
-                this.reloadPage = false
-
-                this.$router.push('/not_found/')
-              } else if (error.res.status === 403) {
-                this.$router.push('/forbidden/')
-              } else {
-                this.$router.push('/error/')
-              }
-            })
+                if (error.res.status === 404) {
+                  this.$router.push('/not_found/')
+                } else if (error.res.status === 403) {
+                  this.$router.push('/forbidden/')
+                } else {
+                  this.$router.push('/error/')
+                }
+              })
           } else {
             this.fetchDataOpenVul(this.param)
           }
         }
       },
       updateUncategorized(event) {
-        this.updateUncategorizedVulName = ''
-        this.updateUncategorizedVulName = event.commonName
-        this.$refs.UpdateuncategorizedModal.show()
-      },
+      this.updateUncategorizedVulName = ''
+      this.updateUncategorizedVulName = event.commonName
+      this.$refs.UpdateuncategorizedModal.show()
+    },
       closeUncategorizedUpdateVul() {
-        this.$refs.UpdateuncategorizedModal.hide()
-      },
-      promptUncategorizedUpdateVul() {
-        this.$refs.beforeSubmitUncategorizedModal.show()
-      },
-      submitUncategorizedUpdateVulClose() {
-        this.$refs.beforeSubmitUncategorizedModal.hide()
-      },
-      submitUncategorizedUpdateVul() {
-        this.$refs.beforeSubmitUncategorizedModal.hide()
-        this.$refs.UpdateuncategorizedModal.hide()
+      this.$refs.UpdateuncategorizedModal.hide()
+    },
+    promptUncategorizedUpdateVul() {
+      this.$refs.beforeSubmitUncategorizedModal.show()
+    },
+    submitUncategorizedUpdateVulClose() {
+      this.$refs.beforeSubmitUncategorizedModal.hide()
+    },
+    submitUncategorizedUpdateVul() {
+      this.$refs.beforeSubmitUncategorizedModal.hide()
+      this.$refs.UpdateuncategorizedModal.hide()
 
-        const formData = {
-          'common_name': this.updateUncategorizedVulName,
-          'cwe': this.updateUncategorizedVulCWE,
-          'name': this.updateUncategorizedVulName
-        }
+      const formData = {
+        'common_name': this.updateUncategorizedVulName,
+        'cwe': this.updateUncategorizedVulCWE,
+        'name': this.updateUncategorizedVulName
+      }
 
-        axios.post('/openvul/catgorize/', formData)
-          .then(res => {
-            this.$refs.beforeSubmitUncategorizedModal.hide()
-            this.$refs.UpdateuncategorizedModal.hide()
-            this.isLoading = true
-            this.$notify({
-              group: 'foo',
-              type: 'info',
-              title: 'Vulnerability',
-              text: 'The Vulnerability has been updated Successfully!',
-              position: 'top right'
-            })
-            this.$router.go()
-          }).catch(error => {
-          if (error.response.data.detail === 'Signature has expired.') {
-            notValidUser()
-            this.$router.push('/')
-          }
+      axios.post('/openvul/catgorize/', formData)
+        .then(res => {
+          this.$refs.beforeSubmitUncategorizedModal.hide()
+          this.$refs.UpdateuncategorizedModal.hide()
+          this.isLoading = true
+          this.$notify({
+            group: 'foo',
+            type: 'info',
+            title: 'Vulnerability',
+            text: 'The Vulnerability has been updated Successfully!',
+            position: 'top right'
+          })
+          this.$router.go()
+        }).catch(error => {
+          if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
         })
 
-        // openvul/catgorize
-      },
+      // openvul/catgorize
+    },
     }
   }
 </script>
 <style scoped>
-  .vul-count {
+  .vul-count{
     font-family: 'Avenir';
     color: #25231F;
     font-size: 48px;
@@ -605,7 +598,6 @@
     margin-bottom: 0;
     font-size: 14px;
   }
-
   .btn-orange-submit {
     color: #FFFFFF;
     background-color: #ff542c;

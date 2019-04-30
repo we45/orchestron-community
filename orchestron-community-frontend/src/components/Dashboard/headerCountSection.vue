@@ -2,7 +2,7 @@
     <div>
         <!-- <b-container fluid> -->
           <div class="row">
-        <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="col-md-3 col-sm-6 col-xs-12">
           <div class="info-box">
             <span class="info-box-icon bg-red">
               <font-awesome-icon icon="hourglass" />
@@ -24,7 +24,7 @@
           </div>
         </div>
             <!--closed Vul-->
-        <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="col-md-3 col-sm-6 col-xs-12">
           <div class="info-box">
             <span class="info-box-icon bg-green">
               <font-awesome-icon icon="hourglass-end"></font-awesome-icon>
@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <!-- <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="col-md-3 col-sm-6 col-xs-12">
           <div class="info-box">
             <span class="info-box-icon bg-yellow">
               <font-awesome-icon icon="hourglass-half"></font-awesome-icon>
@@ -54,7 +54,7 @@
             <template v-if="unCategorised > 0">
               <router-link :to="uncategorized_vul">
             <div class="info-box-content">
-              <span class="info-box-text">Uncategorized</span>
+              <span class="info-box-text">Uncategorized Vulnerabilities</span>
               <span class="info-box-number">{{ unCategorised  }}</span>
             </div>
               </router-link>
@@ -66,10 +66,10 @@
               </div>
             </template>
           </div>
-        </div> -->
+        </div>
 
         <!-- /.col -->
-        <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="col-md-3 col-sm-6 col-xs-12">
           <div class="info-box">
             <span class="info-box-icon bg-aqua">
               <font-awesome-icon icon="history"></font-awesome-icon>
@@ -79,9 +79,7 @@
               <span class="info-box-text">Avg Days Vul Open</span>
               <span class="info-box-number">{{ grade }}</span>
             </div>
-            <!-- /.info-box-content -->
           </div>
-          <!-- /.info-box -->
         </div>
         <!-- /.col -->
       </div>

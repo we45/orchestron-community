@@ -212,6 +212,7 @@ export default {
     },
     methods: {
       fetchData() {
+        this.isLoading = true
         if (this.org && this.token) {
           axios.get('/organizations/' + this.org + '/?projects=1')
             .then(res => {
@@ -226,7 +227,10 @@ export default {
                 })
               }
             this.projectsList = this.full_Data.slice(0, 5)
+             this.isLoading = false
             }).catch(error => {
+             this.isLoading = false
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -239,6 +243,8 @@ export default {
           notValidUser()
           this.$router.push('/')
         }
+        this.isLoading = true
+        
       },
       createProject() {
         this.$refs.fileinput.reset();

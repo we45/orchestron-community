@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-            <loading :active.sync="isLoading" :can-cancel="true"></loading>
+            <loading :active.sync="reloadPage" :can-cancel="true"></loading>
             <engagement-header :engagementHeader="engagementHeader"></engagement-header>
             <br>
             <b-container fluid>
@@ -16,7 +16,10 @@
                             :infoCount="infoCount"></donut-chart>
                     </b-col>
                     <b-col cols="6">
-                        <app-bar-chart :barChartData="vulAgeingData" :barChartTitle="'Scans-wise Stats'"></app-bar-chart>
+                        <!-- <app-bar-chart :barChartData="vulAgeingData" :barChartTitle="'Scans-wise Stats'"></app-bar-chart> -->
+                                <orchy-stacked-bar-chart v-if="ageingChart.length > 0 && ageingCategory.length > 0" :chartData="ageingChart"
+                                        :chartCategories="ageingCategory"
+                                        :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
                     </b-col>
                 </b-row>
             </b-container>
@@ -59,13 +62,18 @@
 
 <script>
     import EngagementHeader from '../../components/Engagements/Header'
-    import DonutChart from '@/components/Dashboard/Charts/DonutChart'
+    // import DonutChart from '@/components/Dashboard/Charts/DonutChart'
+
+    import DonutChart from '@/components/Charts/orchyDonutSeverityChart'
     import AppBarChart from '@/components/Dashboard/Charts/BarChart'
     import Scans from '../../components/Application/Scans'
     import axios from '@/utils/auth'
     import Loading from 'vue-loading-overlay'
     import 'vue-loading-overlay/dist/vue-loading.min.css'
     import { notValidUser } from '@/utils/checkAuthUser'
+    import engAgeing from '@/components/Charts/orchyStackedBarChart'
+    import orchyStackedBarChart from '@/components/Charts/orchyStackedBarChart'
+
 
     export default {
       name: 'individualEngagement',
@@ -74,11 +82,14 @@
         DonutChart,
         AppBarChart,
         Scans,
-        Loading
+        Loading,
+        engAgeing,
+        orchyStackedBarChart
       },
       data() {
         return {
           isLoading: false,
+          reloadPage: false,
           vulnerabilitiesList: [],
           engagementHeader: [],
           applicationLists: [],
@@ -93,7 +104,13 @@
           scanListOptions: [],
           assignedScans: [],
           appId: '',
-          vulAgeingData: []
+          vulAgeingData: [],
+          ageingChart: [] ,
+          ageingCategory: [],
+          highLable: 'High',
+          mediumLable: 'Medium',
+          lowLable: 'Low',
+          infoLable: 'Info',
         }
       },
       created() {
@@ -105,6 +122,7 @@
       methods: {
         fetchData() {
           if (this.org && this.token) {
+            this.reloadPage = true
             axios.get('/engagements/' + this.param + '/?scans=1')
               .then(res => {
                 this.appId = res.data.app_details.id
@@ -129,6 +147,59 @@
                   'closedDate': res.data.closed_on
                 })
 
+             
+
+                 this.ageingCategory = []
+              this.ageingChart = []
+                var highAgeingSevCount = []
+                var mediumAgeingSevCount = []
+                var lowAgeingSevCount = []
+                var infoAgeingSevCount = []
+                console.log("res.data", res.data.ageing['ageing'])
+                for (const [key, value] of Object.entries(res.data.ageing['ageing'])) {
+                  for (const [keys, values] of Object.entries(value)) {
+                  this.ageingCategory.push(keys)
+                    highAgeingSevCount.push(values[3])
+                    mediumAgeingSevCount.push(values[2])
+                    lowAgeingSevCount.push(values[1])
+                    infoAgeingSevCount.push(values[0])
+                }
+                }
+                this.ageingChart.push(
+                  {
+                    name: this.highLable,
+                    data: highAgeingSevCount,
+                    color: '#d11d55'
+                  }
+                )
+
+                this.ageingChart.push(
+                  {
+                    name: this.mediumLable,
+                    data: mediumAgeingSevCount,
+                    color: '#ff9c2c'
+                  }
+                )
+
+                this.ageingChart.push(
+                  {
+                    name: this.lowLable,
+                    data: lowAgeingSevCount,
+                    color: '#008b8f'
+                  }
+                )
+
+                this.ageingChart.push(
+                  {
+                    name: this.infoLable,
+                    data: infoAgeingSevCount,
+                    color: '#1d1e52'
+                  }
+                )
+
+
+
+
                 for (const value of res.data.scans) {
                   this.vulnerabilitiesList.push({
                     name: value.fields.short_name,
@@ -152,6 +223,8 @@
                     }
                     this.scanCount = this.scanListOptions.length
                   }).catch(error => {
+                   this.reloadPage = false
+
                     if (error.res.status === 404) {
                       this.$router.push('/not_found')
                     } else if (error.res.status === 403) {
@@ -161,7 +234,13 @@
                     }
                   })
 
+
+            this.reloadPage = false
+
+
               }).catch(error => {
+            this.reloadPage = false
+
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
@@ -177,6 +256,8 @@
         },
         submitAssignedScans() {
           if (this.org && this.token) {
+            this.reloadPage = true
+
             const assignedScans = []
             for (const val of this.assignedScans) {
               assignedScans.push(val.value)
@@ -196,7 +277,11 @@
                   position: 'top right'
                 })
                 this.isLoading = false
+            this.reloadPage = false
+
               }).catch(error => {
+            this.reloadPage = false
+                
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {

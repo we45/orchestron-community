@@ -14,7 +14,7 @@ from api.models import Organization, User, Project, Application, Engagement, Sca
 from api.validators import text_file_validator, image_file_validator, start_date_validator, end_date_validator, \
 	flat_file_validator
 from api.messages import *
-from api import jira_utils as jira 
+from api import jira_utils as jira
 from api.utils import draw_thumnail
 import os
 import uuid
@@ -32,6 +32,16 @@ class OpenVulSerializer(serializers.Serializer):
 	bug_status = serializers.CharField(required=False)
 	severity = serializers.IntegerField(required=False)
 
+class UnCategorisedSerializer(serializers.Serializer):
+	open_for = serializers.IntegerField(required=False)
+	cwe = serializers.IntegerField(required=False)
+	tools = serializers.CharField(required=False)
+	apps = serializers.CharField(required=False)
+	common_name = serializers.CharField(required=False)
+	names = serializers.CharField(required=False)
+	bug_id = serializers.CharField(required=False)
+	bug_status = serializers.CharField(required=False)
+	severity = serializers.IntegerField(required=False)
 
 class ClosedVulSerializer(serializers.Serializer):
 	cwe = serializers.IntegerField(required=False)
@@ -42,7 +52,7 @@ class ClosedVulSerializer(serializers.Serializer):
 	names = serializers.CharField(required=False)
 	created_on = serializers.DateTimeField(required=False)
 	closed_on = serializers.DateTimeField(required=False)
-	severity = serializers.IntegerField(required=False)	
+	severity = serializers.IntegerField(required=False)
 
 
 class QueryParamSerializer(serializers.Serializer):
@@ -65,7 +75,7 @@ class BasePostParamSerializer(serializers.Serializer):
 
 class RaiseJIRATicketSerializer(BasePostParamSerializer):
 	issuetype = serializers.CharField()
-	assignee = serializers.CharField()	
+	assignee = serializers.CharField()
 
 	def __init__(self, *args, **kwargs):
 		super(RaiseJIRATicketSerializer, self).__init__(*args, **kwargs)
@@ -84,11 +94,11 @@ class RaiseJIRATicketSerializer(BasePostParamSerializer):
 		users = jira.get_users(jira_config)
 		if data not in users:
 			raise serializers.ValidationError('Invalid asignee')
-		return data		
+		return data
 
 
 class AssignScansSerializer(serializers.Serializer):
-	scans = serializers.ListField(child=serializers.CharField(),min_length=1)		
+	scans = serializers.ListField(child=serializers.CharField(),min_length=1)
 
 
 class BaseQueryParamSerializer(serializers.Serializer):
@@ -105,6 +115,7 @@ class BaseQueryParamSerializer(serializers.Serializer):
 	heatmap = serializers.BooleanField(required=False)
 	ageing = serializers.BooleanField(required=False)
 	avg_ageing = serializers.BooleanField(required=False)
+	uncategorized = serializers.BooleanField(required=False)
 
 
 class OrganizationQueryParamSerializer(BaseQueryParamSerializer):
@@ -113,23 +124,23 @@ class OrganizationQueryParamSerializer(BaseQueryParamSerializer):
 
 
 class ProjectQueryParamSerializer(BaseQueryParamSerializer):
-	applications = serializers.BooleanField(required=False)	
+	applications = serializers.BooleanField(required=False)
 
 
 class ApplicationsQueryParamSerializer(BaseQueryParamSerializer):
-	scans = serializers.BooleanField(required=False)		
-	engagements = serializers.BooleanField(required=False)		
-	webhooks = serializers.BooleanField(required=False)	
+	scans = serializers.BooleanField(required=False)
+	engagements = serializers.BooleanField(required=False)
+	webhooks = serializers.BooleanField(required=False)
 	assigned = serializers.BooleanField(required=False)
 	unassigned = serializers.BooleanField(required=False)
 
 
 class EngagementQueryParamSerializer(serializers.Serializer):
-	scans = serializers.BooleanField(required=False)	
+	scans = serializers.BooleanField(required=False)
 
 
 class ScanQueryParamSerializer(BaseQueryParamSerializer):
-	vuls = serializers.BooleanField(required=False)		
+	vuls = serializers.BooleanField(required=False)
 	user = serializers.CharField(required=False)
 	cvss = serializers.FloatField(required=False,max_value=10)
 	false = serializers.BooleanField(required=False)
@@ -147,6 +158,14 @@ class ScanQueryParamSerializer(BaseQueryParamSerializer):
 				raise serializers.ValidationError('This user does not exists')
 		return data
 
+class CategorizeVulnerabilitySerializer(serializers.Serializer):
+	common_name = serializers.CharField()
+	name = serializers.CharField()
+	cwe = serializers.IntegerField()
+
+	def validate_cwe(self, data):
+		return str(data)
+
 
 class OrganizationSerializer(serializers.ModelSerializer):
 	projects_count = serializers.SerializerMethodField()
@@ -154,10 +173,10 @@ class OrganizationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Organization
 		fields = ['id','name','contact','num_engagements','num_projects','num_users','num_apps','num_scans','industry','location','end_date','start_date','timezone','created_on','edited_on','logo','projects_count']
-		read_only_fields = ['created_on','edited_on','start_date','projects_count']	
+		read_only_fields = ['created_on','edited_on','start_date','projects_count']
 
 	def validate_end_date(self,data):
-		return end_date_validator(data)		
+		return end_date_validator(data)
 
 	def get_projects_count(self,obj):
 		return obj.project_set.count()
@@ -177,7 +196,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
 				draw_thumnail(name, full_path)
 				MinioUtil().upload_file_from_path(file_name,full_path)
 				data['logo'] = file_name
-		return data	
+		return data
 
 
 
@@ -192,26 +211,26 @@ class JiraIssueTypesSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = JiraIssueTypes
 		fields = ['url','username','password','created_on','edited_on','org']
-		read_only_fields = ['created_on','edited_on','org']	
+		read_only_fields = ['created_on','edited_on','org']
 
 	def __init__(self, *args, **kwargs):
 		super(JiraIssueTypesSerializer, self).__init__(*args, **kwargs)
 
 
 class JiraConnectionTestSerializer(serializers.Serializer):
-	url = serializers.URLField()		
+	url = serializers.URLField()
 	username = serializers.CharField()
 	password = serializers.CharField(style={'input_type': 'password'})
 
 	class Meta:
 		fields = ['url','username','password']
-	
+
 
 class EmailConfigurationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = EmailConfiguration
 		fields = ['host','username','password','port','from_email','display_name','certs','created_on','edited_on','org']
-		read_only_fields = ['created_on','edited_on','org']	
+		read_only_fields = ['created_on','edited_on','org']
 
 	def __init__(self, *args, **kwargs):
 		super(EmailConfigurationSerializer, self).__init__(*args, **kwargs)
@@ -221,7 +240,7 @@ class ORLConfigSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = ORLConfig
 		fields = ['host','port','protocol','created_on','edited_on','org']
-		read_only_fields = ['created_on','edited_on','org']	
+		read_only_fields = ['created_on','edited_on','org']
 
 	def __init__(self, *args, **kwargs):
 		super(ORLConfigSerializer, self).__init__(*args, **kwargs)
@@ -231,16 +250,16 @@ class ORLConfigSerializer(serializers.ModelSerializer):
 			socket.gethostbyname(data)
 		except:
 			raise serializers.ValidationError('Invalid host name')
-		return data	
+		return data
 
 	def validate_port(self, data):
 		try:
 			data = int(data)
 			if data >= 65535:
-				raise serializers.ValidationError('Invalid port number')								
+				raise serializers.ValidationError('Invalid port number')
 		except:
 			raise serializers.ValidationError('Invalid port number')
-		return data	
+		return data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -258,7 +277,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['email','first_name','last_name','last_login','img']
-		read_only_fields = ['last_login']	
+		read_only_fields = ['last_login']
 
 	def validate(self, data):
 		if not hasattr(self.instance,'img'):
@@ -277,7 +296,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 				draw_thumnail(name, full_path)
 				MinioUtil().upload_file_from_path(file_name,full_path)
 				data['img'] = file_name
-		return data				
+		return data
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -292,8 +311,8 @@ class ChangePasswordSerializer(serializers.Serializer):
 class SuperUserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
-		fields = ['id','email','first_name','last_name','is_staff','is_superuser','org','created_on','edited_on']	
-		read_only_fields = ['created_on','edited_on']	
+		fields = ['id','email','first_name','last_name','is_staff','is_superuser','org','created_on','edited_on']
+		read_only_fields = ['created_on','edited_on']
 
 	def __init__(self, *args, **kwargs):
 		super(SuperUserSerializer, self).__init__(*args, **kwargs)
@@ -374,40 +393,51 @@ class ApplicationSerializer(serializers.ModelSerializer):
 				draw_thumnail(name, full_path)
 				MinioUtil().upload_file_from_path(file_name,full_path)
 				data['logo'] = file_name
-		return data		
+		return data
 
 
 class EngagementSerializer(serializers.ModelSerializer):
 	severity = serializers.SerializerMethodField()
 	parser_classes = (JSONParser,)
 	app_details = serializers.SerializerMethodField()
+	ageing = serializers.SerializerMethodField()
 
 	class Meta:
 		model = Engagement
 		fields = ['id','name','application','description','start_date','stop_date','closed_on','closed_by',\
-		'created_on','edited_on','created_by','severity','uniq_id','app_details']
-		read_only_fields = ['created_on','edited_on','created_by','uniq_id','closed_on','closed_by','severity','app_details']
+		'created_on','edited_on','created_by','severity','uniq_id','app_details','ageing']
+		read_only_fields = ['created_on','edited_on','created_by','uniq_id','closed_on','closed_by','severity','app_details', 'ageing']
 
 	def __init__(self, *args, **kwargs):
 		super(EngagementSerializer, self).__init__(*args, **kwargs)
 
 	def get_app_details(self, obj):
-		return ApplicationSerializer(obj.application,context=self.context).data		
+		return ApplicationSerializer(obj.application,context=self.context).data
 
 	def get_severity(self,obj):
 		from api.analytics import OpenVulnerabilityStatView
 		kwargs = {
 			'scan__engagements':obj
 		}
-		return OpenVulnerabilityStatView().severity_count(kwargs=kwargs)	
+		return OpenVulnerabilityStatView().severity_count(kwargs=kwargs)
 
 	def validate_start_date(self,data):
-		return start_date_validator(data)				
+		return start_date_validator(data)
 
 	def validate(self, data):
 		if data.get('start_date') >= data.get('stop_date'):
 			raise serializers.ValidationError(ENG_START_DATE_END_DATE_VALIDATION)
-		return data				
+		return data
+
+	def get_ageing(self,obj):
+		from api.analytics import OpenVulnerabilityStatView
+		kwargs = {
+			'scan__engagements':obj
+		}
+		data = {
+			'ageing':OpenVulnerabilityStatView().aging_count(kwargs=kwargs),
+		}
+		return data
 
 
 class ScanSerializer(serializers.ModelSerializer):
@@ -444,7 +474,7 @@ class WebhookSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Webhook
-		fields = ['name','application','tool','hook_id','created_on','edited_on']	
+		fields = ['name','application','tool','hook_id','created_on','edited_on']
 		read_only_fields = ['created_on','edited_on','hook_id']
 
 	def __init__(self, *args, **kwargs):
@@ -458,7 +488,7 @@ class ParserSerializer(serializers.Serializer):
 	file = serializers.FileField()
 
 	class Meta:
-		fields = ['name','tool','file']	
+		fields = ['name','tool','file']
 
 	def validate_file(self, data):
 		return flat_file_validator(data)
@@ -469,15 +499,15 @@ class JiraProjectsSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = JiraProjects
-		fields = ['name','key','jira_config','application','created_on','edited_on']	
+		fields = ['name','key','jira_config','application','created_on','edited_on']
 		read_only_fields = ['created_on','edited_on','application','jira_config','key']
 
 	def __init__(self, *args, **kwargs):
-		super(JiraProjectsSerializer, self).__init__(*args, **kwargs)	
+		super(JiraProjectsSerializer, self).__init__(*args, **kwargs)
 		self.user = self.context.get('request').user
 
 	def validate(self, data):
-		name = data.get('name')		
+		name = data.get('name')
 		jira_config = self.user.org.jiraissuetypes
 		project_list = jira.get_projects(jira_config)
 		projects = {p.name:p.key for p in project_list}
@@ -524,7 +554,7 @@ class VulnerabilityEvidenceSerializer(serializers.ModelSerializer):
 
 	def __init__(self, *args, **kwargs):
 		super(VulnerabilityEvidenceSerializer, self).__init__(*args, **kwargs)
-							
+
 	def validate_request(self,data):
 		return text_file_validator(data)
 
@@ -532,7 +562,7 @@ class VulnerabilityEvidenceSerializer(serializers.ModelSerializer):
 		return text_file_validator(data)
 
 	def validate_log(self,data):
-		return text_file_validator(data)		
+		return text_file_validator(data)
 
 	def validate_file(self,data):
 		return image_file_validator(data)
@@ -560,7 +590,7 @@ class UpdateOpenVulnerabilitySerializer(serializers.Serializer):
 	name = serializers.CharField(required=False)
 	owasp = serializers.ChoiceField(required=False,choices=[(o,o) for o in settings.OWASP_TYPES])
 	severity = serializers.ChoiceField(required=False,choices=[(0,'Info'),(1,'Low'),(2,'Medium'),(3,'High')])
-	
+
 	class Meta:
 		fields = ['name','cwe','severity','owasp']
 
@@ -583,7 +613,7 @@ class OpenVulnerabilityRemediationSerializer(serializers.ModelSerializer):
 	def validate(self,data):
 		if not data:
 			raise serializers.ValidationError('Cannot submit a empty form')
-		return data				
+		return data
 
 
 class VulnerabilityEvidenceRemediationSerializer(serializers.ModelSerializer):
@@ -593,20 +623,49 @@ class VulnerabilityEvidenceRemediationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = VulnerabilityEvidenceRemediation
 		fields = ['id','description','file','evid','remediated_by','remediated_on','remediation_type','created_on','edited_on']
-		read_only_fields = ['remediated_by','remediated_on','created_on','edited_on']	
+		read_only_fields = ['remediated_by','remediated_on','created_on','edited_on']
 
 	def __init__(self, *args, **kwargs):
 		super(VulnerabilityEvidenceRemediationSerializer, self).__init__(*args, **kwargs)
 
 	def validate_file(self,data):
-		return image_file_validator(data)																								
+		return image_file_validator(data)
+
+
+
+class ReportSerializer(serializers.Serializer):
+	apps = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	proj = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	eng = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	sev = serializers.ListField(required=False,child=serializers.IntegerField(),min_length=0)
+	tools = serializers.ListField(required=False,child=serializers.CharField(),min_length=0)
+
+	def __init__(self, *args, **kwargs):
+		super(ReportSerializer, self).__init__(*args, **kwargs)
+		self.user = self.context.get('request').user
+
+	def validate_apps(self, data):
+		if data:
+			applications = Application.objects.filter(id__in=data)
+			if not applications.exists():
+				raise serializers.ValidationError('Not Found')
+		return data
+
+	def validate_eng(self, data):
+		if data:
+			engagements = Engagement.objects.filter(id__in=data)
+			if not engagements.exists():
+				raise serializers.ValidationError('Not Found')
+		return data
+
+	def validate_proj(self, data):
+		if data:
+			projects = Project.objects.filter(id__in=data)
+			if not projects.exists():
+				raise serializers.ValidationError('Not Found')
+		return data
 
 
 
 
-			
 
-
-
-
-		

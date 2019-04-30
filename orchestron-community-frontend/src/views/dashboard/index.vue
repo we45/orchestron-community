@@ -2,6 +2,7 @@
   <div>
     <b-container fluid>
       <loading :active.sync="isLoading" :can-cancel="true"></loading>
+      <loading :active.sync="isLoading" :can-cancel="true"></loading>
       <!-- <b-row>
         <b-col>
           <vul-count-section
@@ -15,7 +16,7 @@
 
       <b-row>
         <b-col id="vul_count_section">
-          <header-count-section
+          <!-- <header-count-section
             :openVul="openVulCount"
                 :closedVul="closedVulCount"
                 :grade="grade"
@@ -23,7 +24,17 @@
                 :closedVulUrl="closedVulUrl"
             :unCategorised="unCategorisedCount"
             :uncategorized_vul="uncategorized_vul"
-          ></header-count-section>
+          ></header-count-section> -->
+
+           <vul-count-section
+                :openVul="openVulCount"
+                :uncategorisedVul="unCategorisedCount"
+                :closedVul="closedVulCount"
+                :grade="grade"
+                :openVulUrl=" openVulUrl "
+                :closedVulUrl=" closedVulUrl "
+                :uncategorisedVulUrl=" uncategorized_vul"
+                ></vul-count-section>
         </b-col>
       </b-row>
       <!-- <br> -->
@@ -45,11 +56,27 @@
           <template v-if="toolVulnerabilityChart.length > 0">
             <orchy-pie-chart :title="toolVulChartTitle" :chartData="toolVulnerabilityChart" :tooltipLabel="'tool'"></orchy-pie-chart>
           </template>
+          <template v-else>
+            <b-col style="background-color: #ffffff;height: 475px;">
+              <br>
+              <p class="title">{{ toolVulChartTitle }}</p>
+              <hr>
+              <h5 style="padding-top: 50%;" class="text-center">No Data</h5>
+            </b-col>
+          </template>
         </b-col>
         <b-col cols="4">
             <template v-if="appVulnerabilityChart.length > 0">
               <orchy-pie-chart :title="appVulChartTitle" :chartData="appVulnerabilityChart" :tooltipLabel="'application'"></orchy-pie-chart>
             </template>
+          <template v-else>
+            <b-col style="background-color: #ffffff;height: 475px;">
+              <br>
+              <p class="title">{{ appVulChartTitle }}</p>
+              <hr>
+              <h5 style="padding-top: 50%;" class="text-center">No Data</h5>
+            </b-col>
+          </template>
         </b-col>
       </b-row>
       <br>
@@ -58,7 +85,7 @@
             <template v-if="basicBarDashboardChartData.length > 0">
                 <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
                                         :chartCategories="dashboardCategories"
-                                        :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
+                                        :title="'Vulnerabilities Ageing Analysis'"></orchy-stacked-bar-chart>
             </template>
         </b-col>
         <!-- <b-col cols="6">
@@ -75,8 +102,16 @@
               <orchy-donut-chart
             :orchy_donutTitle="taxonomyChartTitle" :areaChartData="taxanomyData" :tooltipLabel="'OWASP'"></orchy-donut-chart>
               </template>
+          <template v-else>
+            <b-col style="background-color: #ffffff;height: 475px;">
+              <br>
+              <p class="title">{{ taxonomyChartTitle }}</p>
+              <hr>
+              <h5 style="padding-top: 30%;" class="text-center">No Data</h5>
+            </b-col>
+          </template>
         </b-col>
-        
+
       </b-row>
       <br>
       <b-row>
@@ -136,13 +171,14 @@ import VulProgressBarStats from '@/components/Dashboard/VulProgressBarStats'
 import VulCountSection from '@/components/Dashboard/VulCountSection'
 import axios from '@/utils/auth'
 import { notValidUser } from '@/utils/checkAuthUser'
-import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.min.css'
 import headerCountSection from '@/components/Dashboard/headerCountSection'
 import orchyDonutSeverityChart from '@/components/Charts/orchyDonutSeverityChart'
 import orchyPieChart from '@/components/Charts/orchyPieChart'
 import orchyStackedBarChart from '@/components/Charts/orchyStackedBarChart'
 import orchyDonutChart from '@/components/Charts/orchyDonutChart'
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/vue-loading.min.css'
 
 
 export default {
@@ -196,6 +232,7 @@ export default {
       mediumLable: 'Medium',
       lowLable: 'Low',
       infoLable: 'Info',
+      isLoading: false
     }
   },
   created() {
@@ -206,7 +243,8 @@ export default {
   methods: {
     fetchData() {
       if (this.org && this.token) {
-        axios.get('/organizations/' + this.org + '/?apps=1&tool=1&ageing=1&severity=1&&opened=1&closed=1&avg_ageing=1&owasp=1')
+        this.isLoading = true
+        axios.get('/organizations/' + this.org + '/?apps=1&tool=1&ageing=1&severity=1&&opened=1&closed=1&avg_ageing=1&owasp=1&uncategorized=1')
           .then(res => {
             this.isLoading = true
             this.closedVulCount = res.data.closed_vul_count
@@ -220,6 +258,8 @@ export default {
             this.severityChartData = []
             this.appData = []
             this.grade = res.data.avg_ageing
+            console.log("un unCategorised", res.data.uncategorized)
+            this.unCategorisedCount = res.data.uncategorized
 
             this.severityChartData.push(
               ['High', this.high],
@@ -228,7 +268,7 @@ export default {
               ['Info', this.info]
             )
             this.appVulnerabilityChart = []
-            
+
             // for (const ageing of res.data.ageing) {
             //     this.appSevData.push(ageing)
             //   }
@@ -300,10 +340,10 @@ export default {
                   y: val[3] + val[2] + val[1] + val[0]
                 })
               }
-              
 
 
-      
+
+
             const highAgeingSevCount = []
             const mediumAgeingSevCount = []
             const lowAgeingSevCount = []
@@ -370,5 +410,11 @@ export default {
 </script>
 
 <style scoped>
-
+ .title {
+    font-family: 'Avenir';
+    font-size: 14px;
+    line-height: 1.33;
+    color: #6b7784;
+    font-weight: 200;
+  }
 </style>

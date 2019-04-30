@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-            <loading :active.sync="isLoading" :can-cancel="true"></loading>
+            <loading :active.sync="reloadPage" :can-cancel="true"></loading>
             <headers :name="projectName" :createdOn="projectCreatedOn" :logo="projectLogo"></headers>
             <br>
             <common-table
@@ -10,6 +10,7 @@
               :headerTitle="headerTitles"
               @createModal="createApplication"
               @updateModal="updateApplication($event)"
+              @clickPagination="clickPagination($event)"
               @deleteModal="beforeDeleteModal($event)"></common-table>
             <b-modal ref="createApplicationModal" title="Create Application" centered size="lg">
                 <div>
@@ -74,7 +75,6 @@
                                       v-model="appUrl"
                                       type="text"
                                       class="inline-form-control"
-                                      :state="!$v.appUrl.$invalid"
                                       placeholder="http://example.com">
                                     </b-form-input>
                                 </b-col>
@@ -116,7 +116,7 @@
                         <button type="button" class="btn btn-orange-submit"
                             data-dismiss="modal" @click=" submitCreateApplication() "
                                 v-if="!$v.appName.$invalid && !$v.appLogo.$invalid && !$v.appHostType.$invalid
-                            && !$v.appPlatformTags.$invalid && !$v.appUrl.$invalid && !$v.appIpv4.$invalid && !$v.appOsInfo.$invalid">
+                            && !$v.appPlatformTags.$invalid && !$v.appIpv4.$invalid && !$v.appOsInfo.$invalid" :disabled="isClicked">
                         Submit
                         </button>
                     </div>
@@ -182,7 +182,6 @@
                                       v-model="appUpdateUrl"
                                       type="text"
                                       class="inline-form-control"
-                                      :state="!$v.appUpdateUrl.$invalid"
                                       placeholder="http://example.com">
                                     </b-form-input>
                                 </b-col>
@@ -224,7 +223,7 @@
                         <button type="button" class="btn btn-orange-submit"
                             data-dismiss="modal" @click=" submitUpdateApplication() "
                                 v-if="!$v.appUpdateName.$invalid && !$v.appUpdateHostType.$invalid
-                            && !$v.appUpdatePlatformTags.$invalid && !$v.appUpdateUrl.$invalid && !$v.appUpdateIpv4.$invalid
+                            && !$v.appUpdatePlatformTags.$invalid && !$v.appUpdateIpv4.$invalid
                             && !$v.appUpdateOsInfo.$invalid">
                         Submit
                         </button>
@@ -326,7 +325,11 @@
         updateApplicationId: '',
         deleteApplicationId: '',
         typeDelete: '',
-        applicationCount: 0
+        applicationCount: 0,
+        reloadPage : false,
+        paginatedVulnerabilitiesList: [],
+        isClicked: false,
+
       }
     },
     validations: {
@@ -335,17 +338,13 @@
         minLength: minLength(1)
       },
       appLogo: {
-        
+
       },
       appHostType: {
         required
       },
       appPlatformTags: {
         required
-      },
-      appUrl: {
-        required,
-        url
       },
       appIpv4: {
         required,
@@ -363,10 +362,6 @@
       },
       appUpdatePlatformTags: {
         required
-      },
-      appUpdateUrl: {
-        required,
-        url
       },
       appUpdateIpv4: {
         required,
@@ -393,6 +388,7 @@
     },
     methods: {
       fetchData() {
+        this.reloadPage = true
         if (this.param && this.org && this.token) {
           axios.get('/projects/' + this.param + '/?&severity=1&applications=1')
             .then(res => {
@@ -412,6 +408,7 @@
                   }
                 })
               this.projectCreatedOn = res.data.created_on
+              this.vulnerabilitiesList = []
               for (const value of res.data.applications) {
                 this.vulnerabilitiesList.push({
                   name: { vul_name: value.fields.name },
@@ -420,7 +417,10 @@
                   url: '/projects/individual_application/' + value.fields.id + '/'
                 })
               }
+              this.reloadPage = false
+
             }).catch(error => {
+              this.reloadPage = false
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -432,6 +432,43 @@
         } else {
           notValidUser()
           this.$router.push('/')
+        }
+      },
+       clickPagination(event) {
+        if (event.page) {
+          if (event.page > 1) {
+            axios.get('/projects/' + this.param + '/applications/?page=' + event.page)
+              .then(res => {
+                this.paginatedVulnerabilitiesList = []
+                for (const value of res.data.results) {
+                   this.paginatedVulnerabilitiesList.push({
+                      name: { vul_name: value.fields.name },
+                      sev: value.stats.severity_count.severity,
+                      id: value.fields.id,
+                      url: '/projects/individual_application/' + value.fields.id + '/'
+                    })
+                }
+                this.vulnerabilitiesList = []
+                this.vulnerabilitiesList = this.paginatedVulnerabilitiesList
+              }).catch(error => {
+                console.log("error", error)
+                // if (error.response.data.detail === 'Signature has expired.'){
+                //   notValidUser()
+                //   this.$router.push('/')
+                // }
+                // if (error.response.status === 404) {
+                //   this.$router.push('/not_found')
+                // } else if (error.response.status === 403) {
+                //   this.$router.push('/forbidden')
+                // } else {
+                //   this.$router.push('/error')
+                // }
+              })
+          } else {
+            this.fetchData()
+          }
+        } else {
+         this.fetchData()
         }
       },
       createApplication() {
@@ -479,6 +516,7 @@
       },
       submitCreateApplication() {
         if (this.param && this.org && this.token) {
+          this.isClicked = true
           const form_data = new FormData()
           form_data.append('name', this.appName)
           form_data.append('logo', this.appLogo)
@@ -496,7 +534,8 @@
           })
             .then(res => {
               this.$refs.createApplicationModal.hide()
-              this.isLoading = true
+              this.isLoading = false
+              // this.$router.go()
               this.$router.push('/projects/individual_project/' + this.projectId + '/')
               this.$notify({
                 group: 'foo',
@@ -505,7 +544,9 @@
                 text: 'The Application has been created Successfully!',
                 position: 'top right'
               })
+              this.isClicked = false
             }).catch(error => {
+              this.isClicked = false
               var status_info = error.response.status
               if(status_info === 400){
                   this.$notify({
@@ -524,6 +565,7 @@
                 this.$router.push('/error')
               }
             })
+
         } else {
           notValidUser()
           this.$router.push('/')

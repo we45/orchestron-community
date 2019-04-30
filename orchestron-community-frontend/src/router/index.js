@@ -23,6 +23,7 @@ import IndividualProject from '../views/Projects/IndividualProject'
 import IndividualApplication from '../views/Applications/index'
 import AppOpenVulnerabilities from '../views/Applications/OpenVulnerabilities'
 import AppClosedVulnerabilities from '../views/Applications/ClosedVulnerabilities'
+import AppUnCategorisedVulnerabilities from '../views/Applications/UnCategorisedVulnerabilities'
 import AppSeverityWise from '../views/Applications/SeverityWise'
 import IndividualScan from '../views/Scans/Index'
 import ScansIndividualVulInfo from '../views/Scans/ScansIndividualVulInfo'
@@ -34,6 +35,9 @@ import EngagementSeverityWise from '../views/Engagements/SeverityWise'
 import Settings from '../views/Settings/index'
 import IndividualOrg from '../views/Settings/IndividualOrg'
 import AllApplicationsData from '../views/Projects/AllApplication'
+import uncategorizedOpenVulnerabilities from '../views/uncategorized/index'
+import ReportView from '../views/ReportView/index'
+// import UncategorizedSeverityWise from '../views/uncategorized/severityWise'
 
 
 export const constantRouterMap = [
@@ -78,6 +82,16 @@ export const constantRouterMap = [
         meta: {
           title: 'Severity Wise',
           icon: 'Severity Wise'
+        }
+      },
+      {
+        path: 'uncategorized_vul',
+        component: uncategorizedOpenVulnerabilities,
+        name: 'Uncategorized OpenVulnerabilities',
+        meta: {
+          title: 'Uncategorized Vulnerabilities',
+          icon: 'Uncategorized Vulnerabilities',
+          requiresAuth: true
         }
       },
       {
@@ -175,6 +189,12 @@ export const constantRouterMap = [
         meta: { title: 'Individual Application Closed Vulnerabilities' }
       },
       {
+        path: 'individual_application/uncategorized/:applicationId',
+        name: 'Individual Application Uncategorized Vulnerabilities',
+        component: AppUnCategorisedVulnerabilities,
+        meta: { title: 'Individual Application Uncategorized Vulnerabilities' }
+      },
+      {
         path: 'individual_application/:applicationId/severity_wise/:sev',
         name: 'individual_application_severity',
         component: AppSeverityWise,
@@ -255,6 +275,30 @@ export const constantRouterMap = [
         name: 'Severity Wise Engagement',
         component: EngagementSeverityWise,
         meta: { title: 'Severity Wise Engagement', icon: 'Engagements' }
+      }
+    ]
+  },
+  {
+    path: '/report',
+    // name: 'Reports',
+    component: Layout,
+    isReportReq: true,
+    meta: {
+      title: 'Report',
+      icon: 'report',
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: '',
+        name: 'Reports',
+        component: ReportView,
+        meta: {
+          title: 'Reports',
+          icon: 'report',
+          requiresAuth: true,
+          isReportReq: true,
+        }
       }
     ]
   },

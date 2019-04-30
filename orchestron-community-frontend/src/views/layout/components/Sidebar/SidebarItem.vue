@@ -30,6 +30,19 @@
                               style="font-size: 28px;margin-left: -2px;">&#xe805;</span>
                         <span v-if="item.children[0].meta&&item.children[0].meta.title" style="margin-left: 8%;">{{item.children[0].meta.title}}</span>
                     </template>
+
+                      <template v-else-if="item.children[0].meta.icon == 'report'">
+                                    <span class="demo-icon icon-asset-11bulk-actions"
+                                          style="font-size: 26px;margin-left: -2px;">&#xe804;</span>
+                        <span v-if="item.children[0].meta.title" style="margin-left: 10%;">{{ item.children[0].meta.title }}</span>
+                      </template>
+
+
+                    <!--  <template v-else-if="item.children[0].meta.icon == 'Engagements'">
+                        <span class="demo-icon icon-asset-15engagements2"
+                              style="font-size: 28px;margin-left: -2px;">&#xe805;</span>
+                        <span v-if="item.children[0].meta&&item.children[0].meta.title" style="margin-left: 8%;">{{item.children[0].meta.title}}</span>
+                    </template> -->
                     <template v-else-if="item.children[0].meta.icon == 'settings'">
                         <span class="demo-icon icon-asset-9settings"
                               style="font-size: 24px;margin-left: -2px;">&#xe802;</span>

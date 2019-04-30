@@ -10,8 +10,8 @@ from api.stored_procedures import ReportProcedures
 from api.models import Organization,Project,Application,Vulnerability,Engagement,Scan
 from rest_framework.authentication import TokenAuthentication
 from api.utils import get_severity_by_name
-from api.serializers import QueryParamSerializer, BasePostParamSerializer, \
-	RaiseJIRATicketSerializer, OpenVulSerializer, ClosedVulSerializer
+from api.serializers import QueryParamSerializer, BasePostParamSerializer,ApplicationSerializer, \
+	RaiseJIRATicketSerializer, OpenVulSerializer, ClosedVulSerializer, UnCategorisedSerializer
 from datetime import datetime
 from rest_framework.permissions import IsAuthenticated
 from api.orl import get_open_vul_info_from_api
@@ -22,6 +22,8 @@ from api.tasks import webhook_upload, webhook_process_json, raise_jira_ticket
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.pagination import OrchyPagination
 from django.conf import settings
+from api.stats import StatView
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class OpenVulnerabilityStatView(viewsets.ViewSet):
@@ -379,6 +381,60 @@ class BaseAnalyticsView(OrchyPagination,viewsets.ViewSet):
 		sev_context = c.severity_count(kwargs=kwargs)
 		return context,sev_context
 
+	def get_uncategorised_vul_context(self,data,kwargs):
+		"""
+		Parameters
+			cwe : int (max length = 4)
+
+			severity : string (allowed options "info","low","medium","high")
+
+			owasp : string 
+
+			tool : string (allowed options "ZAP","Burp")
+
+			start_date : date 
+
+			stop_date : date 
+
+			jira_sync : boolean 
+
+			false : boolean 
+		"""
+		serializer = QueryParamSerializer(data=data)
+		serializer.is_valid(raise_exception=True)
+		false_positive = serializer.validated_data.get('false',False)
+		true_positive = serializer.validated_data.get('true',False)
+		cwe = serializer.validated_data.get('cwe',False)
+		severity = serializer.validated_data.get('severity',False)
+		owasp = serializer.validated_data.get('owasp',False)
+		name = serializer.validated_data.get('name',False)
+		tool = serializer.validated_data.get('tool',False)
+		jira_sync = serializer.validated_data.get('jira_sync',False)
+		start_date = serializer.validated_data.get('start_date',False)
+		stop_date = serializer.validated_data.get('stop_date',datetime.today().date())
+		if cwe:
+			kwargs['cwe'] = cwe
+		if tool:
+			kwargs['tool'] = tool
+		if owasp:
+			kwargs['owasp'] = owasp
+		if start_date:
+			kwargs['created_on__date__range'] = [start_date,stop_date]
+		if jira_sync:
+			kwargs['jira_id__isnull'] = False
+		if name:
+			kwargs['name'] = name			
+		if severity:
+			kwargs['severity'] = get_severity_by_name(severity)	
+		if false_positive:
+			kwargs['is_false_positive'] = True	
+		if true_positive:
+			kwargs['is_false_positive'] = False	
+		o = UnCategorisedVulnerabilityStatView()				
+		context = o.vuls(kwargs=kwargs)
+		sev_context = o.severity_count(kwargs=kwargs)
+		return context,sev_context
+
 
 class OrganizationAnalyticsView(BaseAnalyticsView):
 	"""
@@ -433,6 +489,29 @@ class OrganizationAnalyticsView(BaseAnalyticsView):
 			serializer = ClosedVulSerializer(page, many=True, context={'request':request})
 			return self.get_paginated_response(serializer.data)
 		serializer = ClosedVulSerializer(context, many=True,context={'request':request})
+		return Response(serializer.data)
+
+
+	def retrieve_uncategorized(self, request, pk=None):
+		"""
+		Fetch Uncategorised vulnerabilities by query params
+
+		Parameters:
+		pk : integer
+		"""
+		obj = self.get_queryset(request.user).get(pk=pk)
+		apps = Application.objects.all()
+		kwargs = {
+		'scan__application__org':obj,
+		'scan__application__in':apps
+		}
+		context, sev_context = self.get_uncategorised_vul_context(self.request.query_params,kwargs)
+		self.sev_context = sev_context
+		page = self.paginate_queryset(context,request=request)
+		if page is not None:
+			serializer = UnCategorisedSerializer(page, many=True, context={'request':request})
+			return self.get_paginated_response(serializer.data)
+		serializer = UnCategorisedSerializer(context, many=True,context={'request':request})
 		return Response(serializer.data)					        
 
 
@@ -489,8 +568,36 @@ class ProjectAnalyticsView(BaseAnalyticsView):
 			serializer = ClosedVulSerializer(page, many=True, context={'request':request})
 			return self.get_paginated_response(serializer.data)
 		serializer = ClosedVulSerializer(context, many=True,context={'request':request})
-		return Response(serializer.data)			
+		return Response(serializer.data)
 
+	def applications(self, request, pk=None):
+		obj = self.get_queryset(request.user).get(pk=pk)
+		
+		context = {}
+		apps = obj.application_set.all()
+		apps_list = []
+		for app in apps:
+			kwargs = {
+				'scan__application__project':obj, 
+				'scan__application':app
+			} 
+			serialized_object = ApplicationSerializer(app, context={'request':self.request})
+			apps_list.append({
+				'fields':serialized_object.data,                
+				'stats':{
+					'severity_count':OpenVulnerabilityStatView().severity_count(kwargs=kwargs),
+					'scans_count':app.scan_set.count()
+				}
+			}) 
+		context['applications_count'] = apps.count()     
+		context['applications'] = apps_list
+		queryset = apps
+		page = self.paginate_queryset(queryset, request=request)
+		if page is not None:
+			serializer = ApplicationSerializer(page, many=True, context={'request':request})
+			return self.get_paginated_response(serializer.data)
+		serializer = ApplicationSerializer(queryset, many=True,context={'request':request})
+		return Response(serializer.data,status=status.HTTP_200_OK)
 
 class ApplicationAnalyticsView(BaseAnalyticsView):
 	"""
@@ -563,6 +670,26 @@ class ApplicationAnalyticsView(BaseAnalyticsView):
 		context, sev_context = self.get_context(self.request.query_params,kwargs)		
 		self.sev_context = sev_context
 		return Response(context)
+	
+	def retrieve_uncategorized(self, request, pk=None):
+		"""
+		Fetch open vulnerabilities by query params
+
+		Parameters:
+			pk : integer
+		"""
+		obj = self.get_queryset(request.user).get(pk=pk)
+		kwargs = {
+			'scan__application':obj
+		}
+		context, sev_context = self.get_uncategorised_vul_context(self.request.query_params,kwargs)       
+		self.sev_context = sev_context
+		page = self.paginate_queryset(context,request=request)
+		if page is not None:
+			serializer = UnCategorisedSerializer(page, many=True, context={'request':request})
+			return self.get_paginated_response(serializer.data)
+		serializer = UnCategorisedSerializer(context, many=True,context={'request':request})
+		return Response(serializer.data)
 
 	def mark_open_vul_false_positive(self, request, pk=None):
 		"""
@@ -839,3 +966,40 @@ class VulnerabilityAnalyticsView(BaseAnalyticsView):
 		context['count'] = remediations.count()		
 		context['data'] = remedy_list
 		return Response(context)													
+
+
+class  UnCategorisedVulnerabilityStatView(viewsets.ViewSet):
+    def uncategorized_vuls_query(self, kwargs={}, exclude_kwargs={}):
+        new_kwargs = kwargs
+        new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
+        open_vuls = Vulnerability.objects.filter(is_remediated=False, cwe=0).filter(**new_kwargs)\
+            .exclude(**exclude_kwargs)\
+            .exclude(cwe__in=settings.JANATHA_CLASS)\
+            .values('cwe')\
+            .distinct()\
+            .order_by('cwe')
+        janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=False, cwe=0).filter(**new_kwargs)\
+            .exclude(**exclude_kwargs)\
+            .values('cwe')\
+            .distinct()\
+            .order_by('cwe') 
+        return open_vuls | janatha_vuls
+
+    def vuls(self, kwargs={}, exclude_kwargs={}):
+        ReportProcedures.set_max_value()
+        raw_vuls = self.uncategorized_vuls_query(kwargs, exclude_kwargs)     
+        open_vuls = raw_vuls.annotate(tools=GroupConcat('tool',distinct=True),\
+                count=Count('name',distinct=True),\
+                apps=GroupConcat('scan__application__name',distinct=True),\
+                common_name=GroupConcat('common_name',distinct=True),\
+                open_for=Aging('created_on'),\
+                names=GroupConcat(Concat('name',V('###'),'scan__application__name',V('###'),'jira_id',V('###'),'jira_issue_status'),distinct=True))         
+        return open_vuls.values('tools','severity','apps','common_name','open_for','names','cwe','count').order_by('-severity')
+
+    def count(self, kwargs={}, exclude_kwargs={}):
+        vuls = self.uncategorized_vuls_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
+        return sum(dict(Counter(vuls)).values())
+
+    def severity_count(self, kwargs={}, exclude_kwargs={}):
+        sevs = self.uncategorized_vuls_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
+        return dict(Counter(sevs)) 

@@ -9,7 +9,8 @@ from api.api import OrganizationView, ProjectView, ApplicationView, ScanView, En
     ClosedVulnerabilityView, UserUtilityView, UserProfileView, MediaServeView, OrganizationOptionView, \
     OptionsListView, ParserView, JiraConnectionTestView, \
     ORLConfigView, ScanResultView, JiraProjectsView, JIRAListView, \
-    ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView
+    ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView, ExecutiveReportView,\
+    CategorizeVulnerability
 from rest_framework_jwt.views import obtain_jwt_token
 from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, ApplicationAnalyticsView, \
     EngagementAnalyticsView, ScanAnalyticsView, VulnerabilityAnalyticsView
@@ -34,7 +35,9 @@ urlpatterns = [
     re_path(r'^api/hosttypes/$', OptionsListView.as_view({'get':'hosttypes'}),name='hosttypes'),
     re_path(r'^api/platforms/$', OptionsListView.as_view({'get':'platforms'}),name='platforms'),
     re_path(r'^api/permissions/$', OptionsListView.as_view({'get':'permissions'}),name='permissions'),
-    
+
+    re_path(r'^api/openvul/catgorize/$', CategorizeVulnerability.as_view(),name='catgorize_open_vul'),
+
     re_path(r'^api/organizations/options/$', OrganizationOptionView.as_view({'get':'list'}),name='org_options'),
     re_path(r'^api/organizations/$', OrganizationView.as_view({'get':'list','put':'create'}),name='org'),
     re_path(r'^api/organizations/(?P<pk>\d+)/$', OrganizationView.as_view({'get':'retrieve','post':'update','delete':'destroy'}),name='ind_org'),
@@ -45,7 +48,7 @@ urlpatterns = [
     re_path(r'^api/organizations/(?P<pk>\d+)/orl/$',  ORLConfigView.as_view({'get':'retrieve','put':'config','post':'update','delete':'destroy'}),name='ind_org_orl_config'),
 
     re_path(r'^api/jira/connection/test/$',  JiraConnectionTestView.as_view(),name='test_jira_con'),
-    
+
     re_path(r'^api/projects/$', ProjectView.as_view({'get':'list','put':'create'}),name='pro'),
     re_path(r'^api/projects/(?P<pk>\d+)/$', ProjectView.as_view({'get':'retrieve','post':'update','delete':'destroy'}),name='ind_pro'),
     re_path(r'^api/projects/(?P<pk>\d+)/applications/$', ProjectAnalyticsView.as_view({'get':'applications'}),name='pro_app_openvul'),
@@ -82,7 +85,7 @@ urlpatterns = [
     re_path(r'^api/vulnerabilities/(?P<pk>\d+)/$', VulnerabilityView.as_view({'get':'retrieve','delete':'destroy'}),name='ind_vul'),
     re_path(r'^api/vulnerabilities/(?P<pk>\d+)/evidences/$', VulnerabilityAnalyticsView.as_view({'get':'evidences'}),name='ind_vul_evids'),
     re_path(r'^api/vulnerabilities/(?P<pk>\d+)/remediations/$', VulnerabilityAnalyticsView.as_view({'get':'remediations'}),name='ind_vul_remedys'),
-    
+
     re_path(r'^api/evidences/$', VulnerabilityEvidenceView.as_view({'get':'list','put':'create'}),name='evidence'),
     re_path(r'^api/evidences/(?P<pk>\d+)/$', VulnerabilityEvidenceView.as_view({'get':'retrieve','post':'update','delete':'destroy'}),name='ind_evidence'),
 
@@ -117,9 +120,12 @@ urlpatterns = [
     re_path(r'^api/closedvul/app/(?P<pk>\d+)/$', ApplicationAnalyticsView.as_view({'get':'retrieve_closed'}),name='app_closedvul'),
 
     re_path(r'^api/closedvul/engagement/(?P<pk>\d+)/$', EngagementAnalyticsView.as_view({'get':'retrieve_closed'}),name='eng_closedvul'),
-    
+
     re_path(r'^api/closedvul/(?P<app_name>.*)/(?P<vul_name>.*)/(?P<cwe>.*)/$', ClosedVulnerabilityView.as_view({'get':'retrieve'}),name='app_ind_closedvul'),
-    
+
+    re_path(r'^api/report/executive/$', ExecutiveReportView.as_view(),name='executive_report'),
+    re_path(r'^api/uncategorize/org/(?P<pk>\d+)/$', OrganizationAnalyticsView.as_view({'get':'retrieve_uncategorized'}),name='org_uncategorize_openvul'),
+    re_path(r'^api/uncategorize/app/(?P<pk>\d+)/$', ApplicationAnalyticsView.as_view({'get':'retrieve_uncategorized'}),name='app_uncategorised'),
 ]
 
 # handler404 = page_not_found

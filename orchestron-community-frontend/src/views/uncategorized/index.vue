@@ -1,8 +1,9 @@
 <template>
   <div>
     <b-container fluid>
+      <loading :active.sync="reloadPage" :can-cancel="true"></loading>
       <b-card>
-        <p class="title">Open Vulnerabilities - {{ selectedOption }} Severity</p>
+        <p>{{ headerTitle }}</p>
         <hr>
         <br>
         <b-row>
@@ -14,20 +15,30 @@
             </p>
           </b-col>
           <b-col sm="4">
-            <v-select  :options="selectOption"
-                       v-model="selectedOption"
-                       v-on:input="onInput(selectedOption)">
+
+            <v-select :options="selectOption"
+                      v-model="selectedOption"
+                      v-on:input="onInput(selectedOption)">
             </v-select>
           </b-col>
-          </b-row>
-        <!--<br>-->
+        </b-row>
+        <br>
+        <vul-progress-bar
+          :high="highCount"
+          :medium="mediumCount"
+          :low="lowCount"
+          :info="infoCount"
+          :total="totalVul"></vul-progress-bar>
+        <br>
         <open-vul-table :pageNumberCount="totalVul"
                         :currentPage="currentPage"
                         :dataItems="items"
                         @updateUncategorized="updateUncategorized($event)"
                         @clickPagination="clickPagination($event)"></open-vul-table>
       </b-card>
-           <!--Update Uncategorized-->
+
+
+      <!--Update Uncategorized-->
       <b-modal ref="UpdateuncategorizedModal" title="Update Uncategorized Vulnerability" size="lg" centered>
               <template>
                 <div>
@@ -90,67 +101,78 @@
   </div>
 </template>
 <script>
-import OpenVulTable from '@/components/OpenVulnerabilities/OpenVulTable.vue'
-import axios from '@/utils/auth'
-import { notValidUser } from '@/utils/checkAuthUser'
+  import OpenVulTable from '@/components/OpenVulnerabilities/OpenVulTable.vue'
+  import OpenVulTableDash from '@/components/OpenVulnerabilities/OpenVulTableDashboard.vue'
 
-export default {
-  name: 'SeverityWise',
-  data() {
-    return {
-      items: [],
-      paginationItems: [],
-      totalVul: 0,
-      highCount: 0,
-      mediumCount: 0,
-      lowCount: 0,
-      infoCount: 0,
-      selectOption: ['High', 'Medium', 'Low', 'Info'],
-      selectedOption: '',
-      isLoading: false,
-      currentPage: 0,
-      updateUncategorizedVulName: '',
+  import VulProgressBar from '@/components/OpenVulnerabilities/VulProgressBar'
+  import axios from '@/utils/auth'
+  import {notValidUser} from '@/utils/checkAuthUser'
+  import Loading from 'vue-loading-overlay'
+
+  export default {
+    name: 'OpenVulnerabilities',
+    components: {
+      OpenVulTable,
+      VulProgressBar,
+      OpenVulTableDash,
+      Loading
+    },
+    data() {
+      return {
+        headerTitle: '',
+        items: [],
+        paginationItems: [],
+        totalVul: 0,
+        highCount: 0,
+        mediumCount: 0,
+        lowCount: 0,
+        infoCount: 0,
+        selectOption: ['Default View', 'Show False Positives'],
+        selectedOption: 'Default View',
+        isLoading: false,
+        currentPage: 0,
+        checkAppNames: [],
+        reloadPage: false,
+        updateUncategorizedVulName: '',
         updateUncategorizedVulCWE: '',
-    }
-  },
-  components: {
-    OpenVulTable
-  },
-  created() {
-    this.param = this.$route.params.sev
-    this.org = localStorage.getItem('org')
-    this.token = localStorage.getItem('token')
-    this.fetchSeverityData()
-  },
-  updated() {
-    if (this.isLoading) {
-      this.$nextTick(() => {
-        this.items = []
-        this.items = this.paginationItems
-      })
-      this.isLoading = false
-    }
-  },
-  methods: {
-    fetchSeverityData() {
-      if (this.param === 'high') {
-        this.selectedOption = 'High'
-      } else if (this.param === 'medium') {
-        this.selectedOption = 'Medium'
-      } else if (this.param === 'low') {
-        this.selectedOption = 'Low'
-      } else if (this.param === 'info') {
-        this.selectedOption = 'Info'
-      } else {
-        this.selectedOption = 'Info'
       }
-      if (this.org && this.token && this.param) {
-        axios.get('/openvul/org/' + this.org + '/?severity=' + this.param)
-          .then(res => {
-            if (res.status === 200) {
+    },
+    created() {
+      this.org = localStorage.getItem('org')
+      this.token = localStorage.getItem('token')
+    },
+    updated() {
+      if (this.isLoading) {
+        this.$nextTick(() => {
+          this.items = []
+          this.items = this.paginationItems
+        })
+        this.isLoading = false
+      }
+    },
+    methods: {
+       checkAppExists(val) {
+        return this.checkAppNames.some(function (el) {
+          return el.value !== val;
+        });
+      },
+
+      fetchFalsePositiveData() {
+        if (this.org && this.token) {
+          var url = '/uncategorize/org/' + this.org + '/?false=1'
+          axios.get(url)
+            .then(res => {
+              this.headerTitle = 'Uncategorised Vulnerabilities'
               this.items = []
+              this.paginationItems = []
+              this.totalVul = 0
               this.totalVul = res.data.count
-              for (const val of Object.values(res.data.results)) {
+              this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
+
+              for (const val of res.data.results) {
                 const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
@@ -173,6 +195,7 @@ export default {
                 } else {
                   commonName = val.common_name
                 }
+
                 const checkObjectEmpty = Object.keys(multipleVuls).length === 0
                 if (checkObjectEmpty) {
                   this.items.push({
@@ -200,56 +223,50 @@ export default {
                   })
                 }
               }
-            } else {
-              this.$router.push('/forbidden')
-            }
-          }).catch(error => {
+              this.reloadPage = false
+
+            }).catch(error => {
+            this.reloadPage = false
+
             if (error.res.status === 404) {
               this.$router.push('/not_found')
-            } else if (error.res.status === 404) {
+            } else if (error.res.status === 403) {
               this.$router.push('/forbidden')
             } else {
               this.$router.push('/error')
             }
           })
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
-    },
-    onInput(value) {
-      this.param = ''
-      if (value === 'High') {
-        this.param = 'high'
-      } else if (value === 'Medium') {
-        this.param = 'medium'
-      } else if (value === 'Low') {
-        this.param = 'low'
-      } else if (value === 'Info') {
-        this.param = 'info'
-      } else {
-        this.param = 'info'
-      }
-      if (this.org && this.token && this.param) {
-        axios.get('/openvul/org/' + this.org + '/?severity=' + this.param)
-          .then(res => {
-            if (res.status === 200) {
+        } else {
+          notValidUser()
+          this.$router.push('/')
+        }
+      },
+
+      fetchData() {
+        if (this.org && this.token) {
+          this.reloadPage = true
+          var url = '/uncategorize/org/' + this.org + '/?true=1'
+          axios.get(url)
+            .then(res => {
+              this.headerTitle = 'Uncategorised Vulnerabilities'
               this.items = []
+              this.paginationItems = []
               this.totalVul = 0
-              this.highCount = 0
-              this.mediumCount = 0
-              this.lowCount = 0
-              this.infoCount = 0
               this.totalVul = res.data.count
-              for (const val of Object.values(res.data.results)) {
+              this.highCount = res.data.severity[3] | 0
+              this.mediumCount = res.data.severity[2] | 0
+              this.lowCount = res.data.severity[1] | 0
+              this.infoCount = res.data.severity[0] | 0
+
+              for (const val of res.data.results) {
                 const splitVuls = val.names.split('###,')
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
                 const tool = val.tools
-                var commonName = ''
-                var vulName = ''
-                var appName = ''
+                let commonName = ''
+                let vulName = ''
+                let appName = ''
                 const multipleVuls = {}
                 for (const actualVul of splitVuls) {
                   const vulDetail = actualVul.split('###')
@@ -264,6 +281,7 @@ export default {
                 } else {
                   commonName = val.common_name
                 }
+
                 const checkObjectEmpty = Object.keys(multipleVuls).length === 0
                 if (checkObjectEmpty) {
                   this.items.push({
@@ -291,36 +309,55 @@ export default {
                   })
                 }
               }
-            } else {
-              this.$router.push('/forbidden')
-            }
-          }).catch(error => {
+              this.reloadPage = false
+
+            }).catch(error => {
+            this.reloadPage = false
+
             if (error.res.status === 404) {
               this.$router.push('/not_found')
-            } else if (error.res.status === 404) {
+            } else if (error.res.status === 403) {
               this.$router.push('/forbidden')
             } else {
               this.$router.push('/error')
             }
           })
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
-    },
-    clickPagination(event) {
-      if (event.page) {
-        this.currentPage = event.page
-        this.isLoading = true
-        if (this.currentPage > 1) {
-          if (this.org && this.token && this.param) {
-            axios.get('/openvul/org/' + this.org + '/?severity='+ this.param + '&page=' + event.page)
-              .then(res => {
-                if (res.status === 200) {
+        } else {
+          notValidUser()
+          this.$router.push('/')
+        }
+      },
+
+      clickPagination(event) {
+        if (this.org && this.token) {
+          if (event.page) {
+            this.currentPage = event.page
+            if (this.currentPage > 1) {
+              this.reloadPage = true
+
+              if (this.selectedOption == 'Default View') {
+                var url = '/uncategorize/org/' + this.org + '/?true=1&page=' + event.page
+              }
+              else {
+                var url = '/uncategorize/org/' + this.org + '/?false=1&page=' + event.page
+              }
+              axios.get(url)
+                .then(res => {
+                  this.headerTitle = 'UnCategorised Vulnerabilities'
+                  this.isLoading = true
+                  this.totalVul = 0
                   this.items = []
                   this.paginationItems = []
-                  this.isLoading = true
-                  for (const val of Object.values(res.data.results)) {
+                  this.totalVul = res.data.count
+                  this.highCount = 0
+                  this.mediumCount = 0
+                  this.lowCount = 0
+                  this.infoCount = 0
+                  this.highCount = res.data.severity[3] | 0
+                  this.mediumCount = res.data.severity[2] | 0
+                  this.lowCount = res.data.severity[1] | 0
+                  this.infoCount = res.data.severity[0] | 0
+                  for (const val of res.data.results) {
                     const splitVuls = val.names.split('###,')
                     const cwe = val.cwe
                     const sev = val.severity
@@ -343,6 +380,7 @@ export default {
                     } else {
                       commonName = val.common_name
                     }
+
                     const checkObjectEmpty = Object.keys(multipleVuls).length === 0
                     if (checkObjectEmpty) {
                       this.paginationItems.push({
@@ -370,10 +408,10 @@ export default {
                       })
                     }
                   }
-                } else {
-                  this.$router.push('/forbidden')
-                }
-              }).catch(error => {
+                  this.reloadPage = false
+
+                }).catch(error => {
+                this.reloadPage = false
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 404) {
@@ -382,16 +420,30 @@ export default {
                   this.$router.push('/error')
                 }
               })
+            } else {
+              this.fetchData()
+            }
           } else {
-            notValidUser()
-            this.$router.push('/')
+            this.fetchData()
           }
         } else {
-          this.fetchSeverityData()
+          notValidUser()
+          this.$router.push('/')
         }
-      }
-    },
-    updateUncategorized(event) {
+      },
+
+      onInput(value) {
+        this.reloadPage = true
+        if (value === 'Default View' || value === null) {
+          this.fetchData()
+        } else {
+          this.fetchFalsePositiveData()
+        }
+      },
+
+
+
+      updateUncategorized(event) {
       this.updateUncategorizedVulName = ''
       this.updateUncategorizedVulName = event.commonName
       this.$refs.UpdateuncategorizedModal.show()
@@ -437,11 +489,13 @@ export default {
 
       // openvul/catgorize
     },
+
+
+    }
   }
-}
 </script>
 <style scoped>
-  .vul-count{
+  .vul-count {
     font-family: 'Avenir';
     color: #25231F;
     font-size: 48px;
