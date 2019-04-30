@@ -1,0 +1,65 @@
+version: '1.0'
+steps:
+  build-orchy-community-nginx:
+    title: Building Orchestron Community Nginx Docker Image
+    type: build
+    image_name: we45/orchestron-community-nginx
+    tag: latest
+    working_directory: ${{main_clone}}/orchestron-community-nginx
+    dockerfile: Dockerfile
+    when:
+      branch:
+        only:
+          - master
+    retry:
+      maxAttempts: 2
+
+  build-orchy-community-api:
+    title: Building Orchestron Community API Docker Image
+    type: build
+    image_name: we45/orchestron-community-api
+    tag: latest
+    working_directory: ${{main_clone}}/orchestron-community-api
+    dockerfile: Dockerfile
+    when:
+      branch:
+        only:
+          - master
+    retry:
+      maxAttempts: 2
+
+  build-orchy-community-frontend:
+    title: Building Orchestron Community Frontend Docker Image
+    type: build
+    image_name: we45/orchestron-community-frontend
+    tag: latest
+    working_directory: ${{main_clone}}/orchestron-community-frontend
+    dockerfile: Dockerfile
+    when:
+      branch:
+        only:
+          - master
+    retry:
+      maxAttempts: 2
+
+  push-orchy-community-nginx:
+    title: Push Orchestron Community Nginx Docker Image to we45 DockerHub
+    type: push
+    candidate: ${{build-orchy-community-nginx}}
+    tag: latest
+    registry: we45-dockerhub
+
+  push-orchy-community-api:
+    title: Push Orchestron Community API Docker Image to we45 DockerHub
+    type: push
+    candidate: ${{build-orchy-community-api}}
+    tag: latest
+    registry: we45-dockerhub
+
+  push-orchy-community-frontend:
+    title: Push Orchestron Community Frontend Docker Image to we45 DockerHub
+    type: push
+    candidate: ${{build-orchy-community-frontend}}
+    tag: latest
+    registry: we45-dockerhub
+

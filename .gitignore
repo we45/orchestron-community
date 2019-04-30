@@ -8,5 +8,4 @@ orchestron-community-api/orchy_project/api/media/*
 orchestron-community-minio
 orchestron-community_migrations
 orchestron_community_mysql
-*.xml
-venv/*
+orchestron-community-frontend/node_modules/*

@@ -19,7 +19,7 @@ services:
         links:
             - api
     api:
-        image: we45/orchestron-community-api:1.2.0
+        image: we45/orchestron-community-api:latest
         expose:
             - "8000"
         environment:

@@ -15,6 +15,8 @@ from rest_framework_jwt.views import obtain_jwt_token
 from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, ApplicationAnalyticsView, \
     EngagementAnalyticsView, ScanAnalyticsView, VulnerabilityAnalyticsView
 
+
+
 urlpatterns = [
     re_path(r'^media/(?P<path>.*)$', MediaServeView.as_view()),
     re_path(r'^api/user/password/change/(?P<email>.*)/$', UserUtilityView.as_view({'post':'change_password'})),
