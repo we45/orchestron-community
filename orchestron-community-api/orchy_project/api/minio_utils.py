@@ -11,7 +11,7 @@ class MinioUtil:
 	                  access_key=settings.MINIO.get('access_key'),
 	                  secret_key=settings.MINIO.get('secret_key'),
 	                  secure=False)
-		
+
 	def create_bucket(self):
 		try:
 			self.connection.make_bucket(self.bucket_name)
@@ -36,7 +36,7 @@ class MinioUtil:
 			raise MinioResponseError
 		except NoSuchBucket:
 			self.create_bucket()
-			raise MinioResponseError			
+			raise MinioResponseError
 
 	def get_file(self, file_name):
 		try:
@@ -44,9 +44,8 @@ class MinioUtil:
 		except ResponseError as err:
 			raise MinioResponseError
 		except NoSuchKey:
-			raise MinioNoFileError			
+			raise MinioNoFileError
 
 
-	
 
-	
+

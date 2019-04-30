@@ -56,11 +56,27 @@
           <template v-if="toolVulnerabilityChart.length > 0">
             <orchy-pie-chart :title="toolVulChartTitle" :chartData="toolVulnerabilityChart" :tooltipLabel="'tool'"></orchy-pie-chart>
           </template>
+          <template v-else>
+            <b-col style="background-color: #ffffff;height: 475px;">
+              <br>
+              <p class="title">{{ toolVulChartTitle }}</p>
+              <hr>
+              <h5 style="padding-top: 50%;" class="text-center">No Data</h5>
+            </b-col>
+          </template>
         </b-col>
         <b-col cols="4">
             <template v-if="appVulnerabilityChart.length > 0">
               <orchy-pie-chart :title="appVulChartTitle" :chartData="appVulnerabilityChart" :tooltipLabel="'application'"></orchy-pie-chart>
             </template>
+          <template v-else>
+            <b-col style="background-color: #ffffff;height: 475px;">
+              <br>
+              <p class="title">{{ appVulChartTitle }}</p>
+              <hr>
+              <h5 style="padding-top: 50%;" class="text-center">No Data</h5>
+            </b-col>
+          </template>
         </b-col>
       </b-row>
       <br>
@@ -69,7 +85,7 @@
             <template v-if="basicBarDashboardChartData.length > 0">
                 <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
                                         :chartCategories="dashboardCategories"
-                                        :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
+                                        :title="'Vulnerabilities Ageing Analysis'"></orchy-stacked-bar-chart>
             </template>
         </b-col>
         <!-- <b-col cols="6">
@@ -86,8 +102,16 @@
               <orchy-donut-chart
             :orchy_donutTitle="taxonomyChartTitle" :areaChartData="taxanomyData" :tooltipLabel="'OWASP'"></orchy-donut-chart>
               </template>
+          <template v-else>
+            <b-col style="background-color: #ffffff;height: 475px;">
+              <br>
+              <p class="title">{{ taxonomyChartTitle }}</p>
+              <hr>
+              <h5 style="padding-top: 30%;" class="text-center">No Data</h5>
+            </b-col>
+          </template>
         </b-col>
-        
+
       </b-row>
       <br>
       <b-row>
@@ -244,7 +268,7 @@ export default {
               ['Info', this.info]
             )
             this.appVulnerabilityChart = []
-            
+
             // for (const ageing of res.data.ageing) {
             //     this.appSevData.push(ageing)
             //   }
@@ -316,10 +340,10 @@ export default {
                   y: val[3] + val[2] + val[1] + val[0]
                 })
               }
-              
 
 
-      
+
+
             const highAgeingSevCount = []
             const mediumAgeingSevCount = []
             const lowAgeingSevCount = []
@@ -386,5 +410,11 @@ export default {
 </script>
 
 <style scoped>
-
+ .title {
+    font-family: 'Avenir';
+    font-size: 14px;
+    line-height: 1.33;
+    color: #6b7784;
+    font-weight: 200;
+  }
 </style>

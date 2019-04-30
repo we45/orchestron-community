@@ -119,7 +119,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'orchy_project.wsgi.application'
 
-DB_IP = os.environ.get('DB_IP')
+DB_IP = os.environ.get('DB_IP', '127.0.0.1')
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -128,10 +128,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'orchy_community',# Or path to database file if using sqlite3.
-        'USER': os.environ.get('MYSQL_USER'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+        'USER': os.environ.get('MYSQL_USER', 'root'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'hegemony86'),
         'HOST': DB_IP,# Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': os.environ.get('DB_PORT'), # Set to empty string for default 3306.
+        'PORT': os.environ.get('DB_PORT', 3306), # Set to empty string for default 3306.
     },
     "OPTIONS": {
         "init_command": "SET SESSION group_concat_max_len = 1000000;"
@@ -190,12 +190,12 @@ REST_FRAMEWORK = {
     ),
    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-   ), 
+   ),
    'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
-    ),  
+    ),
    'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
@@ -328,7 +328,7 @@ LOGGING = {
             'class': 'logging.StreamHandler'
         }
     },
-    'loggers': {        
+    'loggers': {
         'background_task.tasks': {
             'handlers': ['debug_log','error_log','warning_log','critical_log'],
             'level': 'INFO'

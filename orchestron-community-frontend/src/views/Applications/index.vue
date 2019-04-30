@@ -7,6 +7,7 @@
                 :logo="appLogo"
                 :url="appUrl"
                 :osInfo="appOsInfo"
+                :enable_Jira="enable_Jira"
                 :platform="appPlatform" @configureApplication="applicationConfigure()" @configureWebhooks="copyWebhook($event)"></app-headers>
 
           <b-container v-if="showConfig" fluid style="background-color: #FFFFFF;">
@@ -416,6 +417,7 @@
         isLoading: false,
         reloadPage: false,
         vulnerabilitiesList: [],
+        enable_Jira: false,
         appname: '',
         appId: '',
         appLogo: '',
@@ -591,11 +593,6 @@
           axios.get('/applications/' + this.param + '/?scans=1&opened=1&ageing=1&closed=1&avg_ageing=1&severity=1&uncategorized=1')
             .then(res => {
               this.webhookId = res.data.webhook_id
-              // for (const ageing of res.data.ageing) {
-              //   this.appSevData.push(ageing)
-              // }
-              console.log("res data", res.data)
-              console.log("rrssssss", res.data.uncategorized)
               this.unCategorisedVulCount = res.data.uncategorized
               this.openVulCount = res.data.open_vul_count
               this.closeVulCount = res.data.closed_vul_count
@@ -692,7 +689,7 @@
 
             }).catch(error => {
         this.reloadPage = false
-                
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -716,6 +713,7 @@
           axios
             .get('/organizations/' + this.org + '/config/')
             .then(res => {
+              this.enable_Jira = res.data.enable_jira
               if (res.data.enable_jira) {
                 axios
                   .get('/organizations/' + this.org + '/jira/')

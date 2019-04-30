@@ -52,7 +52,7 @@
 	              <form @submit.prevent="submitSelectedApplications">
 	                <label for="">Select Application</label>
 	                <b-col>
-	                 
+
 	                  <template >
 	                    <v-select
 	                      placeholder="Select Applications"
@@ -177,7 +177,7 @@
             </div>
           </b-modal>
           <template v-if="reportType.value==='execSummary' ">
-            
+
   		          <excutive-report :excutivedata="excutivedata"
                              :excutiveSeverityChartData="excutiveSeverityChartData"
                              :excutiveVulDataItems="excutiveVulDataItems"
@@ -299,36 +299,6 @@ import Loading from 'vue-loading-overlay'
           this.excutiveVulAgeingSubTitle  = ''
 
       },
-      closeEngagementModal() {
-        this.$refs.engagementModal.hide()
-      },
-      submitSelectedEngagement() {
-        this.selectedOption = []
-        this.selectedOption = this.selectedOption.filter(function (item) {
-          return item.label !== 'eng:' + item.label
-        })
-        for (const eng of this.filterEngModel) {
-          this.selectedOption.push({label: 'eng:' + eng.label, value: eng.value})
-        }
-
-        if (Array.isArray(this.filterSevModel)) {
-          for (const sevs of this.filterSevModel) {
-            this.selectedOption.push({label: 'sev:' + sevs.label, value: sevs.value})
-          }
-        }
-        if (Array.isArray(this.filterToolModel)) {
-          for (const tools of this.filterToolModel) {
-            this.selectedOption.push({label: 'tool:' + tools.label, value: tools.value})
-          }
-        }
-
-
-        this.selectedOption = this.selectedOption.filter(function (item) {
-          return item.value !== 'engFilter'
-        })
-        this.$refs.engagementModal.hide()
-      },
-
     reportSelectedScope(reportScope) {
         this.emptyChanges()
         // this.reportTypeOptions = []
@@ -336,13 +306,9 @@ import Loading from 'vue-loading-overlay'
         this.filterOptions = []
         this.selectedOption = []
         const currentVal = this.reportScope.value
-       
+
         if (currentVal === 'application') {
             this.filterOptions.push(
-              // {
-              //   label: 'Application Filter',
-              //   value: 'appFilter'
-              // }
               {
                 label: 'Application Filter',
                 value: 'appFilter'
@@ -356,27 +322,6 @@ import Loading from 'vue-loading-overlay'
                 value: 'toolFilter'
               }
             )
-        }
-        if (currentVal === 'engagement') {
-            this.filterOptions.push(
-              {
-                label: 'Engagement Filter',
-                value: 'engFilter'
-              },
-              {
-                label: 'Severity Filter',
-                value: 'sevFilter'
-              },
-              {
-                label: 'Tool Filter',
-                value: 'toolFilter'
-              }
-            )
-          // this.reportTypeOptions.push(
-          //   {label: 'Exec Summary', value: 'execSummary'},
-          //   {label: 'Detailed Report', value: 'detailedReport'},
-            
-          // )
         }
       },
     closeApplicationModal() {
@@ -980,7 +925,7 @@ import Loading from 'vue-loading-overlay'
               })
               .catch(error => {
               })
-            
+
             this.$refs.appModal.show()
           } else {
             this.$refs.appModal.hide()
@@ -993,7 +938,7 @@ import Loading from 'vue-loading-overlay'
             this.$refs.sevModal.hide()
           }
 
-         
+
           if (currentFilter === 'toolFilter') {
             axios.get('/tools/')
               .then(res => {

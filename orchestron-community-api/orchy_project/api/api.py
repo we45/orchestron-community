@@ -28,7 +28,7 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
-    JiraProjectsSerializer, ReportSerializer
+    JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
@@ -70,7 +70,7 @@ class MediaServeView(APIView):
                 assert projects.exists()
             elif path.startswith(settings.APPLICATION_MEDIA_URL):
                 apps = Application.objects.filter(logo=path)
-                assert apps.exists() 
+                assert apps.exists()
             elif path.startswith(settings.EVIDENCE_MEDIA_URL):
                 evidences = VulnerabilityEvidence.objects.filter(Q(request=path) | Q(response=path) | Q(file=path) | Q(log=path))
                 assert evidences.exists()
@@ -79,9 +79,9 @@ class MediaServeView(APIView):
                 assert remediations.exists()
             elif path.startswith(settings.EVIDENCE_REMEDY_MEDIA_URL):
                 evid_remediations = VulnerabilityEvidenceRemediation.objects.filter(file=path)
-                assert evid_remediations.exists()  
+                assert evid_remediations.exists()
             else:
-                assert False       
+                assert False
         except AssertionError:
             raise Unauthorized
         else:
@@ -95,7 +95,7 @@ class BaseView(viewsets.ModelViewSet):
     """
     This class is the base view for creating, updating, fetching and deleting the Model object
     """
-    def get_queryset(self):  
+    def get_queryset(self):
         """
         This view returns a queryset filtered according to the user role
         """
@@ -118,11 +118,11 @@ class BaseView(viewsets.ModelViewSet):
         obj = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(obj,context={'request':request})
         log.info('Retrieved a single object of {0} with primary key {1}'.format(self.model_class.__name__,pk))
-        return Response(serializer.data)       
+        return Response(serializer.data)
 
     def list(self, request):
         """
-        This view returns a queryset of a model, 
+        This view returns a queryset of a model,
         The queryset is paginated by 5 objects
 
         return type :
@@ -141,7 +141,7 @@ class BaseView(viewsets.ModelViewSet):
     def create(self, request):
         """
         This view creates a model instance
-        
+
         return type :
             json
         """
@@ -155,7 +155,7 @@ class BaseView(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         """
         This view updates a model instance
-        
+
         return type :
             json
         """
@@ -171,7 +171,7 @@ class BaseView(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         """
         This view deletes a model instance
-        
+
         return type :
             json
         """
@@ -179,7 +179,7 @@ class BaseView(viewsets.ModelViewSet):
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
         log.info('Deleted an instance of {0} of primary key {1} by {2}'.format(self.model_class.__name__,pk,request.user))
-        return Response({'name':obj.name, 'message':'Successfully Deleted'}, status=status.HTTP_200_OK) 
+        return Response({'name':obj.name, 'message':'Successfully Deleted'}, status=status.HTTP_200_OK)
 
     def get_open_vuls(self, kwargs):
         """
@@ -188,7 +188,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -201,7 +201,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -214,11 +214,11 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
-        return {'cwe':OpenVulnerabilityStatView().cwe_severity_count(kwargs=kwargs)}        
+        return {'cwe':OpenVulnerabilityStatView().cwe_severity_count(kwargs=kwargs)}
 
     def get_severity_stats(self, kwargs):
         """
@@ -227,7 +227,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -240,11 +240,11 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
-        """ 
-        return {'owasp':OpenVulnerabilityStatView().owasp_severity_count(kwargs=kwargs)}         
+        """
+        return {'owasp':OpenVulnerabilityStatView().owasp_severity_count(kwargs=kwargs)}
 
     def get_tools_stats(self, kwargs):
         """
@@ -253,7 +253,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -266,7 +266,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -279,12 +279,12 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
-        return {'applications':OpenVulnerabilityStatView().application_severity_count(kwargs=kwargs)} 
-        
+        return {'applications':OpenVulnerabilityStatView().application_severity_count(kwargs=kwargs)}
+
     def get_months_stats(self, kwargs):
         """
         This view returns a months statistics of the open vulnerabilities
@@ -292,11 +292,11 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
-        return {'months':OpenVulnerabilityStatView().month_severity_count(kwargs=kwargs)}                
+        return {'months':OpenVulnerabilityStatView().month_severity_count(kwargs=kwargs)}
 
     def get_grade_stats(self, kwargs):
         """
@@ -305,7 +305,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -318,11 +318,11 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
-        return {'ageing':OpenVulnerabilityStatView().aging_count(kwargs=kwargs)}        
+        return {'ageing':OpenVulnerabilityStatView().aging_count(kwargs=kwargs)}
 
     def get_avg_ageing_stats(self, kwargs):
         """
@@ -331,11 +331,11 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
-        return {'avg_ageing':OpenVulnerabilityStatView().avg_ageing(kwargs=kwargs)}        
+        return {'avg_ageing':OpenVulnerabilityStatView().avg_ageing(kwargs=kwargs)}
 
     def get_open_vul_stats(self, kwargs):
         """
@@ -344,7 +344,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -357,11 +357,11 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
-        return {'closed_vul_count':ClosedVulnerabilityStatView().count(kwargs=kwargs)}   
+        return {'closed_vul_count':ClosedVulnerabilityStatView().count(kwargs=kwargs)}
 
 
     def get_uncategorized_vul_stats(self, kwargs):
@@ -371,7 +371,7 @@ class BaseView(viewsets.ModelViewSet):
         Parameters:
             - kwargs
                 type : json
-        
+
         return type :
             json
         """
@@ -390,13 +390,13 @@ class UserView(BaseView):
             object_list = self.model_class.objects.filter(is_superuser=False)
         else:
             raise Unauthorized
-        return object_list       
+        return object_list
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data,context={'request':request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK) 
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
         queryset = self.get_queryset()
@@ -404,13 +404,13 @@ class UserView(BaseView):
         serializer = self.serializer_class(obj, data=request.data,context={'request':request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)            
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
-        return Response({'email':obj.email, 'message':'Successfully Deleted'}, status=status.HTTP_200_OK) 
+        return Response({'email':obj.email, 'message':'Successfully Deleted'}, status=status.HTTP_200_OK)
 
 
 class UserProfileView(APIView):
@@ -425,7 +425,7 @@ class UserProfileView(APIView):
         serializer = self.serializer_class(request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)      
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserUtilityView(viewsets.ViewSet):
@@ -435,14 +435,14 @@ class UserUtilityView(viewsets.ViewSet):
     def change_password(self, request, email):
         email = str(b64decode(email),'utf-8')
         queryset = User.objects.filter(is_active=True,is_staff=True)
-        obj = get_object_or_404(queryset, email=email)  
+        obj = get_object_or_404(queryset, email=email)
         serializer = self.change_password_serializer(data=request.data, context={'request':self.request})
         serializer.is_valid(raise_exception=True)
         if not obj.check_password(serializer.validated_data.get("old_password")):
             raise PasswordMisMatchError
         obj.set_password(serializer.validated_data.get("new_password"))
         obj.save()
-        return Response({"message":"Password changed successfully"}, status=status.HTTP_200_OK)      
+        return Response({"message":"Password changed successfully"}, status=status.HTTP_200_OK)
 
 
 class OrganizationOptionView(viewsets.ViewSet):
@@ -474,18 +474,19 @@ class OptionsListView(viewsets.ViewSet):
         return Response(settings.HOST_TYPES,status=status.HTTP_200_OK)
 
     def platforms(self,request):
-        return Response(settings.PLATFORMS,status=status.HTTP_200_OK) 
+        return Response(settings.PLATFORMS,status=status.HTTP_200_OK)
+
 
     def permissions(self,request):
         all_model = ['scan', 'engagement', 'webhook']
         content_filter = DjangoContentType.objects.filter(app_label='api', model__in=all_model)
         all_permissions = DjangoPermission.objects.filter(content_type__in=content_filter)
         data = [(p.id,p.name) for p in all_permissions]
-        return Response(data,status=status.HTTP_200_OK)               
+        return Response(data,status=status.HTTP_200_OK)
 
 
 class ModelListView(viewsets.ModelViewSet):
-    def get_queryset(self):  
+    def get_queryset(self):
         object_list = self.model_class.objects.all()
         return object_list
 
@@ -503,19 +504,19 @@ class OrganizationListView(ModelListView):
 class ProjectListView(ModelListView):
     authentication_classes = (JSONWebTokenAuthentication,)
     serializer_class = ProjectSerializer
-    model_class = Project 
+    model_class = Project
 
 
 class ApplicationListView(ModelListView):
     authentication_classes = (JSONWebTokenAuthentication,)
     model_class = Application
-    serializer_class = ApplicationSerializer        
+    serializer_class = ApplicationSerializer
 
 
 class UserListView(ModelListView):
     authentication_classes = (JSONWebTokenAuthentication,)
     serializer_class = UserSerializer
-    model_class = User       
+    model_class = User
 
 
 class JIRAListView(viewsets.ViewSet):
@@ -527,28 +528,28 @@ class JIRAListView(viewsets.ViewSet):
         queryset = self.get_queryset(user)
         obj = get_object_or_404(queryset, pk=pk)
         return obj.org.jiraissuetypes
-                
+
     def projects(self, request, pk):
         jira_config = self.get_jira_config(request.user, pk)
         projects = jira.get_projects(jira_config)
         data = [p.name for p in projects]
-        return Response(set(data),status=status.HTTP_200_OK)              
+        return Response(set(data),status=status.HTTP_200_OK)
 
     def issuetypes(self, request, pk):
         jira_config = self.get_jira_config(request.user, pk)
         issuetypes = jira.get_issuetypes(jira_config)
         data = [p.name for p in issuetypes]
-        return Response(set(data),status=status.HTTP_200_OK)               
+        return Response(set(data),status=status.HTTP_200_OK)
 
     def groups(self, request, pk):
         jira_config = self.get_jira_config(request.user, pk)
         data = jira.get_groups(jira_config)
-        return Response(data,status=status.HTTP_200_OK)        
+        return Response(data,status=status.HTTP_200_OK)
 
     def users(self, request, pk):
         jira_config = self.get_jira_config(request.user, pk)
         data = JiraUsers.objects.filter(jira_config=jira_config).values_list('name',flat=True)
-        return Response(set(data),status=status.HTTP_200_OK)                      
+        return Response(set(data),status=status.HTTP_200_OK)
 
 
 class JiraConnectionTestView(APIView):
@@ -578,18 +579,18 @@ class OrganizationView(BaseView):
         pros_list = []
         for pro in pros:
             kwargs = {
-                'scan__application__project__org':obj, 
+                'scan__application__project__org':obj,
                 'scan__application__project':pro
-            } 
+            }
             serialized_object = ProjectSerializer(pro, context={'request':self.request})
             pros_list.append({
-                'fields':serialized_object.data,                
+                'fields':serialized_object.data,
                 'stats':{
-                    'severity_count':self.get_severity_stats(kwargs), 
+                    'severity_count':self.get_severity_stats(kwargs),
                     'apps_count':pro.application_set.count()
                 }
-            }) 
-        context['projects_count'] = pros.count()     
+            })
+        context['projects_count'] = pros.count()
         context['projects'] = pros_list
         return context
 
@@ -601,10 +602,10 @@ class OrganizationView(BaseView):
             serialized_object = UserSerializer(user, context={'request':self.request})
             users_list.append({
                 'fields':serialized_object.data
-            }) 
-        context['users_count'] = users.count()     
+            })
+        context['users_count'] = users.count()
         context['users'] = users_list
-        return context                        
+        return context
 
     def create(self, request):
         log.info('Community will only allow single organization')
@@ -613,7 +614,7 @@ class OrganizationView(BaseView):
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
-        serializer = self.serializer_class(obj,context={'request':request})        
+        serializer = self.serializer_class(obj,context={'request':request})
         context = serializer.data
         query_serializer = self.query_serializer(data=self.request.query_params, context={'request':self.request})
         query_serializer.is_valid(raise_exception=True)
@@ -633,9 +634,9 @@ class OrganizationView(BaseView):
         avg_ageing = query_serializer.validated_data.get('avg_ageing',False)
         uncategorized = query_serializer.validated_data.get('uncategorized', False)
         kwargs = {
-            'scan__application__project__org':obj, 
+            'scan__application__project__org':obj,
         }
-        if cwe or tool or owasp or severity or grade or opened or apps or months or ageing or avg_ageing:          
+        if cwe or tool or owasp or severity or grade or opened or apps or months or ageing or avg_ageing:
             if cwe:
                 context.update(self.get_cwe_stats(kwargs))
             if tool:
@@ -660,13 +661,13 @@ class OrganizationView(BaseView):
             context.update(self.get_uncategorized_vul_stats(kwargs))
         if heatmap:
             scan_kwargs = {'application__org':obj}
-            context.update(self.get_heatmap_stats(request.user,scan_kwargs))            
+            context.update(self.get_heatmap_stats(request.user,scan_kwargs))
         if closed:
             context.update(self.get_closed_vuls_stats(kwargs))
         if projects:
             context.update(self.get_projects(obj))
         if users:
-            context.update(self.get_users(obj))          
+            context.update(self.get_users(obj))
         return Response(context)
 
 
@@ -690,7 +691,7 @@ class OrganizationConfigurationView(BaseView):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
-        return Response({'message':'Organization Config Successfully Deleted'}, status=status.HTTP_200_OK)  
+        return Response({'message':'Organization Config Successfully Deleted'}, status=status.HTTP_200_OK)
 
 
 class JiraIssueTypesView(BaseView):
@@ -773,18 +774,18 @@ class ORLConfigView(BaseView):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
-        return Response({'message':'Organization Email Config Successfully Deleted'}, status=status.HTTP_200_OK)                                 
+        return Response({'message':'Organization Email Config Successfully Deleted'}, status=status.HTTP_200_OK)
 
 
 class ProjectView(BaseView):
     serializer_class = ProjectSerializer
-    model_class = Project 
+    model_class = Project
     query_serializer = ProjectQueryParamSerializer
 
     def create(self, request):
         """
         This view creates a project instance
-        
+
         return type :
             json
         """
@@ -800,25 +801,25 @@ class ProjectView(BaseView):
         apps_list = []
         for app in apps:
             kwargs = {
-                'scan__application__project':obj, 
+                'scan__application__project':obj,
                 'scan__application':app
-            } 
+            }
             serialized_object = ApplicationSerializer(app, context={'request':self.request})
             apps_list.append({
-                'fields':serialized_object.data,                
+                'fields':serialized_object.data,
                 'stats':{
-                    'severity_count':self.get_severity_stats(kwargs), 
+                    'severity_count':self.get_severity_stats(kwargs),
                     'scans_count':app.scan_set.count()
                 }
-            }) 
-        context['applications_count'] = apps.count()     
+            })
+        context['applications_count'] = apps.count()
         context['applications'] = apps_list
         return context
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
-        serializer = self.serializer_class(obj,context={'request':request})        
+        serializer = self.serializer_class(obj,context={'request':request})
         context = serializer.data
         query_serializer = self.query_serializer(data=self.request.query_params, context={'request':self.request})
         query_serializer.is_valid(raise_exception=True)
@@ -836,9 +837,9 @@ class ProjectView(BaseView):
         ageing = query_serializer.validated_data.get('ageing',False)
         avg_ageing = query_serializer.validated_data.get('avg_ageing',False)
         kwargs = {
-            'scan__application__project':obj, 
+            'scan__application__project':obj,
         }
-        if cwe or tool or owasp or severity or grade or opened or apps or months or ageing or avg_ageing:          
+        if cwe or tool or owasp or severity or grade or opened or apps or months or ageing or avg_ageing:
             if cwe:
                 context.update(self.get_cwe_stats(kwargs))
             if tool:
@@ -883,15 +884,15 @@ class ApplicationView(BaseView):
         else:
             scans = obj.get_all_scans()
         scans_list = []
-        for scan in scans: 
+        for scan in scans:
             serialized_object = ScanSerializer(scan, context={'request':self.request})
             scans_list.append({
-                'fields':serialized_object.data,                
+                'fields':serialized_object.data,
                 'stats':{
-                    'severity_count':dict(scan.get_vuls_sev_count()), 
+                    'severity_count':dict(scan.get_vuls_sev_count()),
                 }
-            }) 
-        context['scans_count'] = scans.count()     
+            })
+        context['scans_count'] = scans.count()
         context['scans'] = scans_list
         return context
 
@@ -905,32 +906,32 @@ class ApplicationView(BaseView):
             }
             serialized_object = EngagementSerializer(engagement, context={'request':self.request})
             engagement_list.append({
-                'fields':serialized_object.data,                
+                'fields':serialized_object.data,
                 'stats':{
                     'severity_count':self.get_severity_stats(kwargs)
                 }
-            }) 
-        context['engagements_count'] = engagements.count()      
+            })
+        context['engagements_count'] = engagements.count()
         context['engagements'] = engagement_list
-        return context         
+        return context
 
     def get_webhooks(self, obj):
         context = {}
         webhooks = obj.webhook_set.all()
-        webhook_list = []           
+        webhook_list = []
         for webhook in webhooks:
             serialized_object = WebhookSerializer(webhook, context={'request':self.request})
             webhook_list.append({
-                'fields':serialized_object.data,                
-            }) 
-        context['webhooks_count'] = webhooks.count()     
+                'fields':serialized_object.data,
+            })
+        context['webhooks_count'] = webhooks.count()
         context['webhooks'] = webhook_list
-        return context    
+        return context
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
-        serializer = self.serializer_class(obj,context={'request':request})        
+        serializer = self.serializer_class(obj,context={'request':request})
         context = serializer.data
         query_serializer = self.query_serializer(data=self.request.query_params, context={'request':self.request})
         query_serializer.is_valid(raise_exception=True)
@@ -955,9 +956,9 @@ class ApplicationView(BaseView):
         uncategorized = query_serializer.validated_data.get('uncategorized',False)
         context['webhook_id'] = webhook.hook_id
         kwargs = {
-            'scan__application':obj, 
+            'scan__application':obj,
         }
-        if cwe or tool or owasp or severity or grade or opened or apps or months or ageing or avg_ageing:          
+        if cwe or tool or owasp or severity or grade or opened or apps or months or ageing or avg_ageing:
             if cwe:
                 context.update(self.get_cwe_stats(kwargs))
             if tool:
@@ -989,23 +990,23 @@ class ApplicationView(BaseView):
             if assigned:
                 context.update(self.get_scans(obj, assigned=True))
             elif unassigned:
-                context.update(self.get_scans(obj, unassigned=True))                
+                context.update(self.get_scans(obj, unassigned=True))
             else:
-                context.update(self.get_scans(obj))        
+                context.update(self.get_scans(obj))
         if engagements:
-            context.update(self.get_engagements(obj))            
+            context.update(self.get_engagements(obj))
         if webhooks:
-            context.update(self.get_webhooks(obj))            
+            context.update(self.get_webhooks(obj))
         return Response(context)
 
 
 class EngagementView(BaseView):
     serializer_class = EngagementSerializer
-    model_class = Engagement 
+    model_class = Engagement
     query_serializer = EngagementQueryParamSerializer
     assign_scans_serializer = AssignScansSerializer
 
-    def get_queryset(self):  
+    def get_queryset(self):
         # kwargs = {'closed':False}
         kwargs = {}
         object_list = self.model_class.objects.filter(**kwargs)
@@ -1018,14 +1019,14 @@ class EngagementView(BaseView):
         for scan in scans:
             serialized_object = ScanSerializer(scan, context={'request':self.request})
             scans_list.append({
-                'fields':serialized_object.data,                
+                'fields':serialized_object.data,
                 'stats':{
-                    'severity_count':dict(scan.get_vuls_sev_count()), 
+                    'severity_count':dict(scan.get_vuls_sev_count()),
                 }
-            }) 
-        context['scans_count'] = scans.count()     
+            })
+        context['scans_count'] = scans.count()
         context['scans'] = scans_list
-        return context   
+        return context
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
@@ -1036,8 +1037,8 @@ class EngagementView(BaseView):
         query_serializer.is_valid(raise_exception=True)
         scans = query_serializer.validated_data.get('scans', False)
         if scans:
-            context.update(self.get_scans(obj))         
-        return Response(context)             
+            context.update(self.get_scans(obj))
+        return Response(context)
 
     def assign_scans(self, request, pk=None):
         queryset = self.get_queryset()
@@ -1050,7 +1051,7 @@ class EngagementView(BaseView):
             raise QueryMisMatchError
         for scan in unassigned_scans:
             obj.engagements.add(scan.id)
-        return Response({'message':'Scans assigned to Engagement {0} successfully'.format(obj.name)}, status=status.HTTP_200_OK)                  
+        return Response({'message':'Scans assigned to Engagement {0} successfully'.format(obj.name)}, status=status.HTTP_200_OK)
 
     def close(self, request, pk=None):
         queryset = self.get_queryset()
@@ -1059,7 +1060,30 @@ class EngagementView(BaseView):
         obj.closed_on = timezone.now()
         obj.closed_by = request.user.id
         obj.save()
-        return Response({'name':obj.name, 'message':'Engagement closed successfully'}, status=status.HTTP_200_OK)          
+        return Response({'name':obj.name, 'message':'Engagement closed successfully'}, status=status.HTTP_200_OK)
+
+class CategorizeVulnerability(APIView):
+    authentication_classes = (JSONWebTokenAuthentication,)
+    serializer_class = CategorizeVulnerabilitySerializer
+
+    def post(self, request):
+        try:
+            serializer = self.serializer_class(context={'request': request},data=request.data)
+            if serializer.is_valid():
+                name = serializer.validated_data.get('name')
+                common_name = serializer.validated_data.get('common_name')
+                cwe = serializer.validated_data.get('cwe')
+                vuls = Vulnerability.objects.filter(name=name)
+                if vuls.exists():
+                    vuls.update(cwe=cwe,common_name=common_name)
+                    return Response({"sucess":"Categorized successfully!"},status=status.HTTP_200_OK)
+                else:
+                    return Response({"error":"No vuls found!"},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        except BaseException as e:
+            print("Error", e)
+            return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ScanView(BaseView):
@@ -1074,7 +1098,7 @@ class ScanView(BaseView):
         Parameters:
             - obj
                 type : Scan Object
-        
+
         return type :
             json
         """
@@ -1099,15 +1123,15 @@ class ScanView(BaseView):
         for vul in vuls:
             serialized_object = VulnerabilitySerializer(vul, context={'request':self.request})
             vuls_list.append({
-                'fields':serialized_object.data               
-            }) 
-        context['vuls_count'] = vuls.count()     
+                'fields':serialized_object.data
+            })
+        context['vuls_count'] = vuls.count()
         context['vuls'] = vuls_list
         return context
 
     def list(self, request):
         """
-        This view returns a queryset of a scan, 
+        This view returns a queryset of a scan,
         The queryset is paginated by 5 objects
 
         return type :
@@ -1126,12 +1150,12 @@ class ScanView(BaseView):
             serializer = self.get_serializer(page, many=True, context={'request':request})
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True,context={'request':request})
-        return Response(serializer.data)        
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
-        serializer = self.serializer_class(obj,context={'request':request})        
+        serializer = self.serializer_class(obj,context={'request':request})
         context = serializer.data
         query_serializer = self.query_serializer(data=self.request.query_params, context={'request':self.request})
         query_serializer.is_valid(raise_exception=True)
@@ -1144,35 +1168,35 @@ class ScanView(BaseView):
         true = query_serializer.validated_data.get('true', False)
         cvss = query_serializer.validated_data.get('cvss', False)
         if stats:
-            context.update(self.get_stats(obj))            
+            context.update(self.get_stats(obj))
         if vuls:
             all_vuls = obj.vulnerability_set.all()
-            context.update(self.get_vulnerabilities(all_vuls))            
+            context.update(self.get_vulnerabilities(all_vuls))
         elif isinstance(cvss,float):
             all_vuls = obj.vulnerability_set.filter(cvss=cvss)
-            context.update(self.get_vulnerabilities(all_vuls)) 
+            context.update(self.get_vulnerabilities(all_vuls))
         elif severity:
             severity = get_severity_by_name(severity)
             all_vuls = obj.vulnerability_set.filter(severity=severity)
-            context.update(self.get_vulnerabilities(all_vuls)) 
+            context.update(self.get_vulnerabilities(all_vuls))
         elif cwe:
             all_vuls = obj.vulnerability_set.filter(cwe=cwe)
             context.update(self.get_vulnerabilities(all_vuls))
         elif date:
             all_vuls = obj.vulnerability_set.filter(created_on__date=date)
-            context.update(self.get_vulnerabilities(all_vuls)) 
+            context.update(self.get_vulnerabilities(all_vuls))
         elif false:
             all_vuls = obj.get_false_positive_vuls()
             context.update(self.get_vulnerabilities(all_vuls))
         elif true:
             all_vuls = obj.get_true_positive_vuls()
-            context.update(self.get_vulnerabilities(all_vuls))                                  
-        return Response(context)        
+            context.update(self.get_vulnerabilities(all_vuls))
+        return Response(context)
 
     def create(self, request):
         """
         This view creates a model instance
-        
+
         return type :
             json
         """
@@ -1187,7 +1211,7 @@ class ScanView(BaseView):
     def update(self, request, pk=None):
         """
         This view updates a model instance
-        
+
         return type :
             json
         """
@@ -1198,14 +1222,14 @@ class ScanView(BaseView):
         serializer.validated_data['tool'] = 'Manual'
         serializer.validated_data['scan_type'] = 'Manual'
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)              
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class WebhookView(BaseView):
     serializer_class = WebhookSerializer
-    model_class = Webhook 
+    model_class = Webhook
 
-    def get_queryset(self):  
+    def get_queryset(self):
         """
         Fetch all the objects
         """
@@ -1238,16 +1262,16 @@ class ParserView(viewsets.ViewSet):
         scan_log = ScanLog.objects.create(**log_obj)
         init_json = {
             'scan_reference':{
-                'es_reference':scan_name, 
-            }, 
+                'es_reference':scan_name,
+            },
             'organization':{
-                'name':request.user.org.name, 
-            }, 
+                'name':request.user.org.name,
+            },
             'host':{
-                'app_uri':application.url, 
+                'app_uri':application.url,
                 'name':application.name
             }
-        } 
+        }
         dir_path = settings.XML_ROOT
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
@@ -1302,7 +1326,7 @@ class JiraProjectsView(BaseView):
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
-        return Response({'message':'Application JIRA Config Successfully Deleted'}, status=status.HTTP_200_OK) 
+        return Response({'message':'Application JIRA Config Successfully Deleted'}, status=status.HTTP_200_OK)
 
 
 class OpenVulnerabilityBaseView(viewsets.ViewSet):
@@ -1312,8 +1336,8 @@ class OpenVulnerabilityBaseView(viewsets.ViewSet):
         vul_name = str(b64decode(vul_name), 'utf-8')
         cwe = str(b64decode(cwe), 'utf-8')
         kwargs = {
-            'scan__application__name':app_name, 
-            'name':vul_name, 
+            'scan__application__name':app_name,
+            'name':vul_name,
             'cwe':cwe,
             'is_remediated':False
         }
@@ -1335,13 +1359,13 @@ class OpenVulnerabilityView(OpenVulnerabilityBaseView):
         serializer.is_valid(raise_exception=True)
         vul = vuls[0]
         data_dict = {
-            'name':serializer.validated_data.get('name', vul.name), 
-            'cwe':serializer.validated_data.get('cwe', vul.cwe), 
-            'severity':serializer.validated_data.get('severity', vul.severity), 
-            'owasp':serializer.validated_data.get('owasp', vul.owasp), 
+            'name':serializer.validated_data.get('name', vul.name),
+            'cwe':serializer.validated_data.get('cwe', vul.cwe),
+            'severity':serializer.validated_data.get('severity', vul.severity),
+            'owasp':serializer.validated_data.get('owasp', vul.owasp),
         }
         vuls.update(**data_dict)
-        return Response({'message':'Vulnerability has been updated successfully'}, status=status.HTTP_200_OK)        
+        return Response({'message':'Vulnerability has been updated successfully'}, status=status.HTTP_200_OK)
 
 
 class RemediateOpenVulnerabilityView(viewsets.ModelViewSet):
@@ -1352,11 +1376,11 @@ class RemediateOpenVulnerabilityView(viewsets.ModelViewSet):
         vul_name = str(b64decode(vul_name), 'utf-8')
         cwe = str(b64decode(cwe), 'utf-8')
         kwargs = {
-            'scan__application__name':app_name, 
-            'name':vul_name, 
+            'scan__application__name':app_name,
+            'name':vul_name,
             'cwe':cwe
         }
-        object_list = Vulnerability.objects.annotate(open_for=Aging('created_on')).filter(**kwargs)  
+        object_list = Vulnerability.objects.annotate(open_for=Aging('created_on')).filter(**kwargs)
         return object_list
 
     def create_files(self, serializer, vul):
@@ -1372,9 +1396,9 @@ class RemediateOpenVulnerabilityView(viewsets.ModelViewSet):
                 MinioUtil().upload_file(image_file_name,file)
         serializer.validated_data['file'] = image_file_name
         serializer.validated_data['remediated_by'] = self.request.user.id
-        serializer.validated_data['remediated_on'] = timezone.now()        
+        serializer.validated_data['remediated_on'] = timezone.now()
         serializer.validated_data['vul'] = vul
-        return serializer 
+        return serializer
 
     def remediate(self, request, app_name, vul_name, cwe):
         vuls = self.get_vuls(request.user, app_name, vul_name, cwe)
@@ -1382,8 +1406,8 @@ class RemediateOpenVulnerabilityView(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         for vul in vuls:
             serializer = self.create_files(serializer, vul)
-            self.perform_create(serializer)  
-        remediations = VulnerabilityRemediation.objects.filter(vul__in=vuls) 
+            self.perform_create(serializer)
+        remediations = VulnerabilityRemediation.objects.filter(vul__in=vuls)
         if remediations.exists():
             vuls.update(is_remediated=True)
         return Response({'message':'Vulnerability is been remediated'}, status=status.HTTP_200_OK)
@@ -1396,17 +1420,17 @@ class ClosedVulnerabilityView(viewsets.ViewSet):
         vul_name = str(b64decode(vul_name), 'utf-8')
         cwe = str(b64decode(cwe), 'utf-8')
         kwargs = {
-            'scan__application__name':app_name, 
-            'name':vul_name, 
+            'scan__application__name':app_name,
+            'name':vul_name,
             'cwe':cwe
         }
-        object_list = Vulnerability.objects.annotate(open_for=Aging('created_on')).filter(**kwargs)  
+        object_list = Vulnerability.objects.annotate(open_for=Aging('created_on')).filter(**kwargs)
         return object_list
 
     def retrieve(self, request, app_name, vul_name, cwe):
         vuls = self.get_vuls(request.user,app_name, vul_name, cwe)
         context = get_closed_vul_context(vuls)
-        return Response(context, status=status.HTTP_200_OK)        
+        return Response(context, status=status.HTTP_200_OK)
 
 
 class RequestResponseView(viewsets.ViewSet):
@@ -1417,11 +1441,11 @@ class RequestResponseView(viewsets.ViewSet):
         cwe = str(b64decode(cwe), 'utf-8')
         url = str(b64decode(url), 'utf-8')
         kwargs = {
-            'scan__application__name':app_name, 
-            'name':vul_name, 
+            'scan__application__name':app_name,
+            'name':vul_name,
             'cwe':cwe
-        }  
-        vuls = Vulnerability.objects.filter(**kwargs)  
+        }
+        vuls = Vulnerability.objects.filter(**kwargs)
         exclude_kwargs = {
             'log':None,
             'request':None,
@@ -1434,7 +1458,7 @@ class RequestResponseView(viewsets.ViewSet):
         if not evidences.exists():
             raise QueryMisMatchError
         context = get_request_response(evidences)
-        return Response(context, status=status.HTTP_200_OK)         
+        return Response(context, status=status.HTTP_200_OK)
 
 
 class VulnerabilityView(BaseView):
@@ -1444,7 +1468,7 @@ class VulnerabilityView(BaseView):
     def create(self, request):
         """
         This view creates a model instance
-        
+
         return type :
             json
         """
@@ -1463,12 +1487,12 @@ class VulnerabilityView(BaseView):
                 serializer.validated_data['description'] = vul_info.get('description')
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
 
     def update(self, request, pk=None):
         """
         This view updates a model instance
-        
+
         return type :
             json
         """
@@ -1493,7 +1517,7 @@ class VulnerabilityView(BaseView):
 
 class VulnerabilityEvidenceView(BaseView):
     serializer_class = VulnerabilityEvidenceSerializer
-    model_class = VulnerabilityEvidence 
+    model_class = VulnerabilityEvidence
 
     def create_files(self, serializer):
         evid = serializer.validated_data
@@ -1524,7 +1548,7 @@ class VulnerabilityEvidenceView(BaseView):
         serializer.validated_data['log'] = log_file_name
         serializer.validated_data['file'] = image_file_name
         return serializer
-        
+
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data, context={'request':self.request})
@@ -1532,7 +1556,7 @@ class VulnerabilityEvidenceView(BaseView):
         serializer = self.create_files(serializer)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)    
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def update(self, request, pk=None):
@@ -1547,7 +1571,7 @@ class VulnerabilityEvidenceView(BaseView):
 
 class VulnerabilityRemediationView(BaseView):
     serializer_class = VulnerabilityRemediationSerializer
-    model_class = VulnerabilityRemediation    
+    model_class = VulnerabilityRemediation
 
     def create_files(self, serializer):
         evid = serializer.validated_data
@@ -1560,7 +1584,7 @@ class VulnerabilityRemediationView(BaseView):
         serializer.validated_data['file'] = image_file_name
         serializer.validated_data['remediated_by'] = self.request.user.id
         serializer.validated_data['remediated_on'] = timezone.now()
-        return serializer     
+        return serializer
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data, context={'request':self.request})
@@ -1568,7 +1592,7 @@ class VulnerabilityRemediationView(BaseView):
         serializer = self.create_files(serializer)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)    
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def update(self, request, pk=None):
@@ -1583,7 +1607,7 @@ class VulnerabilityRemediationView(BaseView):
 
 class VulnerabilityEvidenceRemediationView(BaseView):
     serializer_class = VulnerabilityEvidenceRemediationSerializer
-    model_class = VulnerabilityEvidenceRemediation    
+    model_class = VulnerabilityEvidenceRemediation
 
     def create_files(self, serializer):
         remedy_dir_path = settings.EVIDENCE_REMEDIATION_ROOT
@@ -1597,7 +1621,7 @@ class VulnerabilityEvidenceRemediationView(BaseView):
         serializer.validated_data['file'] = image_file_name
         serializer.validated_data['remediated_by'] = self.request.user.id
         serializer.validated_data['remediated_on'] = timezone.now()
-        return serializer     
+        return serializer
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data, context={'request':self.request})
@@ -1605,7 +1629,7 @@ class VulnerabilityEvidenceRemediationView(BaseView):
         serializer = self.create_files(serializer)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)    
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
     def update(self, request, pk=None):
@@ -1615,7 +1639,7 @@ class VulnerabilityEvidenceRemediationView(BaseView):
         serializer.is_valid(raise_exception=True)
         serializer = self.create_files(serializer)
         self.perform_update(serializer)
-        return Response(serializer.data)                               
+        return Response(serializer.data)
 
 
 class ScanStatusView(APIView):
@@ -1637,7 +1661,7 @@ class ScanResultView(APIView):
         Parameters:
             - obj
                 type : Scan Object
-        
+
         return type :
             json
         """
@@ -1654,7 +1678,7 @@ class ScanResultView(APIView):
         stats['true_positive_count'] = obj.get_true_positive_vuls_count()
         stats['false_positive_count'] = obj.get_false_positive_vuls_count()
         stats['vuls_count'] = obj.get_vuls_count()
-        return Response(stats)                               
+        return Response(stats)
 
 
 class WebhookUploadView(APIView):
@@ -1687,7 +1711,7 @@ class WebhookUploadView(APIView):
         with open(complete_path, 'wb') as fp:
             fp.write(file.read())
         return complete_path
-                
+
     def get_tool(self, json=None, file_path=None):
         if json:
             tool = json.get('vuls', {}).get('tool', 'Unknown')
@@ -1695,7 +1719,7 @@ class WebhookUploadView(APIView):
             tool = validate_allowed_files(file_path)
         else:
             tool = None
-        return tool        
+        return tool
 
     def post(self, request, pk, format=None):
         try:
@@ -1707,9 +1731,9 @@ class WebhookUploadView(APIView):
                 engagement_id = request.META.get('HTTP_ENGAGEMENT', '')
                 webhook_scan_name = request.META.get('HTTP_SCAN', '')
                 log_dict = {
-                    'file_upload_event':False, 
-                    'file_upload_exception':'', 
-                    'file_upload_datetime':timezone.now(), 
+                    'file_upload_event':False,
+                    'file_upload_exception':'',
+                    'file_upload_datetime':timezone.now(),
                     'webhook':obj
                 }
                 log_obj = WebhookLog.objects.create(**log_dict)
@@ -1725,23 +1749,23 @@ class WebhookUploadView(APIView):
                 scan_name = self.create_scan(webhook_tool, scan_short_name, application, engagement_id)
                 init_json = {
                     'scan_reference':{
-                        'es_reference':scan_name, 
-                    }, 
+                        'es_reference':scan_name,
+                    },
                     'organization':{
-                        'name':request.user.org.name, 
-                    }, 
+                        'name':request.user.org.name,
+                    },
                     'host':{
-                        'app_uri':application.url, 
-                        'name':application.name, 
+                        'app_uri':application.url,
+                        'name':application.name,
                     }
                 }
                 if json_dict:
                     vulnerabilities = request.data.get('vuls', {}).get('vulnerabilities')
                     if not vulnerabilities:
-                        return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)                    
-                    webhook_process_json(request.user, application.id, json_dict, init_json, webhook_tool, scan_name, request.get_host(), request.user.username, log_obj.id)          
+                        return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)
+                    webhook_process_json(request.user, application.id, json_dict, init_json, webhook_tool, scan_name, request.get_host(), request.user.username, log_obj.id)
                     return Response({'Success':'Result pushed successfully', 'scan_id':scan_name}, status=status.HTTP_200_OK)
-                else:               
+                else:
                     valid_file = webhook_tool in settings.WEBHOOK_TOOLS.keys()
                     ext = complete_path.split('.')[-1]
                     if valid_file:
@@ -1755,21 +1779,21 @@ class WebhookUploadView(APIView):
                         remove_file(complete_path)
                         return Response({'Error':'Sorry!!! This file is not supported'}, status=status.HTTP_403_FORBIDDEN)
             else:
-                return Response({'Error':'Sorry!!! Could not process the event'}, status=status.HTTP_403_FORBIDDEN)            
+                return Response({'Error':'Sorry!!! Could not process the event'}, status=status.HTTP_403_FORBIDDEN)
         except BaseException as e:
             log_exception(e)
-            return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+            return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
 # class WebhookUploadView(APIView):
 
 #     def post(self, request, pk, format=None):
-#         obj = Webhook.objects.get(pk=pk)                
+#         obj = Webhook.objects.get(pk=pk)
 #         log_dict = {
-#             'file_upload_event':False, 
-#             'file_upload_exception':'', 
-#             'file_upload_datetime':timezone.now(), 
+#             'file_upload_event':False,
+#             'file_upload_exception':'',
+#             'file_upload_datetime':timezone.now(),
 #             'webhook':obj
 #         }
 #         log_obj = WebhookLog.objects.create(**log_dict)
@@ -1795,16 +1819,16 @@ class WebhookUploadView(APIView):
 #             scan_name = scan.name
 #             init_json = {
 #                 'scan_reference':{
-#                     'es_reference':scan_name, 
-#                 }, 
+#                     'es_reference':scan_name,
+#                 },
 #                 'organization':{
-#                     'name':request.user.org.name, 
-#                 }, 
+#                     'name':request.user.org.name,
+#                 },
 #                 'host':{
-#                     'app_uri':obj.application.url, 
-#                     'name':obj.application.name, 
+#                     'app_uri':obj.application.url,
+#                     'name':obj.application.name,
 #                 }
-#             } 
+#             }
 #             if obj.tool == 'Orchestron JSON':
 #                 json_dict = request.data.get('vuls')
 #                 if not json_dict or request.content_type != 'application/json':
@@ -1814,8 +1838,8 @@ class WebhookUploadView(APIView):
 #                 vulnerabilities = request.data.get('vuls', {}).get('vulnerabilities')
 #                 if not vulnerabilities:
 #                     error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
-#                     return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)                    
-#                 webhook_process_json(request.user, obj.application.id, json_dict, init_json, tool, scan_name, request.get_host(), request.user.username, log_obj.id)          
+#                     return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)
+#                 webhook_process_json(request.user, obj.application.id, json_dict, init_json, tool, scan_name, request.get_host(), request.user.username, log_obj.id)
 #             else:
 #                 result_file = request.data.get('file')
 #                 dir_path = settings.XML_ROOT
@@ -1843,8 +1867,8 @@ class WebhookUploadView(APIView):
 #             log_obj.file_upload_datetime = timezone.now()
 #             log_obj.save()
 #             log_exception(e)
-#             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
-   
+#             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 

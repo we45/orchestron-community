@@ -9,7 +9,7 @@
                     <b-col sm="8" class="m2-top">
                         <p class="text-left">
                             <span class="vul-count">
-                            {{ totalVul }} 
+                            {{ totalVul }}
                             </span>
                         </p>
                     </b-col>
@@ -148,6 +148,7 @@ export default {
       }
     },
      clickPagination(event) {
+       if (this.org && this.token) {
       if (event.page) {
         this.currentPage = event.page
         if (this.currentPage > 1) {
@@ -205,7 +206,7 @@ export default {
                   })
                 }
               }
-            
+
           }).catch(error => {
             if (error.res.status === 404) {
               this.$router.push('/not_found')
@@ -215,10 +216,13 @@ export default {
               this.$router.push('/error')
             }
           })
-          
+
            } else {
           this.fetchSeverityData()
         }
+      } else {
+        this.fetchSeverityData()
+      }
       } else {
         notValidUser()
         this.$router.push('/')
@@ -299,7 +303,7 @@ export default {
                   })
                 }
               }
-              
+
             // } else {
             //   this.$router.push('/forbidden')
             // }

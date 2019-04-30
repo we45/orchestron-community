@@ -9,7 +9,7 @@
                     <b-col sm="8" class="m2-top">
                         <p class="text-left">
                             <span class="vul-count">
-                            {{ totalVul }} 
+                            {{ totalVul }}
                             </span>
                         </p>
                     </b-col>
@@ -24,8 +24,68 @@
                 <open-vul-table :pageNumberCount="totalVul"
                     :currentPage="currentPage"
                     :dataItems="items"
+                                @updateUncategorized="updateUncategorized($event)"
                     @clickPagination="clickPagination($event)"></open-vul-table>
             </b-card>
+                   <!--Update Uncategorized-->
+      <b-modal ref="UpdateuncategorizedModal" title="Update Uncategorized Vulnerability" size="lg" centered>
+              <template>
+                <div>
+                    <form @submit.prevent="promptUncategorizedUpdateVul">
+                        <b-row class="my-1">
+                            <b-col sm="2"><label class="label">Name:</label></b-col>
+                            <b-col sm="10">
+                                <b-form-input v-model="updateUncategorizedVulName" type="text" readonly></b-form-input>
+                            </b-col>
+                        </b-row>
+                        <br>
+                        <b-row class="my-1">
+                            <b-col sm="2"><label class="label">CWE:</label></b-col>
+                            <b-col sm="8">
+                              <b-form-input
+          id="input-1"
+          v-model="updateUncategorizedVulCWE"
+          type="number"
+          placeholder="Enter CWE"
+        ></b-form-input>
+                            </b-col>
+                          <b-col cols="2">
+
+                          </b-col>
+                        </b-row>
+                        <br>
+                    </form>
+                </div>
+                <b-col cols="12" slot="modal-footer">
+                    <div class="pull-right" style="float: right">
+                        <button type="button" class="btn btn-orange-close pull-right" @click=" closeUncategorizedUpdateVul() ">Close</button>
+                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" promptUncategorizedUpdateVul() "
+                              >
+                        Submit
+                        </button>
+                    </div>
+                </b-col>
+              </template>
+            </b-modal>
+
+      <!--Uncategorized Prompt Modal-->
+      <b-modal ref="beforeSubmitUncategorizedModal" title="Update Uncategorized Vulnerability" centered size="lg">
+                <div>
+                    <form @submit.prevent="submitUncategorizedUpdateVul">
+                        <p class="prompt-header">* Vulnerability will be categorized to CWE {{ updateUncategorizedVulCWE }}</p>
+                        <br>
+                    </form>
+                </div>
+                <b-col cols="12" slot="modal-footer">
+                    <div class="pull-right" style="float: right;">
+                        <button type="button" class="btn btn-orange-close" @click=" submitUncategorizedUpdateVulClose() ">No</button>
+                        <button type="button" class="btn btn-orange-submit"
+                            data-dismiss="modal" @click=" submitUncategorizedUpdateVul() ">
+                        Yes
+                        </button>
+                    </div>
+                </b-col>
+            </b-modal>
         </b-container>
     </div>
 </template>
@@ -48,7 +108,9 @@ export default {
       selectOption: ['High', 'Medium', 'Low', 'Info'],
       selectedOption: '',
       isLoading: false,
-      currentPage: 0
+      currentPage: 0,
+      updateUncategorizedVulName: '',
+      updateUncategorizedVulCWE: '',
     }
   },
   components: {
@@ -333,7 +395,53 @@ export default {
           this.fetchSeverityData()
         }
       }
-    }
+    },
+    updateUncategorized(event) {
+      this.updateUncategorizedVulName = ''
+      this.updateUncategorizedVulName = event.commonName
+      this.$refs.UpdateuncategorizedModal.show()
+    },
+      closeUncategorizedUpdateVul() {
+      this.$refs.UpdateuncategorizedModal.hide()
+    },
+    promptUncategorizedUpdateVul() {
+      this.$refs.beforeSubmitUncategorizedModal.show()
+    },
+    submitUncategorizedUpdateVulClose() {
+      this.$refs.beforeSubmitUncategorizedModal.hide()
+    },
+    submitUncategorizedUpdateVul() {
+      this.$refs.beforeSubmitUncategorizedModal.hide()
+      this.$refs.UpdateuncategorizedModal.hide()
+
+      const formData = {
+        'common_name': this.updateUncategorizedVulName,
+        'cwe': this.updateUncategorizedVulCWE,
+        'name': this.updateUncategorizedVulName
+      }
+
+      axios.post('/openvul/catgorize/', formData)
+        .then(res => {
+          this.$refs.beforeSubmitUncategorizedModal.hide()
+          this.$refs.UpdateuncategorizedModal.hide()
+          this.isLoading = true
+          this.$notify({
+            group: 'foo',
+            type: 'info',
+            title: 'Vulnerability',
+            text: 'The Vulnerability has been updated Successfully!',
+            position: 'top right'
+          })
+          this.$router.go()
+        }).catch(error => {
+          if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
+        })
+
+      // openvul/catgorize
+    },
   }
 }
 </script>
@@ -344,5 +452,85 @@ export default {
     font-size: 48px;
     font-weight: 200;
     line-height: 0.33;
+  }
+
+  .btn-orange-close {
+    color: #ff542c;
+    background-color: #FFFFFF;
+    border-color: #ff542c;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    /*height: 20px;*/
+
+  }
+
+  .btn-orange-close:focus,
+  .btn-orange-close.focus {
+    color: #ff542c;
+    background-color: #FFFFFF;
+    border-color: #ff542c;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+
+  .btn-orange-close:hover {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+  .btn-orange-submit {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    /*height: 40px;*/
+
+  }
+
+  .btn-orange-submit:focus,
+  .btn-orange-submit.focus {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+
+  .btn-orange-submit:hover {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+
+  .prompt-header {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 0.99;
+    text-align: center;
+    color: #232325;
   }
 </style>
