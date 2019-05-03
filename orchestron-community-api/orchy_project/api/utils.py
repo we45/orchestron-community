@@ -17,6 +17,7 @@ from django.forms.models import model_to_dict
 from django.contrib.sites.models import Site
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
+import codecs
 
 
 def draw_thumnail(text, temp_file):
@@ -262,59 +263,69 @@ def validate_allowed_files(flat_file):
     try:
         ext = flat_file.split('.')[-1]
         if ext == 'json':
-            with open(flat_file) as data_file:
+            with codecs.open(flat_file,encoding='utf-8') as data_file:
                 data = json.load(data_file)
-                is_arachni = data.get('issues',[])
-                is_zap_json = data.get('Report',[])
-                is_bandit = data.get('results',[])
-                is_brakeman = data.get('scan_info',{}).get('brakeman_version')
-                is_nodejs_json = data.get('files',[])
-                if is_arachni:
-                    return 'Arachni'
+                is_retirejs_json = is_brakeman = is_bandit = False
+                is_arachni = is_nodejsscan = is_snyk = False
+                is_zap_json = is_nodejs_json = is_npm_audit_json = False
+                is_orchy_json = is_gosec_json = False
+                if isinstance(data,dict):
+                    is_brakeman = data.get('scan_info',{}).get('brakeman_version')
+                    is_bandit = data.get('results',[])
+                    is_arachni = data.get('issues',[])
+                    is_zap_json = data.get('Report',[])
+                    is_nodejs_json = data.get('files',[])
+                elif isinstance(data,list):
+                    if data:
+                        is_retirejs_json = data[0].get('results',[])
+                if is_brakeman:
+                    return 'Brakeman'
                 elif is_bandit:
                     return 'Bandit'
-                elif is_brakeman:
-                    return 'Brakeman'
+                elif is_arachni:
+                    return 'Arachni'
                 elif is_nodejs_json:
                     return 'NodeJsScan'
                 elif is_zap_json:
                     return 'ZAP'
+                elif is_retirejs_json:
+                    return 'RetireJS'
                 else:
                     return None
-        elif ext == 'xml':
+        elif ext == 'xml' or ext == 'nessus':
             try:
-                nreport = xml.parse(flat_file)  
+                nreport = xml.parse(flat_file)
                 root_elem = nreport.getroot()
-                if root_elem is not None:   
-                    tag = root_elem.tag  
+                if root_elem is not None:
+                    tag = root_elem.tag
                     nsmap = root_elem.nsmap.get(None)
                     if nsmap:
                         tag = tag.replace('{'+nsmap+'}','')
                     header = settings.HEADER_MAP.get(tag)
-                    if header:            
+                    if header:
                         return header
                     else:
-                        remove_file(flat_file) 
+                        remove_file(flat_file)
                 return None
             except (xml.XMLSyntaxError,xml.ParserError):
                 return None
         elif ext == 'html':
             try:
-                nreport = xml.parse(flat_file)  
+                nreport = xml.parse(flat_file)
                 root_elem = nreport.getroot()
-                if root_elem is not None:            
+                if root_elem is not None:
                     header = settings.HEADER_MAP.get(root_elem.tag)
-                    if header:            
+                    if header:
                         return header
                     else:
-                        remove_file(flat_file) 
+                        remove_file(flat_file)
                 return None
             except (xml.XMLSyntaxError,xml.ParserError):
                 return None
         else:
             return None
     except BaseException as e:
-        log_exception(e)
+        log_exception(e,module_name=inspect.stack()[0][3])
         return None
 
 

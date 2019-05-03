@@ -16,6 +16,7 @@ from parsers.xanitizer import parse_xanitizer
 from parsers.findsecbug import parser_findsecbug
 from parsers.brakeman import parse_brakeman
 from parsers.nodejsscan import parse_nodejsscan
+from parsers.retirejs import parse_retirejs
 from parsers.w3af import W3afParser
 from parsers.owasp_dep_checker import parse_owasp_dep_checker
 from api.models import Scan, WebhookLog, Application, JiraIssueTypes, Vulnerability, \
@@ -137,6 +138,8 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
                 parse_arachni(complete_path,user,init_es)
             elif tool == 'Bandit':
                 parse_bandit(complete_path,user,init_es)
+            elif tool == 'RetireJS':
+                parse_retirejs(complete_path,user,init_es)
             elif tool == 'NodeJsScan':
                 parse_nodejsscan(complete_path,user,init_es)
             elif tool == 'Brakeman':

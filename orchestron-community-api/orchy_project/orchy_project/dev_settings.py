@@ -236,6 +236,7 @@ WEBHOOK_TOOLS = {
     'FindSecBugs':'xml',
     'Brakeman':'json',
     'NodeJsScan':'json',
+    'RetireJS': 'json',
 }
 
 
