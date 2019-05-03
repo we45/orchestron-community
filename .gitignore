@@ -9,3 +9,6 @@ orchestron-community-minio
 orchestron-community_migrations
 orchestron_community_mysql
 orchestron-community-frontend/node_modules/*
+venv/*
+*.xml
+.idea
