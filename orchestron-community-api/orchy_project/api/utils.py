@@ -267,10 +267,16 @@ def validate_allowed_files(flat_file):
                 is_arachni = data.get('issues',[])
                 is_zap_json = data.get('Report',[])
                 is_bandit = data.get('results',[])
+                is_brakeman = data.get('scan_info',{}).get('brakeman_version')
+                is_nodejs_json = data.get('files',[])
                 if is_arachni:
                     return 'Arachni'
                 elif is_bandit:
                     return 'Bandit'
+                elif is_brakeman:
+                    return 'Brakeman'
+                elif is_nodejs_json:
+                    return 'NodeJsScan'
                 elif is_zap_json:
                     return 'ZAP'
                 else:

@@ -234,6 +234,8 @@ WEBHOOK_TOOLS = {
     'Xanitizer':'xml',
     'HP Fortify':'xml',
     'FindSecBugs':'xml',
+    'Brakeman':'json',
+    'NodeJsScan':'json',
 }
 
 
