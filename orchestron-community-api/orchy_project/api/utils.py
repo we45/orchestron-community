@@ -275,6 +275,7 @@ def validate_allowed_files(flat_file):
                     is_arachni = data.get('issues',[])
                     is_zap_json = data.get('Report',[])
                     is_nodejs_json = data.get('files',[])
+                    is_npm_audit_json = data.get('advisories',{})
                 elif isinstance(data,list):
                     if data:
                         is_retirejs_json = data[0].get('results',[])
@@ -290,6 +291,8 @@ def validate_allowed_files(flat_file):
                     return 'ZAP'
                 elif is_retirejs_json:
                     return 'RetireJS'
+                elif is_npm_audit_json:
+                    return 'NpmAudit'
                 else:
                     return None
         elif ext == 'xml' or ext == 'nessus':

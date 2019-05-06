@@ -64,7 +64,7 @@ def create_vul(data,es_reference,confidence,severity,cwe,tool,evidences):
                     log_file_name = '{0}log_{1}.txt'.format(settings.EVIDENCE_MEDIA_URL,str(uuid4()))
                     full_path = os.path.join(settings.MEDIA_ROOT,log_file_name)
                     with open(full_path,'wb') as fp:
-                        if not isinstance(log,bytes):
+                        if not isinstance(log,bytes):                            
                             log = bytes(log.encode('utf-8'))
                         fp.write(log)
                     MinioUtil().upload_file_from_path(log_file_name,full_path)
