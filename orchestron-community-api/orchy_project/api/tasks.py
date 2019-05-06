@@ -17,6 +17,8 @@ from parsers.findsecbug import parser_findsecbug
 from parsers.brakeman import parse_brakeman
 from parsers.nodejsscan import parse_nodejsscan
 from parsers.retirejs import parse_retirejs
+from parsers.burp_json import parse_burp_json
+from parsers.safety import parse_safety
 from parsers.w3af import W3afParser
 from parsers.owasp_dep_checker import parse_owasp_dep_checker
 from api.models import Scan, WebhookLog, Application, JiraIssueTypes, Vulnerability, \
@@ -125,7 +127,11 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
         scan_log.save()
         try:
             if tool == 'Burp':            
-                parse_burp(complete_path,user,init_es)
+                ext = complete_path.split('.')[-1]
+                if ext == 'json':
+                    parse_burp_json(complete_path,user,init_es)
+                elif ext == 'xml':
+                    parse_burp(complete_path,user,init_es)
             elif tool == 'ZAP':
                 ext = complete_path.split('.')[-1]
                 if ext == 'json':
@@ -136,6 +142,8 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
                 parse_appspider(complete_path,user,init_es)
             elif tool == 'Arachni':
                 parse_arachni(complete_path,user,init_es)
+            elif tool == 'Safety':
+                parse_safety(complete_path,user,init_es)
             elif tool == 'Bandit':
                 parse_bandit(complete_path,user,init_es)
             elif tool == 'RetireJS':

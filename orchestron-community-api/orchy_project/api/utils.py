@@ -269,6 +269,8 @@ def validate_allowed_files(flat_file):
                 is_arachni = is_nodejsscan = is_snyk = False
                 is_zap_json = is_nodejs_json = is_npm_audit_json = False
                 is_orchy_json = is_gosec_json = False
+                is_burp = False
+                is_safety = False
                 if isinstance(data,dict):
                     is_brakeman = data.get('scan_info',{}).get('brakeman_version')
                     is_bandit = data.get('results',[])
@@ -276,8 +278,12 @@ def validate_allowed_files(flat_file):
                     is_zap_json = data.get('Report',[])
                     is_nodejs_json = data.get('files',[])
                 elif isinstance(data,list):
-                    if data:
-                        is_retirejs_json = data[0].get('results',[])
+                    if isinstance(data[0],list):
+                        is_safety = True
+                    elif data[0].get('results',False):
+                        is_retirejs_json = True
+                    elif data[0].get('issue',False):
+                        is_burp = True
                 if is_brakeman:
                     return 'Brakeman'
                 elif is_bandit:
@@ -290,6 +296,10 @@ def validate_allowed_files(flat_file):
                     return 'ZAP'
                 elif is_retirejs_json:
                     return 'RetireJS'
+                elif is_burp:
+                    return 'Burp'
+                elif is_safety:
+                    return 'Safety'
                 else:
                     return None
         elif ext == 'xml' or ext == 'nessus':
@@ -325,7 +335,7 @@ def validate_allowed_files(flat_file):
         else:
             return None
     except BaseException as e:
-        log_exception(e,module_name=inspect.stack()[0][3])
+        log_exception(e)
         return None
 
 

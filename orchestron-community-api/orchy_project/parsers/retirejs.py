@@ -30,10 +30,8 @@ def parse_retirejs(json_file,user_name,init_es):
                         dep = related_deps.get('component','')
                         dep_dict['file_paths'].append(dep)
                     evid_dict = {
-                        'module':module,
-                        'version':version,
-                        'related_dependency':dep_dict,
-                        'cve':''
+                        'url':"Module Name "+module,
+                        'name':"Version "+version,
                     }
                     vuls = data_dict.get('vulnerabilities')
                     for v in vuls:

@@ -222,7 +222,7 @@ MINIO = {
 WEBHOOK_TOOLS = {
     'Orchestron JSON':'json',
     'ZAP':'json,xml',
-    'Burp':'xml',
+    'Burp':'json,xml',
     'Bandit':'json',
     'Arachni':'json',
     'AppSpider':'xml',
@@ -237,6 +237,7 @@ WEBHOOK_TOOLS = {
     'Brakeman':'json',
     'NodeJsScan':'json',
     'RetireJS': 'json',
+    'Safety': 'json',
 }
 
 
