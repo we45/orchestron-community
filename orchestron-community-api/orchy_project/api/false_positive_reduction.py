@@ -148,7 +148,6 @@ def write_results_to_db(data):
             data['vulnerability']['cwe'] = {
                 'cwe_id': cwe_id   
             }
-
             if tool == 'Burp':
                 if confidence == 3:
                     data['vulnerability']['is_false_positive'] = False
@@ -161,17 +160,6 @@ def write_results_to_db(data):
                     data['vulnerability']['is_false_positive'] = True
                 elif confidence == 2:
                     data['vulnerability']['is_false_positive'] = False
-
-            if tool == 'Burp' or tool == 'Bandit':
-                tool_vul_name = data.get('vulnerability',{}).get('name','')
-                json_path = os.path.join(settings.PARSERS_ROOT,'burp_db.json')
-                with open(json_path) as f:
-                    json_data = json.load(f)
-                    cwe = json_data.get(tool_vul_name,0)
-                    data['vulnerability']['cwe'] = {
-                        'cwe_id':cwe
-                    }                    
-
             vuls = Vulnerability.objects.select_related('vul','scan__application').filter(name=vul_name,tool=tool,is_false_positive=True,scan__application__name=app_name)     
             if vuls.exists():
                 data['vulnerability']['is_false_positive'] = True
