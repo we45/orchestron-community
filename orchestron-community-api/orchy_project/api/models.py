@@ -206,6 +206,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
 
+class AccessToken(models.Model):
+    access_key = models.CharField(max_length=40, unique=True)
+    secret_key = models.CharField(max_length=40, unique=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+
 class Project(BaseModel):
     """
     Creates a model to hold information about the organization, the team and the

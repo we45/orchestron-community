@@ -7,6 +7,7 @@ from parsers.arachni import parse_arachni
 from parsers.burp import parse_burp
 from parsers.bandit import parse_bandit
 from parsers.zap import parse_zap
+from parsers.npm_audit import parse_npm_audit
 from parsers.parse_zap_json import parse_zap_json
 from parsers.appscan import parse_appscan_dast
 from parsers.appscan_sast import parse_appscan_sast
@@ -168,7 +169,9 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
             elif tool == "Xanitizer":
                 parse_xanitizer(complete_path,user,init_es)
             elif tool == "FindSecBugs":
-                parser_findsecbug(complete_path,user,init_es)                
+                parser_findsecbug(complete_path,user,init_es)
+            elif tool == 'NpmAudit':
+                parse_npm_audit(complete_path,user,init_es)                
             info_debug_log(ip=user_host,user=user,event='XML Parsing',status='success')
             if hook_log:
                 hook_log.scan_process_event = True

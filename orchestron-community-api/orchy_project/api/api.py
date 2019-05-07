@@ -19,7 +19,7 @@ from django.contrib.auth.models import Permission as DjangoPermission
 from api.models import Application, Project, Organization, Scan, Engagement, Webhook, WebhookLog, \
     Vulnerability,  VulnerabilityEvidence, VulnerabilityRemediation, VulnerabilityEvidenceRemediation, \
     User, OrganizationConfiguration, JiraIssueTypes, EmailConfiguration, ORLConfig, JiraProjects, \
-    JiraUsers, ScanLog
+    JiraUsers, ScanLog, AccessToken
 from api.serializers import OrganizationSerializer, ProjectSerializer, ApplicationSerializer, ScanSerializer, \
     EngagementSerializer, WebhookSerializer, VulnerabilitySerializer, VulnerabilityEvidenceSerializer, \
     VulnerabilityRemediationSerializer, VulnerabilityEvidenceRemediationSerializer, UserSerializer, \
@@ -37,6 +37,7 @@ from api.utils import get_request_response, get_single_vul_context, \
 from api.tasks import webhook_upload, webhook_process_json, \
     parse_xmls, sync_jira_users
 from api.utils import log_exception, get_severity_by_num
+from api.authentications import AccessKeyAuthentication
 from api.minio_utils import MinioUtil
 from api.app_log import error_debug_log, info_debug_log, critical_debug_log
 from django.views.static import serve
@@ -55,6 +56,46 @@ from six import string_types
 from api.orchy_logger import log
 from api.stats import StatView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import binascii
+
+class TokenRenewView(APIView):
+    def get(self, request):
+        try:
+            try:
+                data_dict = {
+                    'access_key':binascii.hexlify(os.urandom(20)).decode(),
+                    'secret_key':binascii.hexlify(os.urandom(20)).decode()
+                }
+                token = AccessToken.objects.get(user=request.user)
+                token.access_key = data_dict.get('access_key')
+                token.secret_key = data_dict.get('secret_key')
+                token.save()
+                # info_log('User `{0}` renewed the access token'.format(request.user.email),request)
+                return Response(data_dict)
+            except:
+                raise Unauthorized
+        except BaseException as e:
+            log_exception(e)
+            return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GetTokenView(APIView):
+    def get(self, request):
+        try:
+            try:
+                token = AccessToken.objects.get(user=request.user)
+                data_dict = {
+                    'access_key':token.access_key,
+                    'secret_key':token.secret_key
+                }
+                # info_log('User `{0}` fetched the access token'.format(request.user.email),request)
+                return Response(data_dict)
+            except:
+                raise Unauthorized
+        except BaseException as e:
+            log_exception(e)
+            return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class MediaServeView(APIView):
 
@@ -1682,6 +1723,9 @@ class ScanResultView(APIView):
 
 
 class WebhookUploadView(APIView):
+    authentication_classes = (JSONWebTokenAuthentication, AccessKeyAuthentication)
+    permission_classes = (IsAuthenticated, )
+
     def create_scan(self, tool, name, application, engagement_id):
         obj_dict = {
             'application': application,
