@@ -34,7 +34,7 @@
                     <template v-if="full_name">
                       <b-badge >{{full_name}}</b-badge>
                     </template>
-                    <template v-if="user_type.admin === 'true'">
+                    <!-- <template v-if="user_type.admin === 'true'">
                        <b-badge>Admin User</b-badge>
                     </template>
                     <template v-else-if="user_type.superuser ==='true' ">
@@ -42,7 +42,7 @@
                     </template>
                     <template v-else>
                       <b-badge>Staff User</b-badge>
-                    </template>
+                    </template> -->
                   </p>
                 <!-- <b-btn v-b-modal.modal1 class="btn-orange">Change Password</b-btn> -->
               </row>
@@ -272,7 +272,7 @@
             .then(res => {
               this.firstName = res.data.first_name
               this.lastName = res.data.last_name
-              this.full_name = res.data.first_name + ' ' + res.data.last_name
+              this.full_name = res.data.first_name
               this.email = res.data.email
               this.oldLogo = res.data.img
               var api_url = process.env.API_URL

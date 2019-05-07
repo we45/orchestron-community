@@ -17,7 +17,7 @@
                     <form @submit.prevent="submitCreateApplication">
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Name:</label>
+                                <label class="label">Name: *</label>
                                 <b-col sm="12">
                                     <b-form-input
                                       v-model="appName"
@@ -45,7 +45,7 @@
                         <br>
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Target Type:</label>
+                                <label class="label">Target Type: *</label>
                                 <b-col sm="12">
                                   <v-select
                                     :options="appTargetOption"
@@ -55,7 +55,7 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">Platform Type:</label>
+                              <label class="label">Platform Type: *</label>
                               <b-col sm="12">
                                 <v-select
                                   :options="appPlatformOption"
@@ -69,7 +69,7 @@
                         <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                                <label class="label">URL:</label>
+                                <label class="label">URL: *</label>
                                 <b-col sm="12">
                                     <b-form-input
                                       v-model="appUrl"
@@ -80,7 +80,7 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">IPv4:</label>
+                              <label class="label">IPv4: *</label>
                               <b-col sm="12">
                                   <b-form-input
                                     v-model="appIpv4"
@@ -95,7 +95,7 @@
                       <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                              <label class="label">OS Info:</label>
+                              <label class="label">OS Info: *</label>
                               <b-col sm="12">
                                 <b-form-input
                                   v-model="appOsInfo"
@@ -128,7 +128,7 @@
                     <form @submit.prevent="submitUpdateApplication">
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Name:</label>
+                                <label class="label">Name: *</label>
                                 <b-col sm="12">
                                     <b-form-input
                                       v-model="appUpdateName"
@@ -154,7 +154,7 @@
                         <br>
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Target Type:</label>
+                                <label class="label">Target Type: *</label>
                                 <b-col sm="12">
                                   <v-select
                                     :options="appTargetOption"
@@ -163,7 +163,7 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">Platform Type:</label>
+                              <label class="label">Platform Type: *</label>
                               <b-col sm="12">
                                 <v-select
                                   :options="appPlatformOption"
@@ -176,7 +176,7 @@
                         <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                                <label class="label">URL:</label>
+                                <label class="label">URL: *</label>
                                 <b-col sm="12">
                                     <b-form-input
                                       v-model="appUpdateUrl"
@@ -187,7 +187,7 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">IPv4:</label>
+                              <label class="label">IPv4: *</label>
                               <b-col sm="12">
                                   <b-form-input
                                     v-model="appUpdateIpv4"
@@ -202,7 +202,7 @@
                       <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                              <label class="label">OS Info:</label>
+                              <label class="label">OS Info: *</label>
                               <b-col sm="12">
                                 <b-form-input
                                   v-model="appUpdateOsInfo"
@@ -533,8 +533,9 @@
             }
           })
             .then(res => {
+              this.reloadPage = true
               this.$refs.createApplicationModal.hide()
-              this.isLoading = false
+              this.isLoading = true
               // this.$router.go()
               this.$router.push('/projects/individual_project/' + this.projectId + '/')
               this.$notify({
@@ -545,6 +546,8 @@
                 position: 'top right'
               })
               this.isClicked = false
+              this.reloadPage = false
+
             }).catch(error => {
               this.isClicked = false
               var status_info = error.response.status
@@ -682,9 +685,11 @@
             }
           })
             .then(res => {
-              this.$refs.updateApplicationModal.hide()
+              this.reloadPage = true
               this.isLoading = true
+              this.$refs.updateApplicationModal.hide()
               this.$router.push('/projects/individual_project/' + this.projectId + '/')
+              this.isLoading = true
               this.$notify({
                 group: 'foo',
                 type: 'info',
@@ -692,6 +697,8 @@
                 text: 'The application has been updated Successfully!',
                 position: 'top right'
               })
+              this.reloadPage = false
+
             }).catch(error => {
                var status_info = error.response.status
               if(status_info === 400){
@@ -734,6 +741,7 @@
           axios.delete('/applications/' + this.deleteApplicationId + '/')
             .then(res => {
               this.$refs.deleteApplicationModal.hide()
+              this.reloadPage = true
               this.isLoading = true
               this.$router.push('/projects/individual_project/' + this.projectId)
               this.$notify({
@@ -743,6 +751,7 @@
                 text: 'The aplication has been deleted Successfully!',
                 position: 'top right'
               })
+              this.reloadPage = false
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')

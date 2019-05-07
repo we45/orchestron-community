@@ -18,7 +18,7 @@
         <div>
           <form @submit.prevent="submitCreateEngagement">
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Name:</label></b-col>
+              <b-col sm="2"><label class="label">Name: *</label></b-col>
               <b-col sm="10">
                 <b-form-input
                   v-model="engagementName"
@@ -34,7 +34,7 @@
               </b-col> -->
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Description:</label></b-col>
+              <b-col sm="2"><label class="label">Description: *</label></b-col>
               <b-col sm="10">
                 <b-form-textarea
                   v-model="engagementDesc"
@@ -48,7 +48,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Application:</label></b-col>
+              <b-col sm="2"><label class="label">Application: *</label></b-col>
               <b-col sm="10">
                 <v-select
                   :options="applicationOption"
@@ -60,7 +60,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Start Date:</label></b-col>
+              <b-col sm="2"><label class="label">Date: *</label></b-col>
               <b-col sm="10">
                 <date-picker
                   v-model="engagementDateRange"
@@ -102,7 +102,7 @@
         <div>
           <form @submit.prevent="submitUpdateEngagement">
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Name:</label></b-col>
+              <b-col sm="2"><label class="label">Name: *</label></b-col>
               <b-col sm="10">
                 <b-form-input
                   v-model="updateEngagementName"
@@ -121,7 +121,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Description:</label></b-col>
+              <b-col sm="2"><label class="label">Description: *</label></b-col>
               <b-col sm="10">
                 <b-form-textarea
                   v-model="updateEngagementDesc"
@@ -134,7 +134,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Application:</label></b-col>
+              <b-col sm="2"><label class="label">Application: *</label></b-col>
               <b-col sm="10">
                 <v-select
                   :options="applicationOption"
@@ -145,7 +145,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Start Date:</label></b-col>
+              <b-col sm="2"><label class="label">Date: *</label></b-col>
               <b-col sm="10">
                 <date-picker
                   v-model="updateEngagementDateRange"
