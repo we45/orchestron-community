@@ -572,25 +572,7 @@ class ProjectAnalyticsView(BaseAnalyticsView):
 
 	def applications(self, request, pk=None):
 		obj = self.get_queryset(request.user).get(pk=pk)
-		
-		context = {}
 		apps = obj.application_set.all()
-		apps_list = []
-		for app in apps:
-			kwargs = {
-				'scan__application__project':obj, 
-				'scan__application':app
-			} 
-			serialized_object = ApplicationSerializer(app, context={'request':self.request})
-			apps_list.append({
-				'fields':serialized_object.data,                
-				'stats':{
-					'severity_count':OpenVulnerabilityStatView().severity_count(kwargs=kwargs),
-					'scans_count':app.scan_set.count()
-				}
-			}) 
-		context['applications_count'] = apps.count()     
-		context['applications'] = apps_list
 		queryset = apps
 		page = self.paginate_queryset(queryset, request=request)
 		if page is not None:
