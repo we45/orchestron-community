@@ -16,9 +16,9 @@ class UncategorizedVulnerabilityStatView(viewsets.ViewSet):
         new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
         uncategorize_vuls = Vulnerability.objects.filter(cwe=0,is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')
+            .order_by('cwe')
         return uncategorize_vuls
 
     def vuls(self, user, kwargs={}, exclude_kwargs={}):
@@ -43,9 +43,9 @@ class FalsePositiveVulnerabilityStatView(viewsets.ViewSet):
     def get_open_vul_fp_query(self, user, kwargs={}, exclude_kwargs={}):
         open_vuls = Vulnerability.objects.filter(is_false_positive=True,is_remediated=False).filter(**kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')
+            .order_by('cwe')
         return open_vuls
 
     def vuls(self, user, kwargs={}, exclude_kwargs={}):
@@ -72,9 +72,9 @@ class OpenVulnerabilityToolTypeStatView(viewsets.ViewSet):
         new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
         open_vuls = Vulnerability.objects.filter(is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')
+            .order_by('cwe')
         return open_vuls
 
     def get_tool_type_stats(self, user, kwargs={}, exclude_kwargs={}):
@@ -103,10 +103,10 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
         open_vuls = Vulnerability.objects.filter(is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')\
-            .values_list('common_name',flat=True)
+            .order_by('cwe')\
+            .values_list('cwe',flat=True)
         return open_vuls
 
     def get_open_vul_query(self, user, kwargs={}, exclude_kwargs={}):
@@ -115,14 +115,14 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         open_vuls = Vulnerability.objects.filter(is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
             .exclude(cwe__in=settings.JANATHA_CLASS)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')
+            .order_by('cwe')
         janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name') 
+            .order_by('cwe') 
         return open_vuls | janatha_vuls
 
     def vuls(self, user, kwargs={}, exclude_kwargs={}):
@@ -264,14 +264,14 @@ class ClosedVulnerabilityStatView(viewsets.ViewSet):
         closed_vuls = Vulnerability.objects.filter(is_remediated=True).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
             .exclude(cwe__in=settings.JANATHA_CLASS)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')
+            .order_by('cwe')
         janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=True).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('common_name')\
+            .values('cwe')\
             .distinct()\
-            .order_by('common_name')
+            .order_by('cwe')
         return closed_vuls | janatha_vuls
 
     def vuls(self, user, kwargs={}, exclude_kwargs={}):

@@ -1963,9 +1963,6 @@ class ExecutiveReportView(APIView):
                     user = request.user
                     s = StatView()
                     open_vuls = s.get_open_vuls_abstract(user,kwargs=kwargs)
-                    # print(open_vuls)
-                    # print(dir(open_vuls))
-                    print(open_vuls.count())
                     paginator = Paginator(open_vuls, 5)
                     page = request.GET.get('page')
                     try:
