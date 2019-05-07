@@ -103,10 +103,10 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         new_kwargs['is_false_positive'] = kwargs.get('is_false_positive',False)
         open_vuls = Vulnerability.objects.filter(is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('cwe')\
+            .values('common_name')\
             .distinct()\
-            .order_by('cwe')\
-            .values_list('cwe',flat=True)
+            .order_by('common_name')\
+            .values_list('common_name',flat=True)
         return open_vuls
 
     def get_open_vul_query(self, user, kwargs={}, exclude_kwargs={}):
@@ -115,14 +115,14 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         open_vuls = Vulnerability.objects.filter(is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
             .exclude(cwe__in=settings.JANATHA_CLASS)\
-            .values('cwe')\
+            .values('common_name')\
             .distinct()\
-            .order_by('cwe')
+            .order_by('common_name')
         janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=False).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('cwe')\
+            .values('common_name')\
             .distinct()\
-            .order_by('cwe') 
+            .order_by('common_name') 
         return open_vuls | janatha_vuls
 
     def vuls(self, user, kwargs={}, exclude_kwargs={}):
@@ -166,7 +166,7 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         return sum(dict(Counter(vuls)).values())
 
     def severity_count(self, user, kwargs={}, exclude_kwargs={}):
-        sevs = self.get_open_vul_query(user, kwargs, exclude_kwargs).values_list('severity',flat=True)
+        sevs = self.get_open_vul_query(user, kwargs, exclude_kwargs).values_list('severity',flat=True)        
         return dict(Counter(sevs))
 
     def cwe_severity_count(self, user, kwargs={}, exclude_kwargs={}):
@@ -264,14 +264,14 @@ class ClosedVulnerabilityStatView(viewsets.ViewSet):
         closed_vuls = Vulnerability.objects.filter(is_remediated=True).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
             .exclude(cwe__in=settings.JANATHA_CLASS)\
-            .values('cwe')\
+            .values('common_name')\
             .distinct()\
-            .order_by('cwe')
+            .order_by('common_name')
         janatha_vuls = Vulnerability.objects.filter(cwe__in=settings.JANATHA_CLASS,is_remediated=True).filter(**new_kwargs)\
             .exclude(**exclude_kwargs)\
-            .values('cwe')\
+            .values('common_name')\
             .distinct()\
-            .order_by('cwe')
+            .order_by('common_name')
         return closed_vuls | janatha_vuls
 
     def vuls(self, user, kwargs={}, exclude_kwargs={}):

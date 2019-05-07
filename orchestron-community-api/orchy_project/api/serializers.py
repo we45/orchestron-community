@@ -19,6 +19,12 @@ from api.utils import draw_thumnail
 import os
 import uuid
 from api.minio_utils import MinioUtil
+from django.contrib.sites.models import Site
+
+class DjangoSiteSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Site
+		fields = ['id', 'domain', 'name']
 
 
 class OpenVulSerializer(serializers.Serializer):

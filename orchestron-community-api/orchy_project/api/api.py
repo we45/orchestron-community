@@ -28,7 +28,9 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
-    JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer
+    JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer,\
+    DjangoSiteSerializer
+from django.contrib.sites.models import Site    
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
@@ -714,6 +716,18 @@ class OrganizationView(BaseView):
         if users:
             context.update(self.get_users(obj))
         return Response(context)
+
+
+class DjangoSiteChangeView(BaseView):
+    serializer_class = DjangoSiteSerializer    
+    model_class = Site
+
+    def get_queryset(self, pk=None):
+        if pk:
+            object_list = self.model_class.objects.get(pk=pk)
+        else:
+            object_list = self.model_class.objects.all()
+        return object_list
 
 
 class OrganizationConfigurationView(BaseView):
@@ -1949,6 +1963,9 @@ class ExecutiveReportView(APIView):
                     user = request.user
                     s = StatView()
                     open_vuls = s.get_open_vuls_abstract(user,kwargs=kwargs)
+                    # print(open_vuls)
+                    # print(dir(open_vuls))
+                    print(open_vuls.count())
                     paginator = Paginator(open_vuls, 5)
                     page = request.GET.get('page')
                     try:
