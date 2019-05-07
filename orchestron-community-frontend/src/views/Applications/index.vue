@@ -395,7 +395,7 @@
                   <br>
                 </div> -->
                 <b-col cols="12" slot="modal-footer">
-                    <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p>
+                    <!-- <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p> -->
                 </b-col>
             </b-modal>
 
@@ -737,6 +737,43 @@
               }
             })
 
+         axios
+            .get('/organizations/' + this.org + '/config/')
+            .then(res => {
+              this.enable_Jira = res.data.enable_jira
+              // if (res.data.enable_jira) {
+              //   axios
+              //     .get('/organizations/' + this.org + '/jira/')
+              //     .then(res => {
+              //       axios
+              //         .get('jira/projects/' + this.param + '/')
+              //         .then(res => {
+              //           this.appJiraProjectOptions = res.data
+              //           this.isLoading = false
+              //         })
+              //         .catch(error => {
+              //           this.isLoading = false
+              //           if (error.res.status === 404) {
+              //             this.$router.push('/not_found')
+              //           } else if (error.res.status === 403) {
+              //             this.$router.push('/forbidden')
+              //           } else {
+              //             this.$router.push('/error')
+              //           }
+              //         })
+              //     })
+              //     .catch(error => {
+              //       this.isLoading = false
+              //       if (error.res.status === 404) {
+              //         this.$router.push('/not_found')
+              //       } else if (error.res.status === 403) {
+              //         this.$router.push('/forbidden')
+              //       } else {
+              //         this.$router.push('/error')
+              //       }
+              //     })
+              // }
+            })
         } else {
           notValidUser()
           this.$router.push('/')
@@ -748,6 +785,7 @@
         } else {
           this.isLoading = true
           this.showConfig = true
+                this.reloadPage = true
           axios
             .get('/organizations/' + this.org + '/config/')
             .then(res => {
@@ -759,10 +797,13 @@
                     axios
                       .get('jira/projects/' + this.param + '/')
                       .then(res => {
+                      this.reloadPage = false
                         this.appJiraProjectOptions = res.data
                         this.isLoading = false
                       })
                       .catch(error => {
+                            this.reloadPage = false
+
                         this.isLoading = false
                         if (error.res.status === 404) {
                           this.$router.push('/not_found')
@@ -772,8 +813,10 @@
                           this.$router.push('/error')
                         }
                       })
+
                   })
                   .catch(error => {
+                    this.reloadPage = false
                     this.isLoading = false
                     if (error.res.status === 404) {
                       this.$router.push('/not_found')
@@ -786,6 +829,7 @@
               }
             })
             .catch(error => {
+                this.reloadPage = false
               this.isLoading = false
               if (error.res.status === 404) {
                 this.$router.push('/not_found')

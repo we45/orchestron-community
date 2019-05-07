@@ -17,7 +17,7 @@
                     <b-col md="6" class="my-1">
                     </b-col>
                     <b-col md="6" class="my-1">
-                        <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-1" align="right"/>
+                        <b-pagination :total-rows="dataItems.length" :per-page="perPage" v-model="currentPage" class="my-1" align="right"/>
                     </b-col>
                 </b-row>
                 <b-table show-empty
@@ -29,7 +29,6 @@
                     :filter="filter"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    @filtered="onFiltered"
                     class="m2_top">
                     <template slot="sev" slot-scope="row">
                         <div class="high-vul-severity-line" v-if="row.item.sev===3"></div>
@@ -84,6 +83,11 @@
       dataItems: {
         type: Array,
         required: true
+      }
+    },
+    watch: {
+      'currentPage': function(value_name){
+        this.currentPage = value_name
       }
     },
     created: function() {

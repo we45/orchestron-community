@@ -22,7 +22,7 @@
                     </b-col>
                     <b-col md="6" class="my-1">
                         <b-pagination
-                          :total-rows="totalRows"
+                          :total-rows="dataItems.length"
                           :per-page="perPage"
                           v-model="currentPage"
                           class="my-1"
@@ -39,7 +39,6 @@
                     :filter="filter"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    @filtered="onFiltered"
                     class="m2_top">
                     <template slot="sev" slot-scope="row" v-if="row.item.appDashboard">
                         <!--<b-form-checkbox-->
@@ -134,17 +133,22 @@
         showModal: true
       }
     },
-    beforeUpdate() {
+   beforeUpdate() {
       this.items = this.dataItems
     },
+    watch: {
+        'currentPage': function(value_name){
+            this.currentPage = value_name
+          }
+        },
     methods: {
       deleteModal(id) {
         this.$emit('deleteModal', { id: id, show: this.showModal })
       },
-      onFiltered(filteredItems) {
-        this.totalRows = filteredItems.length
-        this.currentPage = 1
-      }
+      // onFiltered(filteredItems) {
+      //   this.totalRows = filteredItems.length
+      //   this.currentPage = 1
+      // }
     }
   }
 </script>
