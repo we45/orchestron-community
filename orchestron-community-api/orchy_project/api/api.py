@@ -59,6 +59,11 @@ from api.orchy_logger import log
 from api.stats import StatView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import binascii
+from api.utils import get_ip
+
+class IPAdressView(APIView):
+    def get(self, request):
+        return Response({'ip':get_ip()})
 
 class TokenRenewView(APIView):
     def get(self, request):
