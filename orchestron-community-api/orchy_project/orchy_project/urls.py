@@ -19,7 +19,7 @@ from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, Appli
 
 urlpatterns = [
     re_path(r'^api/renew/token/$', TokenRenewView.as_view()),
-    re_path(r'^api/get/token/$', GetTokenView.as_view()),
+    re_path(r'^api/get/token/$', GetTokenView.as_view()),    
     re_path(r'^media/(?P<path>.*)$', MediaServeView.as_view()),
     re_path(r'^api/user/password/change/(?P<email>.*)/$', UserUtilityView.as_view({'post':'change_password'})),
     re_path(r'^api/user/token/', obtain_jwt_token),

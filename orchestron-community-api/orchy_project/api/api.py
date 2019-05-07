@@ -83,15 +83,19 @@ class GetTokenView(APIView):
     def get(self, request):
         try:
             try:
-                token = AccessToken.objects.get(user=request.user)
+                token = AccessToken.objects.get(user=request.user)                
+            except AccessToken.DoesNotExist:
                 data_dict = {
-                    'access_key':token.access_key,
-                    'secret_key':token.secret_key
+                    'access_key':binascii.hexlify(os.urandom(20)).decode(),
+                    'secret_key':binascii.hexlify(os.urandom(20)).decode(),
+                    'user':request.user
                 }
-                # info_log('User `{0}` fetched the access token'.format(request.user.email),request)
-                return Response(data_dict)
-            except:
-                raise Unauthorized
+                token = AccessToken.objects.create(**data_dict) 
+            data_dict = {
+                'access_key':token.access_key,
+                'secret_key':token.secret_key
+            }                
+            return Response(data_dict)
         except BaseException as e:
             log_exception(e)
             return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
