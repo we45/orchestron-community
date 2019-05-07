@@ -107,7 +107,7 @@ def parse_burp(xml_file,user_name,init_es):
             }
             vul_dict['vulnerability']['evidences'] = url_param_list
             vul_dict['vulnerability']['cwe'] = {
-                'cwe_id':0
+                'cwe_id':cwe
             }            
             write_results(vul_dict)
     except BaseException as e:
