@@ -10,7 +10,7 @@
               :headerTitle="headerTitles"
               @createModal="createApplication"
               @updateModal="updateApplication($event)"
-              @clickPagination="clickPagination($event)"
+              @clickPagination="clickProjPagination($event)"
               @deleteModal="beforeDeleteModal($event)"></common-table>
             <b-modal ref="createApplicationModal" title="Create Application" centered size="lg">
                 <div>
@@ -375,24 +375,23 @@
       this.org = localStorage.getItem('org')
       this.token = localStorage.getItem('token')
       this.param = this.$route.params.projectId
+      this.fetchProjectData()
       this.fetchData()
     },
-    updated() {
-      this.$nextTick(function() {
-        if (this.isLoading) {
-          this.vulnerabilitiesList = []
-          this.fetchData()
-          this.isLoading = false
-        }
-      })
-    },
+    // updated() {
+    //   this.$nextTick(function() {
+    //     if (this.isLoading) {
+    //       this.vulnerabilitiesList = []
+    //       this.fetchData()
+    //       this.isLoading = false
+    //     }
+    //   })
+    // },
     methods: {
-      fetchData() {
-        this.reloadPage = true
+      fetchProjectData() {
         if (this.param && this.org && this.token) {
-          axios.get('/projects/' + this.param + '/?&severity=1&applications=1')
+          axios.get('/projects/' + this.param + '/?applications=1')
             .then(res => {
-              this.applicationCount = res.data.applications_count
               this.projectName = res.data.name
               this.projectId = res.data.id
               axios.get(res.data.logo)
@@ -407,14 +406,35 @@
                     this.$router.push('/error')
                   }
                 })
-              this.projectCreatedOn = res.data.created_on
+              this.projectCreatedOn = res.data.created_on            
+            }).catch(error => {
+              this.reloadPage = false
+              if (error.res.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.res.status === 403) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
+            })
+        } else {
+          notValidUser()
+          this.$router.push('/')
+        }
+      },
+      fetchData() {
+        this.reloadPage = true
+        if (this.param && this.org && this.token) {
+          axios.get('/projects/' + this.param + '/applications/?page=1')
+            .then(res => {
+              this.applicationCount = res.data.count
               this.vulnerabilitiesList = []
-              for (const value of res.data.applications) {
+              for (const value of res.data.results) {
                 this.vulnerabilitiesList.push({
-                  name: { vul_name: value.fields.name },
-                  sev: value.stats.severity_count.severity,
-                  id: value.fields.id,
-                  url: '/projects/individual_application/' + value.fields.id + '/'
+                  name: { vul_name: value.name },
+                  sev: value.stats.severity_count,
+                  id: value.id,
+                  url: '/projects/individual_application/' + value.id + '/'
                 })
               }
               this.reloadPage = false
@@ -434,42 +454,37 @@
           this.$router.push('/')
         }
       },
-       clickPagination(event) {
+       clickProjPagination(event) {
         if (event.page) {
           if (event.page > 1) {
             axios.get('/projects/' + this.param + '/applications/?page=' + event.page)
               .then(res => {
-                this.paginatedVulnerabilitiesList = []
+                this.vulnerabilitiesList = []
                 for (const value of res.data.results) {
-                   this.paginatedVulnerabilitiesList.push({
-                      name: { vul_name: value.fields.name },
-                      sev: value.stats.severity_count.severity,
-                      id: value.fields.id,
-                      url: '/projects/individual_application/' + value.fields.id + '/'
+                   this.vulnerabilitiesList.push({
+                      name: { vul_name: value.name },
+                      sev: value.stats.severity_count,
+                      id: value.id,
+                      url: '/projects/individual_application/' + value.id + '/'
                     })
                 }
-                this.vulnerabilitiesList = []
-                this.vulnerabilitiesList = this.paginatedVulnerabilitiesList
               }).catch(error => {
-                console.log("error", error)
-                // if (error.response.data.detail === 'Signature has expired.'){
-                //   notValidUser()
-                //   this.$router.push('/')
-                // }
-                // if (error.response.status === 404) {
-                //   this.$router.push('/not_found')
-                // } else if (error.response.status === 403) {
-                //   this.$router.push('/forbidden')
-                // } else {
-                //   this.$router.push('/error')
-                // }
+                if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
+                if (error.response.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.response.status === 403) {
+                  this.$router.push('/forbidden')
+                } else {
+                  this.$router.push('/error')
+                }
               })
           } else {
             this.fetchData()
           }
-        } else {
-         this.fetchData()
-        }
+        } 
       },
       createApplication() {
         if (this.param && this.org && this.token) {
@@ -537,7 +552,7 @@
               this.$refs.createApplicationModal.hide()
               this.isLoading = true
               // this.$router.go()
-              this.$router.push('/projects/individual_project/' + this.projectId + '/')
+              // this.$router.push('/projects/individual_project/' + this.projectId + '/')
               this.$notify({
                 group: 'foo',
                 type: 'success',
@@ -547,6 +562,7 @@
               })
               this.isClicked = false
               this.reloadPage = false
+              this.fetchData()
 
             }).catch(error => {
               this.isClicked = false
@@ -688,7 +704,8 @@
               this.reloadPage = true
               this.isLoading = true
               this.$refs.updateApplicationModal.hide()
-              this.$router.push('/projects/individual_project/' + this.projectId + '/')
+              // this.$router.go()
+              // this.$router.push('/projects/individual_project/' + this.projectId + '/')
               this.isLoading = true
               this.$notify({
                 group: 'foo',
@@ -698,6 +715,7 @@
                 position: 'top right'
               })
               this.reloadPage = false
+              this.fetchData()
 
             }).catch(error => {
                var status_info = error.response.status
@@ -752,6 +770,7 @@
                 position: 'top right'
               })
               this.reloadPage = false
+              this.fetchData()
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
