@@ -4,11 +4,11 @@ from django.utils import timezone
 from api.utils import log_exception
 from api.utils import write_results
 from base64 import b64encode
-
+import codecs
 
 def parse_zap_json(file_path, user_name, init_es):
 	try:
-		with open(file_path) as fp:
+		with codecs.open(file_path,'r',encoding='utf-8') as fp:
 			data = json.loads(fp.read())
 			hosts = data.get('Report',{}).get('Sites',[])
 
