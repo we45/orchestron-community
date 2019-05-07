@@ -80,8 +80,8 @@ def send_email_to_users(user, domain_override, email_template_name,use_https, to
         if not user.email:
             raise ValueError('Email address is required to send an email')
         if not domain_override:
-            domain = 'http://{0}:8000'.format(get_ip())
-            site_name = 'http://{0}:8000'.format(get_ip())
+            domain = 'http://{0}'.format(get_ip())
+            site_name = 'http://{0}'.format(get_ip())
         else:
             site_name = domain = domain_override
         t = loader.get_template(email_template_name)
@@ -108,8 +108,8 @@ def send_email_to_users(user, domain_override, email_template_name,use_https, to
             error_debug_log(user=user,event='Email address is not provided',status='failure')
             raise ValueError('Email address is required to send an email')
         if not domain_override:                        
-            domain = 'http://{0}:8000'.format(get_ip())
-            site_name = 'http://{0}:8000'.format(get_ip())
+            domain = 'http://{0}'.format(get_ip())
+            site_name = 'http://{0}'.format(get_ip())
         else:
             site_name = domain = domain_override
         t = loader.get_template(email_template_name)
