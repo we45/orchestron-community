@@ -344,17 +344,38 @@
               <br>
                   </b-col>
                   <b-col cols="12">
-              <div style="background-color: #2b2b2b; border-radius: 5px; height:50px;display: table;width: 100%;">
+                     <div style="background-color:#2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+                      <p style="text-align:left;vertical-align: middle;padding-top: 2%;" class="word-wrap">
+                      <pre> <span class="webhook-label">Secret Key : </span>  <span
+                        class='webhook'>{{ secret_key }}</span></pre>
+                      </p>
+                      <pre> <span class="webhook-label">Access Key : </span>  <span
+                        class='webhook'>{{ access_key }}</span></pre>
+                      <br>
+                    </div>
+                    <br>
+             <!--  <div style="background-color: #2b2b2b; border-radius: 5px; height:50px;display: table;width: 100%;">
                   <p style="vertical-align: middle;width: 100%;padding-top: 2%;" class="word-wrap">
                     <span class="webhook-label" style="padding:7px;">User Token : </span>
                    <span class='webhook'><label style="word-break: break-all;padding:7px;">{{ userToken }}</label></span>
                   </p>
                   <br>
-                </div>
+                </div> -->
               <br>
                     </b-col>
                 </b-row>
-              <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+                 <div style="background-color: #2b2b2b; border-radius: 5px; height:120px;width: 100%;">
+                  <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
+                  <span class="webhook-label"
+                        style="padding:7px;">Curl Command (File Processing) Using Secrect and Access Key: </span>
+                    <span class='webhook'>
+                               {{curlCmd_secret_access_key}}<label>{{ webhookId }}/</label>
+                            </span>
+                  </p>
+                  <br>
+                </div>
+                <br>
+              <!-- <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
                     <span class="webhook-label" style="padding:7px;">Curl Command (File Processing) : </span>
                     <span class='webhook'>
@@ -363,7 +384,7 @@
                   </p>
                   <br>
                 </div>
-              <br>
+ -->              <br>
              <!--  <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;display: table;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;">
                    <span class="webhook-label" style="padding:7px;"> Curl Command (JSON Processing) : </span>
@@ -434,7 +455,8 @@
         openVulCount: 0,
         closeVulCount: 0,
         unCategorisedVulCount: 0,
-
+        secret_key: '',
+        access_key: '',
         appGrade: 0,
         uploadName: '',
         uploadFile: '',
@@ -442,6 +464,7 @@
         uploadTool: '',
         manualScanName: '',
         manualVulName: '',
+        curlCmd_secret_access_key : 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + 'http://127.0.0.1:8000' + '/api/webhooks/post/',
         manualCwe: '',
         manualSeverityList: [
           { label: 'High', value: 3 },
@@ -561,6 +584,7 @@
       this.org = localStorage.getItem('org')
       this.token = localStorage.getItem('token')
       this.fetchData()
+      this.fetchSecretKeys()
     },
     updated() {
       this.$nextTick(function() {
@@ -585,6 +609,20 @@
       copyWebhook() {
         this.$refs.copyWebhookModal.show()
         this.userToken = localStorage.getItem('token')
+      },
+      fetchSecretKeys() {
+        if (this.param && this.org && this.token) {
+          axios.get('/get/token/').then(res => {
+            this.access_key = ''
+            this.secret_key = ''
+            this.access_key = res.data.access_key
+            this.secret_key = res.data.secret_key
+          }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+              this.$router.push('/')
+            }
+          })
+        }
       },
       fetchData() {
         this.reloadPage = true
