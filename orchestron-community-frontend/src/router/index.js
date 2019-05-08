@@ -36,7 +36,7 @@ import Settings from '../views/Settings/index'
 import IndividualOrg from '../views/Settings/IndividualOrg'
 import AllApplicationsData from '../views/Projects/AllApplication'
 import uncategorizedOpenVulnerabilities from '../views/uncategorized/index'
-import ReportView from '../views/ReportView/index'
+// import ReportView from '../views/ReportView/index'
 // import UncategorizedSeverityWise from '../views/uncategorized/severityWise'
 
 
@@ -278,30 +278,29 @@ export const constantRouterMap = [
       }
     ]
   },
-  {
-    path: '/report',
-    // name: 'Reports',
-    component: Layout,
-    isReportReq: true,
-    meta: {
-      title: 'Report',
-      icon: 'report',
-      requiresAuth: true
-    },
-    children: [
-      {
-        path: '',
-        name: 'Reports',
-        component: ReportView,
-        meta: {
-          title: 'Reports',
-          icon: 'report',
-          requiresAuth: true,
-          isReportReq: true,
-        }
-      }
-    ]
-  },
+  // {
+  //   path: '/report',
+  //   component: Layout,
+  //   isReportReq: true,
+  //   meta: {
+  //     title: 'Report',
+  //     icon: 'report',
+  //     requiresAuth: true
+  //   },
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'Reports',
+  //       component: ReportView,
+  //       meta: {
+  //         title: 'Reports',
+  //         icon: 'report',
+  //         requiresAuth: true,
+  //         isReportReq: true,
+  //       }
+  //     }
+  //   ]
+  // },
   {
     path: '/settings',
     component: Layout,

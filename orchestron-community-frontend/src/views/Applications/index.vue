@@ -463,7 +463,7 @@
         uploadTool: '',
         manualScanName: '',
         manualVulName: '',
-        curlCmd_secret_access_key : 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + 'http://127.0.0.1:8000' + '/api/webhooks/post/',
+        curlCmd_secret_access_key : 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/',
         manualCwe: '',
         manualSeverityList: [
           { label: 'High', value: 3 },
@@ -503,6 +503,7 @@
         showConfig: false,
         appJiraProject: '',
         appJiraProjectOptions: null,
+        ipWebhook: '',
         webhookId : '',
         api_site_url: '',
         userToken: '',
@@ -606,8 +607,19 @@
       })
     },
     methods: {
+      getIP(){
+         axios.get('/get/ip/').then(res => {
+           this.ipWebhook = res.data.ip
+           this.curlCmd_secret_access_key = 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + 'http://'+this.ipWebhook + '/api/webhooks/post/'
+          }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+              this.$router.push('/')
+            }
+          })
+      },
       copyWebhook() {
         this.$refs.copyWebhookModal.show()
+        this.getIP()
         this.userToken = localStorage.getItem('token')
       },
       fetchSecretKeys() {

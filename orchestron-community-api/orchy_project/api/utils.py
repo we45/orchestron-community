@@ -123,10 +123,10 @@ def get_single_vul_context(vuls):
     return context
 
 
-def get_request_response(evidences):
-    domain = 'http://{0}'.format(get_ip())
-    if not domain.startswith("http://") or not domain.startswith("https://"):
-        domain = 'http://{0}'.format(domain)
+def get_request_response(host,evidences):
+    domain = 'http://{0}'.format(host)
+    # if not domain.startswith("http://") or not domain.startswith("https://"):
+        # domain = 'http://{0}'.format(domain)
     context = {}
     for evidence in evidences:
         context[evidence.url] = {}
@@ -147,9 +147,9 @@ def get_request_response(evidences):
     return context        
 
 
-def get_closed_vul_context(vuls):
+def get_closed_vul_context(host,vuls):
     context = {}
-    domain = 'http://{0}'.format(get_ip())
+    domain = 'http://{0}'.format(host)
     if not domain.startswith("http://") or not domain.startswith("https://"):
         domain = 'http://{0}'.format(domain)
     for v in vuls:
