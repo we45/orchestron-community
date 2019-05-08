@@ -42,7 +42,7 @@
 
             <b-container fluid>
                 <b-row style="background-color: #FFFFFF;">
-                    <b-col cols="6">
+                    <b-col cols="6" v-if="highCount > 0 || mediumCount > 0 || lowCount > 0 || infoCount > 0">
                         <donut-chart
                             :chartData="chartData"
                             :title="title"
@@ -54,8 +54,7 @@
                     <!-- <b-col cols="6">
                         <app-bar-chart :barChartData="appSevData" :barChartTitle="'Application-wise Vulnerabilities'"></app-bar-chart>
                     </b-col> -->
-
-                     <b-col cols="6">
+                     <b-col cols="6" >
                         <template v-if="basicBarDashboardChartData.length > 0">
                             <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
                                                     :chartCategories="dashboardCategories"
@@ -600,6 +599,7 @@
           this.infoCount = 0
           this.appSevData = []
           this.chartData = []
+          this.basicBarDashboardChartData = []
           this.fetchData()
           this.isLoading = false
         }
@@ -853,8 +853,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Project',
-                text: 'The project has been created Successfully!',
+                title: 'success',
+                text: 'The project has been created successfully!',
                 position: 'top right'
               })
             }).catch(error => {
@@ -866,8 +866,8 @@
                       this.$notify({
                         group: 'foo',
                         type: 'success',
-                        title: 'Project',
-                        text: 'The project has been updated Successfully!',
+                        title: 'success',
+                        text: 'The project has been updated successfully!',
                         position: 'top right'
                       })
                     })
@@ -921,6 +921,8 @@
               this.isLoading = true
               this.$refs.deleteScanModal.hide()
               this.$router.push('/projects/individual_application/' + this.param)
+              this.isLoading = true
+              this.reloadPage = true
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -951,8 +953,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Application',
-                text: 'The file  has been uploaded Successfully!',
+                title: 'success',
+                text: 'The file  has been uploaded successfully!',
                 position: 'top right'
               })
               this.uploadFile = ''
@@ -1032,8 +1034,8 @@
                       this.$notify({
                         group: 'foo',
                         type: 'success',
-                        title: 'Application',
-                        text: 'The Manual Vulnerability has been created Successfully!',
+                        title: 'success',
+                        text: 'The manual vulnerability has been created successfully!',
                         position: 'top right'
                       })
                       this.isLoading = false

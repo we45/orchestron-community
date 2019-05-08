@@ -314,8 +314,8 @@
         this.$notify({
           group: 'foo',
           type: 'success',
-          title: 'Token',
-          text: 'The token has been copied Successfully!',
+          title: 'success',
+          text: 'The token has been copied successfully!',
           position: 'top right'
         })
       },
@@ -323,7 +323,7 @@
         this.$notify({
           group: 'foo',
           type: 'error',
-          title: 'Token',
+          title: 'error',
           text: 'The token havent copied!',
           position: 'top right'
         })
@@ -351,8 +351,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'User',
-                text: 'The user profile has been updated Successfully!',
+                title: 'success',
+                text: 'The user profile has been updated successfully!',
                 position: 'top right'
               })
               this.isLoading = false
@@ -440,8 +440,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'User',
-                text: 'The password has been changed Successfully!',
+                title: 'success',
+                text: 'The password has been changed successfully!',
                 position: 'top right'
               })
               this.isLoading = false
@@ -450,7 +450,7 @@
               this.$notify({
                 group: 'foo',
                 type: 'error',
-                title: 'User',
+                title: 'error',
                 text: 'Invalid Current Password',
                 position: 'top right'
               })
@@ -462,7 +462,7 @@
               this.$notify({
                 group: 'foo',
                 type: 'error',
-                title: 'User',
+                title: 'error',
                 text: 'Invalid Current Password',
                 position: 'top right'
               })

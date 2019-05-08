@@ -272,8 +272,8 @@
                 this.$notify({
                   group: 'foo',
                   type: 'success',
-                  title: 'Engagement',
-                  text: 'The scans has been included Successfully!',
+                  title: 'success',
+                  text: 'The scans has been included successfully!',
                   position: 'top right'
                 })
                 this.isLoading = false

@@ -534,6 +534,7 @@ export default {
         this.userData = []
         this.fetchData()
         this.isLoading = false
+        this.reloadPage = false
       }
     })
   },
@@ -671,12 +672,13 @@ export default {
             if (res.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
+              this.reloadPage = true
               this.$router.push('/settings/individual_org/' + this.param + '/')
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'User',
-                text: 'The user has been created Successfully!',
+                title: 'success',
+                text: 'The user has been created successfully!',
                 position: 'top right'
               })
             }
@@ -742,13 +744,14 @@ export default {
             if (res.status === 200) {
               this.$refs.userUpdateModal.hide()
               this.isLoading = true
+              this.reloadPage = true
               this.$router.push('/settings/individual_org/' + this.param + '/')
               this.userId = ''
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'User',
-                text: 'The user has been updated Successfully!',
+                title: 'success',
+                text: 'The user has been updated successfully!',
                 position: 'top right'
               })
             }
@@ -783,12 +786,13 @@ export default {
               this.$refs.deleteUserModal.hide()
               this.userId = ''
               this.isLoading = true
+              this.reloadPage = true
               this.$router.push('/settings/individual_org/' + this.param + '/')
               this.$notify({
                 group: 'foo',
-                type: 'error',
-                title: 'User',
-                text: 'The user has been deleted Successfully!',
+                type: 'info',
+                title: 'success',
+                text: 'The user has been deleted successfully!',
                 position: 'top right'
               })
             }
@@ -831,8 +835,8 @@ export default {
                 this.$notify({
                   group: 'foo',
                   type: 'success',
-                  title: 'Organization Configuration',
-                  text: 'The Organization has been created Successfully!',
+                  title: 'success',
+                  text: 'The organization has been created successfully!',
                   position: 'top right'
                 })
               }
@@ -857,8 +861,8 @@ export default {
                 this.$notify({
                   group: 'foo',
                   type: 'success',
-                  title: 'Organization Configuration',
-                  text: 'The Organization has been created Successfully!',
+                  title: 'success',
+                  text: 'The organization has been created successfully!',
                   position: 'top right'
                 })
               }
@@ -896,8 +900,8 @@ export default {
             this.$notify({
               group: 'foo',
               type: 'error',
-              title: 'JIRA',
-              text: 'Please enter a valid JIRA Credentials',
+              title: 'error',
+              text: 'Please enter a valid JIRA credentials',
               position: 'top right'
             })
             this.isLoading = false
@@ -926,8 +930,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'JIRA',
-                text: 'The JIRA has been updated Successfully!',
+                title: 'success',
+                text: 'The JIRA configuration has been updated successfully!',
                 position: 'top right'
               })
               this.isLoading = false
@@ -954,8 +958,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'JIRA',
-                text: 'The JIRA has been created Successfully!',
+                title: 'success',
+                text: 'The JIRA configuration has been created successfully!',
                 position: 'top right'
               })
               this.isLoading = false
@@ -996,8 +1000,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Email',
-                text: 'The Email has been created Successfully!',
+                title: 'success',
+                text: 'The email configuration has been created successfully!',
                 position: 'top right'
               })
               this.isLoading = false

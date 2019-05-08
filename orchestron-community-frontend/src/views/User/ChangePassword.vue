@@ -96,8 +96,8 @@
                 this.$notify({
                   group: 'foo',
                   type: 'success',
-                  title: 'User',
-                  text: 'The password has been changed Successfully!',
+                  title: 'success',
+                  text: 'The password has been changed successfully!',
                   position: 'top right'
                 })
               }).catch(error => {

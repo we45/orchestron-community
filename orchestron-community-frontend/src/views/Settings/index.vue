@@ -295,8 +295,8 @@
                 this.$notify({
                   group: 'foo',
                   type: 'info',
-                  title: 'Organization',
-                  text: 'The organization has been updated Successfully!',
+                  title: 'success',
+                  text: 'The organization has been updated successfully!',
                   position: 'top right'
                 })
               }).catch(error => {

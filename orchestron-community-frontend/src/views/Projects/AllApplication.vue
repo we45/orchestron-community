@@ -546,8 +546,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'Application',
-                text: 'The application has been updated Successfully!',
+                title: 'success',
+                text: 'The application has been updated successfully!',
                 position: 'top right'
               })
             }).catch(error => {
@@ -618,9 +618,9 @@ export default {
                 this.$router.go('/all_applications/')
                 this.$notify({
                   group: 'foo',
-                  type: 'error',
-                  title: 'Application',
-                  text: 'The aplication has been deleted Successfully!',
+                  type: 'info',
+                  title: 'success',
+                  text: 'The aplication has been deleted successfully!',
                   position: 'top right'
                 })
               }).catch(error => {
