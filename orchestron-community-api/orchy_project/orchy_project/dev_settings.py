@@ -215,7 +215,7 @@ MINIO = {
     'bucket_name':os.environ.get('MINIO_BUCKET_NAME'),
     'access_key':os.environ.get('MINIO_ACCESS_KEY'),
     'secret_key':os.environ.get('MINIO_SECRET_KEY'),
-    'url': '{0}'.format(minio_url, minio_port)
+    'url': '{0}:{1}'.format(minio_url, minio_port)
 }
 
 
