@@ -853,8 +853,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Project',
-                text: 'The project has been created Successfully!',
+                title: 'success',
+                text: 'The project has been created successfully!',
                 position: 'top right'
               })
             }).catch(error => {
@@ -866,8 +866,8 @@
                       this.$notify({
                         group: 'foo',
                         type: 'success',
-                        title: 'Project',
-                        text: 'The project has been updated Successfully!',
+                        title: 'success',
+                        text: 'The project has been updated successfully!',
                         position: 'top right'
                       })
                     })
@@ -953,8 +953,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Application',
-                text: 'The file  has been uploaded Successfully!',
+                title: 'success',
+                text: 'The file  has been uploaded successfully!',
                 position: 'top right'
               })
               this.uploadFile = ''
@@ -1034,8 +1034,8 @@
                       this.$notify({
                         group: 'foo',
                         type: 'success',
-                        title: 'Application',
-                        text: 'The Manual Vulnerability has been created Successfully!',
+                        title: 'success',
+                        text: 'The manual vulnerability has been created successfully!',
                         position: 'top right'
                       })
                       this.isLoading = false

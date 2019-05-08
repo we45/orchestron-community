@@ -428,8 +428,8 @@ export default {
           this.$notify({
             group: 'foo',
             type: 'info',
-            title: 'Vulnerability',
-            text: 'The Vulnerability has been updated Successfully!',
+            title: 'success',
+            text: 'The vulnerability has been updated successfully!',
             position: 'top right'
           })
           this.$router.go()

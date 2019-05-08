@@ -333,6 +333,14 @@
       }
     },
     validations: {
+      appUrl:{
+        required,
+        url
+      },
+      appUpdateUrl:{
+        required,
+        url
+      },
       appName: {
         required,
         minLength: minLength(1)
@@ -556,8 +564,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Application',
-                text: 'The Application has been created Successfully!',
+                title: 'success',
+                text: 'The application has been created successfully!',
                 position: 'top right'
               })
               this.isClicked = false
@@ -571,8 +579,8 @@
                   this.$notify({
                     group: 'foo',
                     type: 'error',
-                    title: 'Error In Creation of Application',
-                    text: 'Application with this Name exists',
+                    title: 'error',
+                    text: 'Error in creation of application',
                     position: 'top right'
                 })
               }
@@ -710,7 +718,7 @@
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'Application',
+                title: 'success',
                 text: 'The application has been updated Successfully!',
                 position: 'top right'
               })
@@ -723,8 +731,8 @@
                   this.$notify({
                     group: 'foo',
                     type: 'error',
-                    title: 'Error In Update of Application',
-                    text: 'Application with this Name exists',
+                    title: 'error',
+                    text: 'Error in updation of application',
                     position: 'top right'
                 })
               }
@@ -764,9 +772,9 @@
               this.$router.push('/projects/individual_project/' + this.projectId)
               this.$notify({
                 group: 'foo',
-                type: 'error',
-                title: 'Application',
-                text: 'The aplication has been deleted Successfully!',
+                type: 'info',
+                title: 'success',
+                text: 'The aplication has been deleted successfully!',
                 position: 'top right'
               })
               this.reloadPage = false

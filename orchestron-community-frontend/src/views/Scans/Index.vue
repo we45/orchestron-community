@@ -438,8 +438,8 @@
                     this.$notify({
                       group: 'foo',
                       type: 'success',
-                      title: 'Application',
-                      text: 'The Manual Vulnerability has been created Successfully!',
+                      title: 'success',
+                      text: 'The manual vulnerability has been created successfully!',
                       position: 'top right'
                     })
                   }).catch(error => {

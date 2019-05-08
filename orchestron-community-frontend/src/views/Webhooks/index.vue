@@ -406,7 +406,7 @@
                 group: 'foo',
                 type: 'success',
                 title: 'Webhook',
-                text: 'The Webhook has been created Successfully!',
+                text: 'The webhook has been created successfully!',
                 position: 'top right'
               })
             }).catch(error => {
@@ -503,7 +503,7 @@
                 group: 'foo',
                 type: 'info',
                 title: 'Webhook',
-                text: 'The Webhook has been updated Successfully!',
+                text: 'The webhook has been updated successfully!',
                 position: 'top right'
               })
               this.webhookId = ''
@@ -539,7 +539,7 @@
                 group: 'foo',
                 type: 'error',
                 title: 'Webhook',
-                text: 'The webhook has been deleted Successfully!',
+                text: 'The webhook has been deleted successfully!',
                 position: 'top right'
               })
               this.webhookId = ''
