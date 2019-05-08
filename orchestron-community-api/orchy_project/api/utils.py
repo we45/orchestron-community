@@ -14,10 +14,20 @@ from functools import reduce
 from parsers.exceptions import MalFormedXMLException
 from api.orl import get_open_vul_info_from_api
 from django.forms.models import model_to_dict
-from django.contrib.sites.models import Site
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
 import codecs
+import socket
+
+def get_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return '127.0.0.1'
 
 
 def draw_thumnail(text, temp_file):
@@ -114,8 +124,7 @@ def get_single_vul_context(vuls):
 
 
 def get_request_response(evidences):
-    current_site = Site.objects.get_current()
-    domain = current_site.domain
+    domain = 'http://{0}'.format(get_ip())
     if not domain.startswith("http://") or not domain.startswith("https://"):
         domain = 'http://{0}'.format(domain)
     context = {}
@@ -140,8 +149,7 @@ def get_request_response(evidences):
 
 def get_closed_vul_context(vuls):
     context = {}
-    current_site = Site.objects.get_current()
-    domain = current_site.domain
+    domain = 'http://{0}'.format(get_ip())
     if not domain.startswith("http://") or not domain.startswith("https://"):
         domain = 'http://{0}'.format(domain)
     for v in vuls:
@@ -185,7 +193,7 @@ def get_closed_vul_context(vuls):
             if context[cwe]['evidences'].get(evidence.url) is None:
                 context[cwe]['evidences'][evidence.url] = set()
             context[cwe]['evidences'][evidence.url].add(evidence.param)
-        remediation = v.vulnerabilityremediation_set.last()
+        remediation = v.vulnerabilityremediation_set
         if remediation:
             user = User.objects.filter(id=remediation.remediated_by).last()
             if user:

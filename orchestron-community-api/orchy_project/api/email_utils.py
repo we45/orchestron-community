@@ -7,6 +7,17 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template import loader
 from api.ciphertext_manager import EmailCipher
 from api.app_log import *
+import socket
+
+def get_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return '127.0.0.1'
 
 
 def test_email_connection(host,port,username,password,certs,from_email):
@@ -69,9 +80,8 @@ def send_email_to_users(user, domain_override, email_template_name,use_https, to
         if not user.email:
             raise ValueError('Email address is required to send an email')
         if not domain_override:
-            current_site = Site.objects.get_current()
-            site_name = current_site.name
-            domain = current_site.domain
+            domain = 'http://{0}'.format(get_ip())
+            site_name = 'http://{0}'.format(get_ip())
         else:
             site_name = domain = domain_override
         t = loader.get_template(email_template_name)
@@ -97,10 +107,9 @@ def send_email_to_users(user, domain_override, email_template_name,use_https, to
         if not user.email:
             error_debug_log(user=user,event='Email address is not provided',status='failure')
             raise ValueError('Email address is required to send an email')
-        if not domain_override:
-            current_site = Site.objects.get_current()
-            site_name = current_site.name
-            domain = current_site.domain
+        if not domain_override:                        
+            domain = 'http://{0}'.format(get_ip())
+            site_name = 'http://{0}'.format(get_ip())
         else:
             site_name = domain = domain_override
         t = loader.get_template(email_template_name)

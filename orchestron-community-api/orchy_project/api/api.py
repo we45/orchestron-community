@@ -28,7 +28,9 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
-    JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer
+    JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer,\
+    DjangoSiteSerializer
+from django.contrib.sites.models import Site    
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
@@ -57,6 +59,11 @@ from api.orchy_logger import log
 from api.stats import StatView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import binascii
+from api.utils import get_ip
+
+class IPAdressView(APIView):
+    def get(self, request):
+        return Response({'ip':get_ip()})
 
 class TokenRenewView(APIView):
     def get(self, request):
@@ -83,15 +90,19 @@ class GetTokenView(APIView):
     def get(self, request):
         try:
             try:
-                token = AccessToken.objects.get(user=request.user)
+                token = AccessToken.objects.get(user=request.user)                
+            except AccessToken.DoesNotExist:
                 data_dict = {
-                    'access_key':token.access_key,
-                    'secret_key':token.secret_key
+                    'access_key':binascii.hexlify(os.urandom(20)).decode(),
+                    'secret_key':binascii.hexlify(os.urandom(20)).decode(),
+                    'user':request.user
                 }
-                # info_log('User `{0}` fetched the access token'.format(request.user.email),request)
-                return Response(data_dict)
-            except:
-                raise Unauthorized
+                token = AccessToken.objects.create(**data_dict) 
+            data_dict = {
+                'access_key':token.access_key,
+                'secret_key':token.secret_key
+            }                
+            return Response(data_dict)
         except BaseException as e:
             log_exception(e)
             return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -710,6 +721,18 @@ class OrganizationView(BaseView):
         if users:
             context.update(self.get_users(obj))
         return Response(context)
+
+
+class DjangoSiteChangeView(BaseView):
+    serializer_class = DjangoSiteSerializer    
+    model_class = Site
+
+    def get_queryset(self, pk=None):
+        if pk:
+            object_list = self.model_class.objects.get(pk=pk)
+        else:
+            object_list = self.model_class.objects.all()
+        return object_list
 
 
 class OrganizationConfigurationView(BaseView):

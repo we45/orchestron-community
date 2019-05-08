@@ -31,7 +31,7 @@ def parse_bandit(json_file,user_name,init_es):
 				code = r.get('code','')
 				line_num = r.get('line_number','')
 				evid_desc = "File :{0}, Line :{1}".format(filename,line_num)
-				new_vuls[(r.get('issue_text','Unknown'),r.get('issue_severity','LOW'))].append(
+				new_vuls[(r.get('test_name','Unknown'),r.get('issue_severity','LOW'))].append(
 					{
 						'url':filename,
 						'name':evid_desc,

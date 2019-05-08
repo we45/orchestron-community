@@ -10,7 +10,8 @@ from api.api import OrganizationView, ProjectView, ApplicationView, ScanView, En
     OptionsListView, ParserView, JiraConnectionTestView, \
     ORLConfigView, ScanResultView, JiraProjectsView, JIRAListView, \
     ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView, ExecutiveReportView,\
-    CategorizeVulnerability, TokenRenewView, GetTokenView
+    CategorizeVulnerability, TokenRenewView, GetTokenView, DjangoSiteChangeView, \
+    IPAdressView
 from rest_framework_jwt.views import obtain_jwt_token
 from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, ApplicationAnalyticsView, \
     EngagementAnalyticsView, ScanAnalyticsView, VulnerabilityAnalyticsView
@@ -18,8 +19,13 @@ from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, Appli
 
 
 urlpatterns = [
+    re_path(r'^api/get/ip/$', IPAdressView.as_view()),    
+
+    re_path(r'^api/site/$', DjangoSiteChangeView.as_view({'get':'list', 'put':'create'}),name='sitechange'),
+    re_path(r'^api/site/(?P<pk>\d+)/$', DjangoSiteChangeView.as_view({'post':'update', 'delete':'destroy'}),name='siteupdate'),
+    
     re_path(r'^api/renew/token/$', TokenRenewView.as_view()),
-    re_path(r'^api/get/token/$', GetTokenView.as_view()),
+    re_path(r'^api/get/token/$', GetTokenView.as_view()),    
     re_path(r'^media/(?P<path>.*)$', MediaServeView.as_view()),
     re_path(r'^api/user/password/change/(?P<email>.*)/$', UserUtilityView.as_view({'post':'change_password'})),
     re_path(r'^api/user/token/', obtain_jwt_token),
