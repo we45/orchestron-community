@@ -57,7 +57,7 @@
                     <form @submit.prevent="submitUpdateProject">
                         <input type="hidden" v-model="updateProjectId">
                         <b-row class="my-1">
-                            <b-col sm="2"><label class="label">Name:</label></b-col>
+                            <b-col sm="2"><label class="label">Name: *</label></b-col>
                             <b-col sm="10">
                                 <b-form-input
                                     v-model="updateProjectName"

@@ -534,6 +534,7 @@ export default {
         this.userData = []
         this.fetchData()
         this.isLoading = false
+        this.reloadPage = false
       }
     })
   },
@@ -671,6 +672,7 @@ export default {
             if (res.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
+              this.reloadPage = true
               this.$router.push('/settings/individual_org/' + this.param + '/')
               this.$notify({
                 group: 'foo',
