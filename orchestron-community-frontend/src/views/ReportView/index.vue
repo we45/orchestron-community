@@ -35,6 +35,7 @@
                   placeholder="Filter"
                   style="font-family: Avenir;"
                   @input="reportFilters"
+                  @change="reportFilters"
                   ></v-select>
           </b-col>
         </b-row>
