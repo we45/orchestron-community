@@ -21,7 +21,7 @@
                                     </b-col>
                                 </b-row>
                             </b-col>
-                            <b-col cols="6">
+                       <!--      <b-col cols="6">
                             <b-row>
                                     <b-col sm="6"><label class="label">Enable Email:</label></b-col>
                                     <b-col sm="6">
@@ -31,7 +31,7 @@
                                     </b-col>
                                 </b-row>
                             </b-col>
-
+ -->
                           <b-col>
                             <br>
                             <div class="pull-right" style="float: right">
@@ -49,7 +49,7 @@
                 </b-row>
             </b-container>
             <br>
-            <b-container fluid style="background-color: #FFFFFF;">
+            <!-- <b-container fluid style="background-color: #FFFFFF;">
                 <br>
                 <p class="title">Manage Users</p>
                 <hr>
@@ -69,7 +69,6 @@
                     </b-tab>
                 </b-tabs>
                 <br>
-                <!--User Create-->
                 <b-modal
                     ref="userCreateModal"
                     title="Create User"
@@ -124,7 +123,6 @@
                         </div>
                     </b-col>
                 </b-modal>
-                <!--UserUpdate-->
                 <b-modal
                     ref="userUpdateModal"
                     title="Update User"
@@ -179,7 +177,6 @@
                         </div>
                     </b-col>
                 </b-modal>
-                <!--Delete User-->
                 <b-modal ref="deleteUserModal" title="Delete User" centered size="lg">
                     <div>
                         <form @submit.prevent="deleteSubmitUser">
@@ -198,7 +195,7 @@
                         </div>
                     </b-col>
                 </b-modal>
-            </b-container>
+            </b-container> -->
             <br>
             <b-container fluid style="background-color: #FFFFFF;" v-if="enableJira || enableEmail">
                 <br>
@@ -271,7 +268,7 @@
                         </div>
                         <br>
                     </b-tab>
-                    <b-tab title="Email" small v-if="enableEmail">
+                    <!-- <b-tab title="Email" small v-if="enableEmail">
                         <b-row>
                             <b-col cols="12">
                                 <b-col cols="4">
@@ -371,7 +368,7 @@
                                 </div>
                             </b-col>
                         </div>
-                    </b-tab>
+                    </b-tab> -->
                 </b-tabs>
                 <br>
             </b-container>
