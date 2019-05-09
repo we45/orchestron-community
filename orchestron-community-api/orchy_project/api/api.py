@@ -63,7 +63,7 @@ from api.utils import get_ip
 
 class IPAdressView(APIView):
     def get(self, request):
-        return Response({'ip':get_ip()})
+        return Response({'ip':request.get_host()})
 
 class TokenRenewView(APIView):
     def get(self, request):
@@ -1493,7 +1493,7 @@ class ClosedVulnerabilityView(viewsets.ViewSet):
 
     def retrieve(self, request, app_name, vul_name, cwe):
         vuls = self.get_vuls(request.user,app_name, vul_name, cwe)
-        context = get_closed_vul_context(vuls)
+        context = get_closed_vul_context(request.get_host(),vuls)
         return Response(context, status=status.HTTP_200_OK)
 
 
@@ -1521,7 +1521,7 @@ class RequestResponseView(viewsets.ViewSet):
         evidences = VulnerabilityEvidence.objects.filter(vul__in=vuls,url=url).exclude(**exclude_kwargs)
         if not evidences.exists():
             raise QueryMisMatchError
-        context = get_request_response(evidences)
+        context = get_request_response(request.get_host(),evidences)
         return Response(context, status=status.HTTP_200_OK)
 
 

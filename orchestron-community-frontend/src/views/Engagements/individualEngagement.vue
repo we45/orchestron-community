@@ -155,7 +155,6 @@
                 var mediumAgeingSevCount = []
                 var lowAgeingSevCount = []
                 var infoAgeingSevCount = []
-                console.log("res.data", res.data.ageing['ageing'])
                 for (const [key, value] of Object.entries(res.data.ageing['ageing'])) {
                   for (const [keys, values] of Object.entries(value)) {
                   this.ageingCategory.push(keys)
@@ -272,8 +271,8 @@
                 this.$notify({
                   group: 'foo',
                   type: 'success',
-                  title: 'Engagement',
-                  text: 'The scans has been included Successfully!',
+                  title: 'success',
+                  text: 'The scans has been included successfully!',
                   position: 'top right'
                 })
                 this.isLoading = false

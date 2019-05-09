@@ -258,7 +258,7 @@ export default {
             this.severityChartData = []
             this.appData = []
             this.grade = res.data.avg_ageing
-            console.log("un unCategorised", res.data.uncategorized)
+            
             this.unCategorisedCount = res.data.uncategorized
 
             this.severityChartData.push(
@@ -305,7 +305,7 @@ export default {
             // for (const ageing of res.data.ageing) {
             //   this.vulAgeingData.push(ageing)
             // }
-            console.log("owasp data", res.data.owasp)
+          
             for (const [key, val] of Object.entries(res.data.owasp)) {
                 // this.owaspData.push({
                 //   name: key,
@@ -350,7 +350,7 @@ export default {
             const infoAgeingSevCount = []
             for (const [key, value] of Object.entries(res.data.ageing)) {
                 for (const [keys, values] of Object.entries(value)) {
-                console.log("value", values)
+                
 
                 this.dashboardCategories.push(keys)
                   highAgeingSevCount.push(values[3])

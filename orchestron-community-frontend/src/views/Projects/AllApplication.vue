@@ -398,7 +398,7 @@ export default {
         }
       },
      clickPaginations(event) {
-          console.log("event fired")
+          
           if (event.page) {
             if (event.page > 1) {
                this.applicationCount = this.applicationsList.length
@@ -410,9 +410,9 @@ export default {
                 // this.isDataLoading = false
               // this.isDataLoading = true
               //   var page_no = event.page
-              //   console.log("33333", event.page)
+              
               //   this.paginatedapplicationsList = this.applicationsList.slice(5*(page_no-1), 5*(page_no))
-              //   console.log("paginatedapplicationsList", this.paginatedapplicationsList)
+            
               //   this.data_showing =  this.paginatedapplicationsList
               //   this.isLoading = true
               //   this.isDataLoading = true
@@ -448,7 +448,7 @@ export default {
           //   })
           await axios.get('/applications/' + event.id + '/')
             .then(res => {
-              console.log("update app", res.data)
+              
               this.appUpdateIpv4 = res.data.ipv4
               this.appUpdatePlatformTags = res.data.platform_tags
               this.projectId = res.data.project
@@ -546,8 +546,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'Application',
-                text: 'The application has been updated Successfully!',
+                title: 'success',
+                text: 'The application has been updated successfully!',
                 position: 'top right'
               })
             }).catch(error => {
@@ -618,9 +618,9 @@ export default {
                 this.$router.go('/all_applications/')
                 this.$notify({
                   group: 'foo',
-                  type: 'error',
-                  title: 'Application',
-                  text: 'The aplication has been deleted Successfully!',
+                  type: 'info',
+                  title: 'success',
+                  text: 'The aplication has been deleted successfully!',
                   position: 'top right'
                 })
               }).catch(error => {

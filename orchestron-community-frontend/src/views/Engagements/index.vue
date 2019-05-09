@@ -335,7 +335,7 @@
 
         this.$nextTick(() => {
           this.engagementList = this.engagementPagnatedList
-          // console.log(this)
+          
         })
         this.isPaginated = false
       }
@@ -487,8 +487,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Engagement',
-                text: 'The Engagement has been created Successfully!',
+                title: 'success',
+                text: 'The engagement has been created successfully!',
                 position: 'top right'
               })
               this.$router.go()
@@ -608,8 +608,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'Engagement',
-                text: 'The Engagement has been updated Successfully!',
+                title: 'success',
+                text: 'The engagement has been updated successfully!',
                 position: 'top right'
               })
               this.$router.go()
@@ -688,9 +688,9 @@
               this.isLoading = true
               this.$notify({
                 group: 'foo',
-                type: 'error',
-                title: 'Engagement',
-                text: 'The engagement has been deleted Successfully!',
+                type: 'success',
+                title: 'success',
+                text: 'The engagement has been deleted successfully!',
                 position: 'top right'
               })
               this.$router.go()

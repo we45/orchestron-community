@@ -13,7 +13,7 @@
           <b-container v-if="showConfig" fluid style="background-color: #FFFFFF;">
             <br>
                <b-row class="my-1">
-                  <b-col sm="2"><label class="label">JIRA Project:</label></b-col>
+                  <b-col sm="2"><label class="label">* JIRA Project :</label></b-col>
                   <b-col sm="10">
                     <v-select v-model="appJiraProject" :options="appJiraProjectOptions" placeholder="Select JIRA Project"></v-select>
                   </b-col>
@@ -42,7 +42,7 @@
 
             <b-container fluid>
                 <b-row style="background-color: #FFFFFF;">
-                    <b-col cols="6">
+                    <b-col cols="6" v-if="highCount > 0 || mediumCount > 0 || lowCount > 0 || infoCount > 0">
                         <donut-chart
                             :chartData="chartData"
                             :title="title"
@@ -54,8 +54,7 @@
                     <!-- <b-col cols="6">
                         <app-bar-chart :barChartData="appSevData" :barChartTitle="'Application-wise Vulnerabilities'"></app-bar-chart>
                     </b-col> -->
-
-                     <b-col cols="6">
+                     <b-col cols="6" >
                         <template v-if="basicBarDashboardChartData.length > 0">
                             <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
                                                     :chartCategories="dashboardCategories"
@@ -84,7 +83,7 @@
                             <br>
                             <form @submit.prevent="submitUploadResult">
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Tool:</label></b-col>
+                                    <b-col sm="2"><label class="label">Tool: *</label></b-col>
                                     <b-col sm="10">
                                         <v-select :options="toolOption"
                                             placeholder="Select Tool"
@@ -94,7 +93,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Name: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-input
                                             v-model="uploadName"
@@ -105,7 +104,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Upload File:</label></b-col>
+                                    <b-col sm="2"><label class="label">Upload File: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-file
                                             v-model="uploadFile"
@@ -139,7 +138,7 @@
                             <br>
                             <form v-if="manualStepOne">
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Scan Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Scan Name: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualScanName"
@@ -150,7 +149,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Vulnerability Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Vulnerability Name: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualVulName"
@@ -161,18 +160,18 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">CWE:</label></b-col>
+                                    <b-col sm="2"><label class="label">CWE: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualCwe"
-                                            type="text"
+                                            type="number"
                                             class="inline-form-control"
                                             placeholder="Enter CWE" :state="!$v.manualCwe.$invalid"></b-form-input>
                                     </b-col>
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Severity:</label></b-col>
+                                    <b-col sm="2"><label class="label">Severity: *</label></b-col>
                                     <b-col sm="10">
                                       <v-select
                                         :options="manualSeverityList"
@@ -182,7 +181,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">OWASP:</label></b-col>
+                                    <b-col sm="2"><label class="label">OWASP: *</label></b-col>
                                     <b-col sm="10">
                                       <v-select
                                         :options="manualOwaspList"
@@ -206,7 +205,7 @@
                             <form v-if="manualStepTwo">
                               <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Description:</label></b-col>
+                                    <b-col sm="2"><label class="label">Description: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulDesc"
@@ -219,7 +218,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Remediation:</label></b-col>
+                                    <b-col sm="2"><label class="label">Remediation: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulRemedy"
@@ -249,7 +248,7 @@
                             <form v-if="manualStepThree">
                               <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">URL:</label></b-col>
+                                    <b-col sm="2"><label class="label">URL: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulUrl"
@@ -260,7 +259,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Parameter:</label></b-col>
+                                    <b-col sm="2"><label class="label">Parameter: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulParam"
@@ -271,7 +270,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Description:</label></b-col>
+                                    <b-col sm="2"><label class="label">Description: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulUrlDesc"
@@ -284,7 +283,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">File:</label></b-col>
+                                    <b-col sm="2"><label class="label">File: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-file
                                             v-model="manualVulUrlFile"
@@ -464,7 +463,7 @@
         uploadTool: '',
         manualScanName: '',
         manualVulName: '',
-        curlCmd_secret_access_key : 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + 'http://127.0.0.1:8000' + '/api/webhooks/post/',
+        curlCmd_secret_access_key : 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/',
         manualCwe: '',
         manualSeverityList: [
           { label: 'High', value: 3 },
@@ -504,6 +503,7 @@
         showConfig: false,
         appJiraProject: '',
         appJiraProjectOptions: null,
+        ipWebhook: '',
         webhookId : '',
         api_site_url: '',
         userToken: '',
@@ -600,14 +600,26 @@
           this.infoCount = 0
           this.appSevData = []
           this.chartData = []
+          this.basicBarDashboardChartData = []
           this.fetchData()
           this.isLoading = false
         }
       })
     },
     methods: {
+      getIP(){
+         axios.get('/get/ip/').then(res => {
+           this.ipWebhook = res.data.ip
+           this.curlCmd_secret_access_key = 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + 'http://'+this.ipWebhook + '/api/webhooks/post/'
+          }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+              this.$router.push('/')
+            }
+          })
+      },
       copyWebhook() {
         this.$refs.copyWebhookModal.show()
+        this.getIP()
         this.userToken = localStorage.getItem('token')
       },
       fetchSecretKeys() {
@@ -853,8 +865,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Project',
-                text: 'The project has been created Successfully!',
+                title: 'success',
+                text: 'The project has been created successfully!',
                 position: 'top right'
               })
             }).catch(error => {
@@ -866,8 +878,8 @@
                       this.$notify({
                         group: 'foo',
                         type: 'success',
-                        title: 'Project',
-                        text: 'The project has been updated Successfully!',
+                        title: 'success',
+                        text: 'The project has been updated successfully!',
                         position: 'top right'
                       })
                     })
@@ -921,6 +933,8 @@
               this.isLoading = true
               this.$refs.deleteScanModal.hide()
               this.$router.push('/projects/individual_application/' + this.param)
+              this.isLoading = true
+              this.reloadPage = true
             }).catch(error => {
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -951,8 +965,8 @@
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Application',
-                text: 'The file  has been uploaded Successfully!',
+                title: 'success',
+                text: 'The file  has been uploaded successfully!',
                 position: 'top right'
               })
               this.uploadFile = ''
@@ -1032,8 +1046,8 @@
                       this.$notify({
                         group: 'foo',
                         type: 'success',
-                        title: 'Application',
-                        text: 'The Manual Vulnerability has been created Successfully!',
+                        title: 'success',
+                        text: 'The manual vulnerability has been created successfully!',
                         position: 'top right'
                       })
                       this.isLoading = false

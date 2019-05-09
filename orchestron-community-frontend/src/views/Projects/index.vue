@@ -57,7 +57,7 @@
                     <form @submit.prevent="submitUpdateProject">
                         <input type="hidden" v-model="updateProjectId">
                         <b-row class="my-1">
-                            <b-col sm="2"><label class="label">Name:</label></b-col>
+                            <b-col sm="2"><label class="label">Name: *</label></b-col>
                             <b-col sm="10">
                                 <b-form-input
                                     v-model="updateProjectName"
@@ -276,8 +276,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'success',
-                title: 'Project',
-                text: 'The project has been created Successfully!',
+                title: 'success',
+                text: 'The project has been created successfully!',
                 position: 'top right'
               })
               this.projectLogo = ''
@@ -288,8 +288,8 @@ export default {
                   this.$notify({
                     group: 'foo',
                     type: 'error',
-                    title: 'Error In Creation of Project',
-                    text: 'Project with this Name exists',
+                    title: 'error',
+                    text: 'Error in creation of project',
                     position: 'top right'
                 })
               }
@@ -369,8 +369,8 @@ export default {
               this.$notify({
                 group: 'foo',
                 type: 'info',
-                title: 'Project',
-                text: 'The project has been updated Successfully!',
+                title: 'success',
+                text: 'Project updated successfully!',
                 position: 'top right'
               })
               this.updateProjectName = ''
@@ -383,8 +383,8 @@ export default {
                   this.$notify({
                     group: 'foo',
                     type: 'error',
-                    title: 'Error In Update of Project',
-                    text: 'Project with this Name exists',
+                    title: 'error',
+                    text: 'Error in updation of project',
                     position: 'top right'
                 })
               }
@@ -441,9 +441,9 @@ export default {
               this.$router.push('/projects/')
               this.$notify({
                 group: 'foo',
-                type: 'error',
-                title: 'Project',
-                text: 'The project has been deleted Successfully!',
+                type: 'info',
+                title: 'success',
+                text: 'The project has been deleted successfully!',
                 position: 'top right'
               })
               this.deleteProjectId = ''

@@ -33,7 +33,7 @@
                     <br>
                             <form v-if="manualStepOne">
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Vulnerability Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Vulnerability Name: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualVulName"
@@ -44,18 +44,18 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">CWE:</label></b-col>
+                                    <b-col sm="2"><label class="label">CWE: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualCwe"
-                                            type="text"
+                                            type="number"
                                             class="inline-form-control"
                                             placeholder="Enter CWE" :state="!$v.manualCwe.$invalid"></b-form-input>
                                     </b-col>
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Severity:</label></b-col>
+                                    <b-col sm="2"><label class="label">Severity: *</label></b-col>
                                     <b-col sm="10">
                                       <v-select
                                         :options="manualSeverityList"
@@ -65,7 +65,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">OWASP:</label></b-col>
+                                    <b-col sm="2"><label class="label">OWASP: *</label></b-col>
                                     <b-col sm="10">
                                       <v-select
                                         :options="manualOwaspList"
@@ -89,7 +89,7 @@
                             <form v-if="manualStepTwo">
                               <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Description:</label></b-col>
+                                    <b-col sm="2"><label class="label">Description: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulDesc"
@@ -102,7 +102,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Remediation:</label></b-col>
+                                    <b-col sm="2"><label class="label">Remediation: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulRemedy"
@@ -132,7 +132,7 @@
                             <form v-if="manualStepThree">
                               <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">URL:</label></b-col>
+                                    <b-col sm="2"><label class="label">URL: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulUrl"
@@ -143,7 +143,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Parameter:</label></b-col>
+                                    <b-col sm="2"><label class="label">Parameter: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulParam"
@@ -154,7 +154,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Description:</label></b-col>
+                                    <b-col sm="2"><label class="label">Description: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulUrlDesc"
@@ -167,7 +167,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">File:</label></b-col>
+                                    <b-col sm="2"><label class="label">File: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-file
                                             v-model="manualVulUrlFile"
@@ -195,7 +195,7 @@
                 </div>
                 <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
-                        <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateProject() "> Close</button>
+                        <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateScan() "> Close</button>
                         <!--<button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" submitAddVulnerabilities() " v-if="!$v.projectName.$invalid && !$v.projectLogo.$invalid">-->
                         <!--Submit-->
                         <!--</button>-->
@@ -381,6 +381,9 @@
             this.$router.push('/')
           }
         },
+        closeCreateScan(){
+          this.$refs.addVulnerabilityModal.hide()
+        },
         addVulnerabilities() {
           this.$refs.addVulnerabilityModal.show()
           this.manualStepOne = true
@@ -438,8 +441,8 @@
                     this.$notify({
                       group: 'foo',
                       type: 'success',
-                      title: 'Application',
-                      text: 'The Manual Vulnerability has been created Successfully!',
+                      title: 'success',
+                      text: 'The manual vulnerability has been created successfully!',
                       position: 'top right'
                     })
                   }).catch(error => {
