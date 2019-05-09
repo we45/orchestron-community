@@ -98,7 +98,6 @@ export default {
             localStorage.removeItem('breadCum')
           }
         }).catch(error => {
-          console.log('error',error.response.data)
           localStorage.removeItem('username')
           localStorage.removeItem('token')
           localStorage.removeItem('superuser')

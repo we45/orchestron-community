@@ -83,6 +83,7 @@
         if (this.org && this.token) {
           axios.get('/vulnerabilities/' + this.vulId + '/')
             .then(res => {
+             
               this.sev = res.data.severity
               this.vulName = res.data.name
               let tools = []

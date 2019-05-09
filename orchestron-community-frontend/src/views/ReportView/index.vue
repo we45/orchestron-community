@@ -481,14 +481,14 @@ import Loading from 'vue-loading-overlay'
               this.excutiveMediumCount = this.excutivedata.severity[2] | 0
               this.excutiveLowCount = this.excutivedata.severity[1] | 0
               this.excutiveInfoCount = this.excutivedata.severity[0] | 0
-              console.log("res data", res.data.owasp)
+              
               this.excutiveVulDataItems = []
               for (var vuls of res.data.open_vuls) {
                 const vulName = vuls.common_name
                 const vulSev = vuls.severity
                 const vulApps = vuls.apps
                 const cwe = parseInt(vuls.cwe)
-                // console.log("vulname", vulName)
+              
                  this.excutiveVulDataItems.push(
                     {
                       vulnerability: vuls.common_name,
@@ -512,9 +512,9 @@ import Loading from 'vue-loading-overlay'
               const mediumAgeingSevCount = []
               const lowAgeingSevCount = []
               const infoAgeingSevCount = []
-              console.log("hereeee",res.data.ageing)
+              
               for (const [key, value] of Object.entries(res.data.ageing)) {
-                  console.log("keysssssss", key)
+                 
                 for (const [keys, values] of Object.entries(value)) {
                   this.excutiveVulAgeingCategories.push(keys)
                   highAgeingSevCount.push(values[3])
@@ -593,9 +593,9 @@ import Loading from 'vue-loading-overlay'
               const mediumSevCount = []
               const lowSevCount = []
               const infoSevCount = []
-              console.log("heree")
+             
               for (const [key, value] of Object.entries(res.data.owasp)) {
-                // console.log("owasppp", key)
+                
                 this.excutiveOWASPCategory.push(key)
                 highSevCount.push(value[3])
                 mediumSevCount.push(value[2])
@@ -677,7 +677,7 @@ import Loading from 'vue-loading-overlay'
         else{
            axios.post('/report/executive/', this.data_values_selected)
             .then(res => {
-              // console.log("hereeeeeee")
+          
               this.excutiveNoPages = res.data.open_vul_count
               this.excutivedata = []
               this.excutivedata = res.data
@@ -696,14 +696,14 @@ import Loading from 'vue-loading-overlay'
               this.excutiveMediumCount = this.excutivedata.severity[2] | 0
               this.excutiveLowCount = this.excutivedata.severity[1] | 0
               this.excutiveInfoCount = this.excutivedata.severity[0] | 0
-              console.log("res data", res.data.owasp)
+             
               this.excutiveVulDataItems = []
               for (var vuls of res.data.open_vuls) {
                 const vulName = vuls.common_name
                 const vulSev = vuls.severity
                 const vulApps = vuls.apps
                 const cwe = parseInt(vuls.cwe)
-                // console.log("vulname", vulName)
+                
                  this.excutiveVulDataItems.push(
                     {
                       vulnerability: vuls.common_name,
@@ -727,9 +727,9 @@ import Loading from 'vue-loading-overlay'
               const mediumAgeingSevCount = []
               const lowAgeingSevCount = []
               const infoAgeingSevCount = []
-              console.log("hereeee",res.data.ageing)
+            
               for (const [key, value] of Object.entries(res.data.ageing)) {
-                  console.log("keysssssss", key)
+                 
                 for (const [keys, values] of Object.entries(value)) {
                   this.excutiveVulAgeingCategories.push(keys)
                   highAgeingSevCount.push(values[3])
@@ -808,9 +808,9 @@ import Loading from 'vue-loading-overlay'
               const mediumSevCount = []
               const lowSevCount = []
               const infoSevCount = []
-              console.log("heree")
+            
               for (const [key, value] of Object.entries(res.data.owasp)) {
-                // console.log("owasppp", key)
+                
                 this.excutiveOWASPCategory.push(key)
                 highSevCount.push(value[3])
                 mediumSevCount.push(value[2])
@@ -882,7 +882,7 @@ import Loading from 'vue-loading-overlay'
               }
             })
             .catch(error => {
-              console.log("errrr", error)
+              
               if (error.response.data.detail === 'Signature has expired.') {
                 notValidUser()
                 this.$router.push('/')
@@ -893,7 +893,7 @@ import Loading from 'vue-loading-overlay'
     reportFilters(filterValue) {
         // if (filterValue.length > 0) {
           const currentFilter = filterValue[filterValue.length - 1].value
-          // console.log("tooooooooolll", currentFilter)
+          
           if(currentFilter === 'toolFilter'){
           	// window.alert("tool")
           }
@@ -987,7 +987,7 @@ import Loading from 'vue-loading-overlay'
           axios.post('/report/executive/', this.data_values_selected)
             .then(res => {
               this.reloadPage = true
-            	// console.log("hereeeeeee")
+            	
               this.excutiveNoPages = res.data.open_vul_count
               this.excutivedata = []
               this.excutivedata = res.data
@@ -1006,14 +1006,14 @@ import Loading from 'vue-loading-overlay'
               this.excutiveMediumCount = this.excutivedata.severity[2] | 0
               this.excutiveLowCount = this.excutivedata.severity[1] | 0
               this.excutiveInfoCount = this.excutivedata.severity[0] | 0
-              console.log("res data", res.data.owasp)
+              
               this.excutiveVulDataItems = []
               for (var vuls of res.data.open_vuls) {
                 const vulName = vuls.common_name
                 const vulSev = vuls.severity
                 const vulApps = vuls.apps
                 const cwe = parseInt(vuls.cwe)
-                // console.log("vulname", vulName)
+               
                  this.excutiveVulDataItems.push(
                     {
                       vulnerability: vuls.common_name,
@@ -1038,7 +1038,7 @@ import Loading from 'vue-loading-overlay'
               const lowAgeingSevCount = []
               const infoAgeingSevCount = []
               for (const [key, value] of Object.entries(res.data.ageing)) {
-                  // console.log("keysssssss", key)
+                
                 for (const [keys, values] of Object.entries(value)) {
                   this.excutiveVulAgeingCategories.push(keys)
                   highAgeingSevCount.push(values[3])
@@ -1117,9 +1117,9 @@ import Loading from 'vue-loading-overlay'
               const mediumSevCount = []
               const lowSevCount = []
               const infoSevCount = []
-              console.log("heree")
+            
               for (const [key, value] of Object.entries(res.data.owasp)) {
-                // console.log("owasppp", key)
+               
                 this.excutiveOWASPCategory.push(key)
                 highSevCount.push(value[3])
                 mediumSevCount.push(value[2])
@@ -1193,7 +1193,7 @@ import Loading from 'vue-loading-overlay'
             })
             .catch(error => {
               this.reloadPage = false
-            	console.log("errrr", error)
+            	
               if (error.response.data.detail === 'Signature has expired.') {
                 notValidUser()
                 this.$router.push('/')

@@ -1493,7 +1493,7 @@ class ClosedVulnerabilityView(viewsets.ViewSet):
 
     def retrieve(self, request, app_name, vul_name, cwe):
         vuls = self.get_vuls(request.user,app_name, vul_name, cwe)
-        context = get_closed_vul_context(request,get_host(),vuls)
+        context = get_closed_vul_context(request.get_host(),vuls)
         return Response(context, status=status.HTTP_200_OK)
 
 

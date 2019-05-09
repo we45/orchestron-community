@@ -172,7 +172,7 @@
               for (const val of Object.values(res.data.results)) {
                 // const splitVuls = val.names.split(',')
                 const splitVuls = val.names.split('###,')
-                console.log(splitVuls)
+                
                 const cwe = val.cwe
                 const sev = val.severity
                 const openFor = val.open_for
