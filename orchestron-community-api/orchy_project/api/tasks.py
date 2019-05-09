@@ -91,7 +91,6 @@ def raise_jira_ticket(obj,org_id):
                 data_dict = {
                     'project':{'key':project_key },
                     'issuetype':{'name': issuetype},
-                    'priority':{'name': 'Highest'},
                     'summary':vul_name,
                     'description':complete_desc,                
                 }            
