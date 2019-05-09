@@ -13,7 +13,7 @@
           <b-container v-if="showConfig" fluid style="background-color: #FFFFFF;">
             <br>
                <b-row class="my-1">
-                  <b-col sm="2"><label class="label">JIRA Project:</label></b-col>
+                  <b-col sm="2"><label class="label">* JIRA Project :</label></b-col>
                   <b-col sm="10">
                     <v-select v-model="appJiraProject" :options="appJiraProjectOptions" placeholder="Select JIRA Project"></v-select>
                   </b-col>
@@ -83,7 +83,7 @@
                             <br>
                             <form @submit.prevent="submitUploadResult">
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Tool:</label></b-col>
+                                    <b-col sm="2"><label class="label">Tool: *</label></b-col>
                                     <b-col sm="10">
                                         <v-select :options="toolOption"
                                             placeholder="Select Tool"
@@ -93,7 +93,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Name: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-input
                                             v-model="uploadName"
@@ -104,7 +104,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Upload File:</label></b-col>
+                                    <b-col sm="2"><label class="label">Upload File: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-file
                                             v-model="uploadFile"
@@ -138,7 +138,7 @@
                             <br>
                             <form v-if="manualStepOne">
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Scan Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Scan Name: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualScanName"
@@ -149,7 +149,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Vulnerability Name:</label></b-col>
+                                    <b-col sm="2"><label class="label">Vulnerability Name: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualVulName"
@@ -160,18 +160,18 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">CWE:</label></b-col>
+                                    <b-col sm="2"><label class="label">CWE: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-input
                                             v-model="manualCwe"
-                                            type="text"
+                                            type="number"
                                             class="inline-form-control"
                                             placeholder="Enter CWE" :state="!$v.manualCwe.$invalid"></b-form-input>
                                     </b-col>
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Severity:</label></b-col>
+                                    <b-col sm="2"><label class="label">Severity: *</label></b-col>
                                     <b-col sm="10">
                                       <v-select
                                         :options="manualSeverityList"
@@ -181,7 +181,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">OWASP:</label></b-col>
+                                    <b-col sm="2"><label class="label">OWASP: *</label></b-col>
                                     <b-col sm="10">
                                       <v-select
                                         :options="manualOwaspList"
@@ -205,7 +205,7 @@
                             <form v-if="manualStepTwo">
                               <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Description:</label></b-col>
+                                    <b-col sm="2"><label class="label">Description: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulDesc"
@@ -218,7 +218,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Remediation:</label></b-col>
+                                    <b-col sm="2"><label class="label">Remediation: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulRemedy"
@@ -248,7 +248,7 @@
                             <form v-if="manualStepThree">
                               <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">URL:</label></b-col>
+                                    <b-col sm="2"><label class="label">URL: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulUrl"
@@ -259,7 +259,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Parameter:</label></b-col>
+                                    <b-col sm="2"><label class="label">Parameter: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulParam"
@@ -270,7 +270,7 @@
                                 </b-row>
                                 <br>
                                 <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">Description:</label></b-col>
+                                    <b-col sm="2"><label class="label">Description: *</label></b-col>
                                     <b-col sm="10">
                                       <b-form-textarea
                                             v-model="manualVulUrlDesc"
@@ -283,7 +283,7 @@
                                 </b-row>
                                 <br>
                               <b-row class="my-1">
-                                    <b-col sm="2"><label class="label">File:</label></b-col>
+                                    <b-col sm="2"><label class="label">File: *</label></b-col>
                                     <b-col sm="10">
                                         <b-form-file
                                             v-model="manualVulUrlFile"

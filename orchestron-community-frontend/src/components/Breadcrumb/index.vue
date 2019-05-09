@@ -131,7 +131,7 @@ export default {
       }
 
       // if(this.breadCrumbList.length < 1){
-      //   console.log("bread crumb ", this.breadCrumbList)
+      
       //     localStorage.setItem('breadcrumbs', JSON.stringify(this.breadCrumbList))
       // }
 

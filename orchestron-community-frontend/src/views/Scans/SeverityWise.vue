@@ -112,7 +112,7 @@ export default {
         }
         axios.get('/scans/' + this.scanId + '/?severity=' + this.param)
           .then(res => {
-            console.log(this.scanId)
+            
             this.sevData = []
             this.totalVul = 0
             this.totalVul = res.data.vuls.length

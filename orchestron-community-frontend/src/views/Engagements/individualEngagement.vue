@@ -155,7 +155,6 @@
                 var mediumAgeingSevCount = []
                 var lowAgeingSevCount = []
                 var infoAgeingSevCount = []
-                console.log("res.data", res.data.ageing['ageing'])
                 for (const [key, value] of Object.entries(res.data.ageing['ageing'])) {
                   for (const [keys, values] of Object.entries(value)) {
                   this.ageingCategory.push(keys)

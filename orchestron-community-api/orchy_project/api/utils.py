@@ -150,8 +150,6 @@ def get_request_response(host,evidences):
 def get_closed_vul_context(host,vuls):
     context = {}
     domain = 'http://{0}'.format(host)
-    if not domain.startswith("http://") or not domain.startswith("https://"):
-        domain = 'http://{0}'.format(domain)
     for v in vuls:
         cwe = v.cwe
         if context.get(cwe) is None:
@@ -193,7 +191,8 @@ def get_closed_vul_context(host,vuls):
             if context[cwe]['evidences'].get(evidence.url) is None:
                 context[cwe]['evidences'][evidence.url] = set()
             context[cwe]['evidences'][evidence.url].add(evidence.param)
-        remediation = v.vulnerabilityremediation_set
+        remediation = v.vulnerabilityremediation_set.last()
+        # for remediation in remediation_set:
         if remediation:
             user = User.objects.filter(id=remediation.remediated_by).last()
             if user:
