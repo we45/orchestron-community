@@ -111,7 +111,7 @@
                             </b-col>
                             <b-col cols="2" v-if="isUncategorised">
                               <b-badge variant="danger" v-if="cwe_val_multiple===0" pill
-                                       style="cursor: pointer" @click="updateUncategorized(row.item)">Uncategorized
+                                       style="cursor: pointer" @click="updateUncategorized(row.item[0])">Uncategorized
                               </b-badge>
                             </b-col>
                           </b-row>

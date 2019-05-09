@@ -85,7 +85,7 @@
             <template v-if="basicBarDashboardChartData.length > 0">
                 <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
                                         :chartCategories="dashboardCategories"
-                                        :title="'Vulnerabilities Ageing Analysis'"></orchy-stacked-bar-chart>
+                                        :title="'Vulnerabilities by ageing analysis'"></orchy-stacked-bar-chart>
             </template>
         </b-col>
         <!-- <b-col cols="6">
@@ -224,7 +224,7 @@ export default {
       appVulChartTitle: 'Vulnerabilities by application',
       dashboardCategories: [],
       basicBarDashboardChartData: [],
-      taxonomyChartTitle: 'Vulnerability by taxanomy',
+      taxonomyChartTitle: 'Vulnerabilities by taxanomy',
       taxanomyData: [],
       toolVulnerabilityChart: [],
       toolVulChartTitle: 'Vulnerabilities by tool',

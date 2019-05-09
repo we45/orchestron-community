@@ -33,7 +33,7 @@
                 <b-col v-if="closedVul > 0">
                     <center>
                         <br/>
-                        <p class="title">Closed Vulnerabilities</p>
+                        <p class="title">Closed vulnerabilities</p>
                         <br>
                         <router-link :to="closedVulUrl">
                             <p>
@@ -47,7 +47,7 @@
                 <b-col v-else>
                     <center>
                         <br/>
-                        <p class="title">Closed Vulnerabilities</p>
+                        <p class="title">Closed vulnerabilities</p>
                         <br>
                             <p>
                                 <strong class="closed-vul-count">
@@ -60,7 +60,7 @@
                 <b-col v-if="uncategorisedVul > 0">
                     <center>
                         <br/>
-                        <p class="title">Uncategorised Vulnerabilities</p>
+                        <p class="title">Uncategorised vulnerabilities</p>
                         <br>
                         <router-link :to="uncategorisedVulUrl">
                             <p>
@@ -74,7 +74,7 @@
                 <b-col v-else>
                     <center>
                         <br/>
-                        <p class="title">Uncategorised Vulnerabilities</p>
+                        <p class="title">Uncategorised vulnerabilities</p>
                         <br>
                             <p>
                                 <strong class="uncategorised-vul-count">
@@ -87,7 +87,7 @@
                 <b-col>
                     <center>
                         <br/>
-                        <p class="title">Avg Days Vul Open</p>
+                        <p class="title">Average days vulnerabilities open</p>
                         <br>
                         <p class="org-grade-no-data">{{ grade }}</p>
                     </center>

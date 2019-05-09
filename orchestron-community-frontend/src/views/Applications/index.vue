@@ -58,7 +58,7 @@
                         <template v-if="basicBarDashboardChartData.length > 0">
                             <orchy-stacked-bar-chart :chartData="basicBarDashboardChartData"
                                                     :chartCategories="dashboardCategories"
-                                                    :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
+                                                    :title="'Vulnerabilities by ageing analysis'"></orchy-stacked-bar-chart>
                         </template>
                     </b-col>
                 </b-row>

@@ -3,7 +3,7 @@
       <b-container fluid style="background-color: #FFFFFF;">
             <b-col cols="12">
                 <br>
-                <p>List of Vuls</p>
+                <p>List of Vulnerabilities</p>
                 <b-row>
                     <b-col md="6" class="my-1">
                         <b-form-input v-model="filter" placeholder="Type to Search" class="inline-form-control"/>

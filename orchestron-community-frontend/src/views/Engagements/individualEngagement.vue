@@ -19,7 +19,7 @@
                         <!-- <app-bar-chart :barChartData="vulAgeingData" :barChartTitle="'Scans-wise Stats'"></app-bar-chart> -->
                                 <orchy-stacked-bar-chart v-if="ageingChart.length > 0 && ageingCategory.length > 0" :chartData="ageingChart"
                                         :chartCategories="ageingCategory"
-                                        :title="'Vulnerabilities Aging Analysis'"></orchy-stacked-bar-chart>
+                                        :title="'Vulnerabilities by ageing analysis'"></orchy-stacked-bar-chart>
                     </b-col>
                 </b-row>
             </b-container>
