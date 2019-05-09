@@ -222,37 +222,16 @@ MINIO = {
 WEBHOOK_TOOLS = {
     'Orchestron JSON':'json',
     'ZAP':'json,xml',
-    'Burp':'json,xml',
-    'Bandit':'json',
-    'Arachni':'json',
-    'AppSpider':'xml',
-    'Checkmarx':'xml',
-    'w3af':'xml',
-    'OWASP Dependency Checker':'xml',
-    'AppScan - DAST':'xml',
-    'AppScan - SAST':'html',
-    'Xanitizer':'xml',
-    'HP Fortify':'xml',
-    'FindSecBugs':'xml',
-    'Brakeman':'json',
-    'NodeJsScan':'json',
-    'RetireJS': 'json',
-    'NpmAudit':'json',
-    'Safety': 'json',
+    'Burp':'json,xml',    
+    'OWASP Dependency Checker':'xml',    
+    'FindSecBugs':'xml'    
 }
 
 
 HEADER_MAP = {
     'issues':'Burp',
-    'OWASPZAPReport':'ZAP',
-    'w3af-run':'w3af',
-    'VulnSummary':'AppSpider',
-    'xml-report':'AppScan - DAST',
-    'html':'AppScan - SAST',
-    'CxXMLResults':'Checkmarx',
-    'analysis':'OWASP Dependency Checker',
-    'ReportDefinition':'HP Fortify',
-    'XanitizerFindingsList':'Xanitizer',
+    'OWASPZAPReport':'ZAP',    
+    'analysis':'OWASP Dependency Checker',    
     'BugCollection':'FindSecBugs'
 }
 

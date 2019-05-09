@@ -2,25 +2,11 @@ from background_task import background
 import time
 from django.utils import timezone
 from datetime import datetime,timedelta
-from parsers.appspider import parse_appspider
-from parsers.arachni import parse_arachni
 from parsers.burp import parse_burp
-from parsers.bandit import parse_bandit
 from parsers.zap import parse_zap
-from parsers.npm_audit import parse_npm_audit
 from parsers.parse_zap_json import parse_zap_json
-from parsers.appscan import parse_appscan_dast
-from parsers.appscan_sast import parse_appscan_sast
-from parsers.checkmarx import parse_checkmarx
-from parsers.hp_fortify import parse_hp_fortify
-from parsers.xanitizer import parse_xanitizer
 from parsers.findsecbug import parser_findsecbug
-from parsers.brakeman import parse_brakeman
-from parsers.nodejsscan import parse_nodejsscan
-from parsers.retirejs import parse_retirejs
 from parsers.burp_json import parse_burp_json
-from parsers.safety import parse_safety
-from parsers.w3af import W3afParser
 from parsers.owasp_dep_checker import parse_owasp_dep_checker
 from api.models import Scan, WebhookLog, Application, JiraIssueTypes, Vulnerability, \
     VulnerabilityEvidence, JiraUsers, ScanLog
@@ -138,40 +124,11 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
                 if ext == 'json':
                     parse_zap_json(complete_path,user,init_es)
                 elif ext == 'xml':
-                    parse_zap(complete_path,user,init_es)
-            elif tool == 'AppSpider':
-                parse_appspider(complete_path,user,init_es)
-            elif tool == 'Arachni':
-                parse_arachni(complete_path,user,init_es)
-            elif tool == 'Safety':
-                parse_safety(complete_path,user,init_es)
-            elif tool == 'Bandit':
-                parse_bandit(complete_path,user,init_es)
-            elif tool == 'RetireJS':
-                parse_retirejs(complete_path,user,init_es)
-            elif tool == 'NodeJsScan':
-                parse_nodejsscan(complete_path,user,init_es)
-            elif tool == 'Brakeman':
-                parse_brakeman(complete_path,user,init_es)
-            elif tool == 'Checkmarx':
-                parse_checkmarx(complete_path,user,init_es)
-            elif tool == 'AppScan - DAST':
-                parse_appscan_dast(complete_path,user,init_es)
-            elif tool == 'AppScan - SAST':
-                parse_appscan_sast(complete_path,user,init_es)
+                    parse_zap(complete_path,user,init_es)            
             elif tool == 'OWASP Dependency Checker':
-                parse_owasp_dep_checker(complete_path,user,init_es)
-            elif tool == 'w3af':
-                w = W3afParser(complete_path,user,init_es,tool)
-                w.parse_xml()
-            elif tool == "HP Fortify":
-                parse_hp_fortify(complete_path,user,init_es)
-            elif tool == "Xanitizer":
-                parse_xanitizer(complete_path,user,init_es)
+                parse_owasp_dep_checker(complete_path,user,init_es)            
             elif tool == "FindSecBugs":
-                parser_findsecbug(complete_path,user,init_es)
-            elif tool == 'NpmAudit':
-                parse_npm_audit(complete_path,user,init_es)                
+                parser_findsecbug(complete_path,user,init_es)                            
             info_debug_log(ip=user_host,user=user,event='XML Parsing',status='success')
             if hook_log:
                 hook_log.scan_process_event = True
