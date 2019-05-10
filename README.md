@@ -30,19 +30,9 @@ To Get Started with Orchestron , run the following steps
 git clone https://github.com/we45/orchestron-community.git
 
 cd orchestron-community
-```
 
-##### Make the necessary changes in the compose file(docker-compose.yml)
-* **MYSQL_ROOT_PASSWORD**   MySQL Database Password for Root User. If necessary, changes can be made to the docker-compose.yml file and a non-root User can be used instead.
-* **MINIO_ACCESS_KEY**   Minio Access Key should be a minimum of 3 characters in length.
-* **MINIO_SECRET_KEY** Minio Secret Key should be a minimum of 8 characters in length.
-* **ENC_KEY** Encryption Key is used to Encrypt Jira and Email Configuration Parameters.
-* **JWT_SECRET_KEY** JWT Secret Key to Generate JWT tokens.
-
-**Note:** Once you made the necessary changes in the compose file run the below command.
-
-```commandline
 docker-compose up -d
+
 ```
 
 * Browser to [http://localhost](http://localhost)
