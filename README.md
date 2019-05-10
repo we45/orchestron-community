@@ -26,7 +26,7 @@ Orchestron allows you to do the following quite effectively:
 To Get Started with Orchestron , run the following steps
 
 ```commandline
-git cline https://github.com/we45/orchestron-community.git
+git clone https://github.com/we45/orchestron-community.git
 
 cd orchestron-community
 ```
