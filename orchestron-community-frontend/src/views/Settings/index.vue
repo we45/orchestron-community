@@ -125,7 +125,7 @@
           reloadPage: false,
           orgCount: 0,
           orgList: [],
-          headerTitles: 'List of Organizations',
+          headerTitles: 'Organization',
           individualOrgUrl: 'individual_org',
           orgId: '',
           today: new Date(),

@@ -187,7 +187,8 @@
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
                   if (splitVuls.length > 1) {
-                    multipleVuls[vulName] = appName
+                    // multipleVuls[vulName] = appName
+                     multipleVuls[vulName+'!!!###!!!'+appName] = appName
                   }
                 }
                 if (val.common_name === null) {
@@ -273,7 +274,8 @@
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
                   if (splitVuls.length > 1) {
-                    multipleVuls[vulName] = appName
+                    // multipleVuls[vulName] = appName
+                     multipleVuls[vulName+'!!!###!!!'+appName] = appName
                   }
                 }
                 if (val.common_name === null) {
@@ -372,7 +374,8 @@
                       vulName = vulDetail[0]
                       appName = vulDetail[1]
                       if (splitVuls.length > 1) {
-                        multipleVuls[vulName] = appName
+                        // multipleVuls[vulName] = appName
+                         multipleVuls[vulName+'!!!###!!!'+appName] = appName
                       }
                     }
                     if (val.common_name === null) {

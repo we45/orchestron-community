@@ -74,6 +74,7 @@
                                     <b-form-input
                                       v-model="appUrl"
                                       type="text"
+                                      :state="!$v.appUrl.$invalid"
                                       class="inline-form-control"
                                       placeholder="http://example.com">
                                     </b-form-input>
@@ -116,7 +117,7 @@
                         <button type="button" class="btn btn-orange-submit"
                             data-dismiss="modal" @click=" submitCreateApplication() "
                                 v-if="!$v.appName.$invalid && !$v.appLogo.$invalid && !$v.appHostType.$invalid
-                            && !$v.appPlatformTags.$invalid && !$v.appIpv4.$invalid && !$v.appOsInfo.$invalid" :disabled="isClicked">
+                            && !$v.appPlatformTags.$invalid && !$v.appIpv4.$invalid && !$v.appOsInfo.$invalid && !$v.appUrl.$invalid" :disabled="isClicked">
                         Submit
                         </button>
                     </div>
@@ -181,6 +182,7 @@
                                     <b-form-input
                                       v-model="appUpdateUrl"
                                       type="text"
+                                      :state="!$v.appUpdateUrl.$invalid"
                                       class="inline-form-control"
                                       placeholder="http://example.com">
                                     </b-form-input>
@@ -224,7 +226,7 @@
                             data-dismiss="modal" @click=" submitUpdateApplication() "
                                 v-if="!$v.appUpdateName.$invalid && !$v.appUpdateHostType.$invalid
                             && !$v.appUpdatePlatformTags.$invalid && !$v.appUpdateIpv4.$invalid
-                            && !$v.appUpdateOsInfo.$invalid">
+                            && !$v.appUpdateOsInfo.$invalid && !$v.appUpdateUrl.$invalid">
                         Submit
                         </button>
                     </div>

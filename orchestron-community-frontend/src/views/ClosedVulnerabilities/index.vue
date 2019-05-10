@@ -118,8 +118,9 @@
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
-                    multipleVuls[vulName] = appName
+                  if (splitVuls.length > 1) {
+                    // multipleVuls[vulName] = appName
+                    multipleVuls[vulName+'!!!###!!!'+appName] = appName
                   }
                 }
                 if (val.common_name === null) {
@@ -212,8 +213,9 @@
                   const vulDetail = actualVul.split('###')
                   vulName = vulDetail[0]
                   appName = vulDetail[1]
-                  if (splitVuls.length > 2) {
-                    multipleVuls[vulName] = appName
+                  if (splitVuls.length > 1) {
+                    // multipleVuls[vulName] = appName
+                     multipleVuls[vulName+'!!!###!!!'+appName] = appName
                   }
                 }
                 if (val.common_name === null) {
@@ -316,8 +318,9 @@
                       const vulDetail = actualVul.split('###')
                       vulName = vulDetail[0]
                       appName = vulDetail[1]
-                      if (splitVuls.length > 2) {
-                        multipleVuls[vulName] = appName
+                      if (splitVuls.length > 1) {
+                        // multipleVuls[vulName] = appName
+                         multipleVuls[vulName+'!!!###!!!'+appName] = appName
                       }
                     }
                     if (val.common_name === null) {

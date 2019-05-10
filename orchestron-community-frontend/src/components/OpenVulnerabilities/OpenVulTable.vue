@@ -107,16 +107,16 @@
                         <b-list-group-item class="d-flex justify-content-between align-items-center">
                           <b-row>
                             <b-col cols="10">
-                              {{ row.item[0] }}
+                              {{ row.item[0].replace('!!!###!!!'+row.item[1],"")}}
                             </b-col>
                             <b-col cols="2" v-if="isUncategorised">
                               <b-badge variant="danger" v-if="cwe_val_multiple===0" pill
-                                       style="cursor: pointer" @click="updateUncategorized(row.item)">Uncategorized
+                                       style="cursor: pointer" @click="updateUncategorizedMultiple(row.item[0],row.item[1])">Uncategorized
                               </b-badge>
                             </b-col>
                           </b-row>
 
-                          <b-button size="sm" @click="viewIndividualVul(row.item[1], row.item[0], cwe_val_multiple)"
+                          <b-button size="sm" @click="viewIndividualVul(row.item[1], row.item[0].replace('!!!###!!!'+row.item[1],''), cwe_val_multiple)"
                                     class="mr-1 btn-orange">
                             {{ row.item[1] }} 
                           </b-button>
@@ -218,6 +218,10 @@
     methods: {
       updateUncategorized(commonName) {
         this.$emit('updateUncategorized', {commonName: commonName})
+      },
+      updateUncategorizedMultiple(commonName, replaceName){
+        var info = commonName.replace('!!!###!!!'+replaceName,"")
+        this.$emit('updateUncategorized', {commonName: info})
       },
       viewIndividualVul(app, name, cwe) {
         const encodedApp = btoa(unescape(encodeURIComponent(app)))

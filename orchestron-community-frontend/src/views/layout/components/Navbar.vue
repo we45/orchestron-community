@@ -11,7 +11,7 @@
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
         <router-link class="inlineBlock" to="/org/profile">
           <el-dropdown-item>
-            profile
+            Profile
           </el-dropdown-item>
         </router-link>
         <el-dropdown-item divided>

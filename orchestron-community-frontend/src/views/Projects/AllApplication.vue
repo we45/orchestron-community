@@ -207,7 +207,7 @@ export default {
       return {
         applicationCount: 0,
         applicationList: [],
-        headerTitles: 'All Application List',
+        headerTitles: 'List of Applications',
         isLoading: false,
         timeout: 1000,
         org:1,
@@ -279,8 +279,8 @@ export default {
         required
       },
       appUrl: {
-        required
-        // url
+        required,
+        url
       },
       appIpv4: {
         required,
