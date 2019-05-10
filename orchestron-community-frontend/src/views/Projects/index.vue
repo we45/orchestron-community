@@ -415,6 +415,7 @@ export default {
         this.$refs.beforeDeleteProjectModal.hide()
       },
       beforeSubmitDeleteProject() {
+        this.$refs.beforeDeleteProjectModal.hide()
         this.$refs.deleteProjectModal.show()
       },
       clickPaginations(event) {
