@@ -2,7 +2,7 @@ version: '3'
 services:
     nginx:
         image: we45/orchestron-community-nginx:latest
-        ports: 
+        ports:
             - "80:80"
         depends_on:
             - api
@@ -15,7 +15,7 @@ services:
         depends_on:
             - api
         environment:
-            - API_URL=api
+            - API_URL=http://api
         links:
             - api
     api:
