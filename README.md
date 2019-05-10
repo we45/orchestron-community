@@ -15,5 +15,40 @@ Orchestron allows you to do the following quite effectively:
 * Easily manage releases and "in-time" security assessments with Engagements. See "Engagements" for more details
 * Unlike many other tools, Orchestron also attempts to correlate/merge results from across SAST, DAST and SCA tools
 
-## Installation Details and Full User-Guide
-https://we45devteam.atlassian.net/wiki/spaces/OR/overview
+
+### Prerequisites
+* Install [Docker](https://docs.docker.com/install/)
+* Install [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Getting started
+
+
+To Get Started with Orchestron , run the following steps
+
+```commandline
+git cline https://github.com/we45/orchestron-community.git
+
+cd orchestron-community
+```
+
+##### Make the necessary changes in the compose file(docker-compose.yml)
+* **MYSQL_ROOT_PASSWORD**   MySQL Database Password for Root User. If necessary, changes can be made to the docker-compose.yml file and a non-root User can be used instead.
+* **MINIO_ACCESS_KEY**   Minio Access Key should be a minimum of 3 characters in length.
+* **MINIO_SECRET_KEY** Minio Secret Key should be a minimum of 8 characters in length.
+* **ENC_KEY** Encryption Key is used to Encrypt Jira and Email Configuration Parameters.
+* **JWT_SECRET_KEY** JWT Secret Key to Generate JWT tokens.
+* **ADMIN_USER_EMAIL** Administrator Email ID.
+* **ADMIN_USER_PASS** Administrator Password.
+
+**Note:** Once you made the necessary changes in the compose file run the below command.
+
+```commandline
+docker-compose up -d
+```
+
+* Browser to [http://localhost](http://localhost)
+
+
+### Documentation
+Click here [Orchestron Documentation](https://we45devteam.atlassian.net/wiki/spaces/OR/overview)
+
