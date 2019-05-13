@@ -353,13 +353,7 @@
                       <br>
                     </div>
                     <br>
-             <!--  <div style="background-color: #2b2b2b; border-radius: 5px; height:50px;display: table;width: 100%;">
-                  <p style="vertical-align: middle;width: 100%;padding-top: 2%;" class="word-wrap">
-                    <span class="webhook-label" style="padding:7px;">User Token : </span>
-                   <span class='webhook'><label style="word-break: break-all;padding:7px;">{{ userToken }}</label></span>
-                  </p>
-                  <br>
-                </div> -->
+           
               <br>
                     </b-col>
                 </b-row>
@@ -368,7 +362,7 @@
                   <span class="webhook-label"
                         style="padding:7px;">Curl Command (File Processing) Using Secrect and Access Key: </span>
                     <span class='webhook'>
-                               {{curlCmd_secret_access_key}}<label>{{ webhookId }}/</label>
+                               {{curlCmd_secret_access_key}}
                             </span>
                   </p>
                   <br>
@@ -394,6 +388,15 @@
                   <br>
                 </div> -->
                 <b-col cols="12" slot="modal-footer">
+                    <div style="display: flex; justify-content: flex-end">
+                        
+                 <b-btn type="button"
+                            align="right"
+                        class="btn-orange-submit pull-right" 
+                          v-clipboard:copy="curlCmd_secret_access_key"
+                          v-clipboard:success="onCopy"
+                          v-clipboard:error="onError">Copy Curl Command!</b-btn>
+                    </div>
                     <!-- <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p> -->
                 </b-col>
             </b-modal>
@@ -428,6 +431,7 @@
     },
     data() {
       return {
+        message: 'Copy These Text',
         basicBarDashboardChartData: [],
         dashboardCategories: [],
         highLable: 'High',
@@ -463,7 +467,7 @@
         uploadTool: '',
         manualScanName: '',
         manualVulName: '',
-        curlCmd_secret_access_key : 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/',
+        curlCmd_secret_access_key : 'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/',
         manualCwe: '',
         manualSeverityList: [
           { label: 'High', value: 3 },
@@ -607,10 +611,31 @@
       })
     },
     methods: {
+
+    onCopy: function (e) {
+      this.$notify({
+                    group: 'foo',
+                    type: 'success',
+                    title: 'success',
+                    text: 'Webhook Copied !!',
+                    position: 'top right'
+                  })
+    },
+    onError: function(e){
+        this.$notify({
+                    group: 'foo',
+                    type: 'error',
+                    title: 'error',
+                    text: 'Webhook not copied !!',
+                    position: 'top right'
+                  })
+      },
       getIP(){
          axios.get('/get/ip/').then(res => {
+            console.log("res", res.data)
            this.ipWebhook = res.data.ip
-           this.curlCmd_secret_access_key = 'curl -H "Secret-Key: Key" -H "Access-Key: key" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + 'http://'+this.ipWebhook + '/api/webhooks/post/'
+           this.curlCmd_secret_access_key = 
+           'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/'
           }).catch(error => {
             if (error.response.data.detail === 'Signature has expired.') {
               this.$router.push('/')

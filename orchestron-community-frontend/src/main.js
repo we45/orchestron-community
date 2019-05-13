@@ -19,6 +19,9 @@ import App from './App'
 import router from './router'
 import store from './store'
 import '@/utils/filters.js'
+// import Clipboard from 'v-clipboard'
+import VueClipboard from 'vue-clipboard2'
+ 
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faHourglass, faHourglassEnd, faHourglassHalf, faHistory
@@ -31,6 +34,9 @@ library.add(faHourglassHalf)
 library.add(faHistory)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
+// Vue.use(Clipboard)
+Vue.use(VueClipboard)
+VueClipboard.config.autoSetContainer = true
 Vue.use(BootstrapVue)
 Vue.use(Vue2Filters)
 Vue.use(VueChartkick, { Chartkick })
