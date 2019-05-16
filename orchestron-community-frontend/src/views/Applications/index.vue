@@ -331,8 +331,8 @@
             </b-modal>
 
             <!--Copy-->
-            <b-modal ref="copyWebhookModal" title="Copy Webhook" centered size="lg">
-                <b-row>
+            <b-modal ref="copyWebhookModal" title="Copy Webhook" centered size="xl">
+               <!--  <b-row>
                   <b-col cols="12">
                 <div style="background-color:#2b2b2b; border-radius: 5px; height:50px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;" class="word-wrap">
@@ -356,28 +356,24 @@
            
               <br>
                     </b-col>
-                </b-row>
-                 <div style="background-color: #2b2b2b; border-radius: 5px; height:120px;width: 100%;">
-                  <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
-                  <span class="webhook-label"
-                        style="padding:7px;">Curl Command (File Processing) Using Secrect and Access Key: </span>
-                    <span class='webhook'>
+                </b-row> -->
+                 <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+                  <p style="text-align:left;vertical-align: middle; padding-top: 2%;" class="webhook_label_curl">
+                  <!-- <span class="webhook-label"
+                        style="padding:7px;">Curl Command (File Processing) Using Secrect and Access Key: </span> -->
+                    <span class='webhook_label_curl'>
                                {{curlCmd_secret_access_key}}
                             </span>
                   </p>
                   <br>
                 </div>
                 <br>
-              <!-- <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
-                  <p style="text-align:left;vertical-align: middle; padding-top: 2%;">
-                    <span class="webhook-label" style="padding:7px;">Curl Command (File Processing) : </span>
-                    <span class='webhook'>
-                       {{curlCmd}}<label>{{ webhookId }}/</label>
-                    </span>
-                  </p>
-                  <br>
-                </div>
- -->              <br>
+ <b-btn type="button"
+                            align="right"
+                        class="btn-orange-submit pull-right" 
+                          v-clipboard:copy="curlCmd_secret_access_key"
+                          v-clipboard:success="onCopy"
+                          v-clipboard:error="onError" style="float:right;">Copy Curl Command!</b-btn>
              <!--  <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;display: table;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;">
                    <span class="webhook-label" style="padding:7px;"> Curl Command (JSON Processing) : </span>
@@ -388,7 +384,7 @@
                   <br>
                 </div> -->
                 <b-col cols="12" slot="modal-footer">
-                    <div style="display: flex; justify-content: flex-end">
+                   <!--  <div style="display: flex; justify-content: flex-end">
                         
                  <b-btn type="button"
                             align="right"
@@ -396,8 +392,7 @@
                           v-clipboard:copy="curlCmd_secret_access_key"
                           v-clipboard:success="onCopy"
                           v-clipboard:error="onError">Copy Curl Command!</b-btn>
-                    </div>
-                    <!-- <p class="importent-text">* (Optional) To fetch engagement id go to Engagements</p> -->
+                    </div> -->
                 </b-col>
             </b-modal>
 
@@ -512,8 +507,8 @@
         api_site_url: '',
         userToken: '',
         update_app_wise_jira: false,
-        curlCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> http://127.0.0.1/api/webhook/post/',
-        jsonCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -H "Scan-Name: <scan_name>" -d \'{"vuls":<json_dictionary>}\' http://127.0.0.1/api/webhook/post/'
+        curlCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -v -F file=@<file_path> http://127.0.0.1/api/webhook/post/',
+        jsonCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -d \'{"vuls":<json_dictionary>}\' http://127.0.0.1/api/webhook/post/'
       }
     },
     validations: {
@@ -635,7 +630,7 @@
             console.log("res", res.data)
            this.ipWebhook = res.data.ip
            this.curlCmd_secret_access_key = 
-           'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/'
+           'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/'
           }).catch(error => {
             if (error.response.data.detail === 'Signature has expired.') {
               this.$router.push('/')
@@ -1199,6 +1194,13 @@
    white-space: -pre-wrap;
    white-space: -o-pre-wrap;
    word-wrap: break-word;
+  }
+  .webhook_label_curl{
+   color: #ffb648;
+    word-wrap:break-word;
+    font-family: 'Avenir';
+    padding: 5px;
+      font-size: 16px;
   }
   .webhook-label{
     font-family: 'Avenir';
