@@ -31,7 +31,6 @@
                             <b-col sm="2"><label for="input-small" class="label">Logo:</label></b-col>
                             <b-col sm="10">
                                 <b-form-file
-                                    ref="file-input"
                                     v-model="projectLogo"
                                     placeholder="Choose a logo..."
                                     accept="image/jpeg, image/png,image/jpg,"
@@ -247,13 +246,11 @@ export default {
         
       },
       createProject() {
-        this.$refs['file-input'].reset();
         this.projectLogo = ''
         this.projectName = ''
         this.$refs.createProjectModal.show()
       },
       closeCreateProject() {
-        this.$refs['file-input'].reset();
         this.projectLogo = ''
         this.projectName = ''
         this.$refs.createProjectModal.hide()
