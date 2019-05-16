@@ -2,7 +2,7 @@
     <div>
         <b-container fluid>
           <loading :active.sync="reloadPage" :can-cancel="true" :is-full-page="true"></loading>
-            <settings-org-header :settingsHeader="headerData" :logoOrg="orgLogo" @configureSettings="configureOrgSettings"></settings-org-header>
+            <settings-org-header :settingsHeader="headerData" :logoOrg="orgLogo" @configureSettings="configureOrgSettings" @updateOrg="updateOrg"></settings-org-header>
             <b-container fluid v-if="showConfig" style="background-color: #FFFFFF;">
                 <br>
                 <p>Organization Configure</p>
@@ -197,7 +197,7 @@
                 </b-modal>
             </b-container> -->
             <br>
-            <b-container fluid style="background-color: #FFFFFF;" v-if="enableJira || enableEmail">
+            <b-container fluid style="background-color: #FFFFFF;" v-if="enableJira">
                 <br>
                 <p class="title">Manage Communication and Bug Tracking System</p>
                 <hr>
@@ -268,6 +268,102 @@
                         </div>
                         <br>
                     </b-tab>
+                    <b-modal
+                                ref="updateOrgModal"
+                                title="Update Organization"
+                                size="lg"
+                                centered>
+                                <div>
+                                    <form @submit.prevent="submitUpdateOrganization">
+                                        <b-row class="my-1">
+                                          <b-col cols="6">
+                                            <b-col><label class="label">Name:</label></b-col>
+                                            <b-col sm="12">
+                                                <b-form-input
+                                                    v-model="updateOrgName"
+                                                    type="text"
+                                                    class="inline-form-control"></b-form-input>
+                                            </b-col>
+                                            </b-col>
+                                          <b-col cols="6">
+                                            <b-col><label class="label">Logo:</label></b-col>
+                                            <b-col sm="12">
+                                                <b-form-file
+                                                    v-model="updateOrgLogo"
+                                                    placeholder="Choose a logo..."
+                                                    accept="image/jpeg, image/png,image/jpg,"
+                                                    :state="!$v.updateOrgLogo.$invalid"></b-form-file>
+                                                <br>
+                                                <p>Previous logo: {{ updateOrgLogo }} </p>
+                                                <p>{{ updateOrgLogo.name }}</p>
+                                            </b-col>
+                                          </b-col>
+                                        </b-row>
+                                        <br>
+                                      <b-row class="my-1">
+                                          <b-col cols="6">
+                                            <b-col><label class="label">Location:</label></b-col>
+                                            <b-col sm="12">
+                                                <b-form-input
+                                                    v-model="updateOrgLocation"
+                                                    type="text"
+                                                    class="inline-form-control"
+                                                    placeholder="Enter Location" :state="!$v.updateOrgLocation.$invalid"></b-form-input>
+                                            </b-col>
+                                            </b-col>
+                                          <b-col cols="6">
+                                            <b-col><label class="label">Subscription End Date:</label></b-col>
+                                            <b-col sm="12">
+                                                <date-picker
+                                                  v-model="updateOrgEndDate"
+                                                  format="yyyy-MM-dd"
+                                                  lang="en" width="100%"
+                                                  :not-before="today" :state="!$v.updateOrgEndDate.$invalid"></date-picker>
+                                            </b-col>
+                                          </b-col>
+                                        </b-row>
+                                        <br>
+                                      <b-row class="my-1">
+                                          <b-col cols="6">
+                                            <b-col><label class="label">Organization Type:</label></b-col>
+                                            <b-col sm="12">
+                                                <v-select
+                                                    :options="orgTypeOption"
+                                                    v-model="updateOrgType"
+                                                    label="label"
+                                                    placeholder="Select Organization Type"
+                                                    :state="!$v.updateOrgType.$invalid"></v-select>
+                                            </b-col>
+                                            </b-col>
+                                          <b-col cols="6">
+                                            <b-col><label class="label">Timezone:</label></b-col>
+                                            <b-col sm="12">
+                                                <v-select
+                                                    :options="orgTimezoneOption"
+                                                    v-model="updateOrgTimezone"
+                                                    label="label"
+                                                    placeholder="Select Timezone"
+                                                    :state="!$v.updateOrgTimezone.$invalid"></v-select>
+
+                                            </b-col>
+                                          </b-col>
+                                        </b-row>
+                                        <br>
+                                        <br>
+                                    </form>
+                                </div>
+                                <b-col cols="12" slot="modal-footer">
+                                    <div class="pull-right" style="float: right">
+                                        <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateOrganization() "> Close</button>
+                                        <button type="button"
+                                                class="btn btn-orange-submit pull-right"
+                                                data-dismiss="modal"
+                                                @click=" submitUpdateOrganization() ">
+                                        Submit
+                                        </button>
+                                    </div>
+                                </b-col>
+                      </b-modal>
                     <!-- <b-tab title="Email" small v-if="enableEmail">
                         <b-row>
                             <b-col cols="12">
@@ -380,6 +476,7 @@
 import settingsOrgHeader from '../../components/Settings/Header'
 import UserTable from '../../components/Settings/UserTable'
 import { required, minLength, email, url } from 'vuelidate/lib/validators'
+import DatePicker from 'vue2-datepicker'
 import axios from '@/utils/auth'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.min.css'
@@ -390,12 +487,14 @@ export default {
   components: {
     settingsOrgHeader,
     UserTable,
-    Loading
+    Loading,
+    DatePicker
   },
   data() {
     return {
       isLoading: false,
       reloadPage: false,
+      today: new Date(),
       headerData: [],
       userData: [],
       userId: '',
@@ -428,7 +527,15 @@ export default {
       isConfCreated: false,
       jiraTestStatus: '',
       orgLogo: '',
-      post_jira_method: false
+      post_jira_method: false,
+      updateOrgLogo: '',
+      updateOrgLocation: '',
+      updateOrgType: '',
+      updateOrgTimezone: '',
+      updateOrgEndDate: '',
+      updateOrgName: '',
+      orgTypeOption: [],
+      orgTimezoneOption: []
     }
   },
   validations: {
@@ -516,16 +623,34 @@ export default {
     emailWithoutDisplayName: {
       required,
       minLength: minLength(1)
+    },
+    updateOrgName: {
+      required
+      // minLength: minLength(1)
+    },
+    updateOrgLogo: {
+      
+    },
+    updateOrgLocation: {
+      required
+    },
+    updateOrgEndDate: {
+      required
+    },
+    updateOrgType: {
+      required
+    },
+    updateOrgTimezone: {
+      required
     }
   },
   created() {
     this.org = localStorage.getItem('org')
     this.token = localStorage.getItem('token')
-    this.param = this.$route.params.orgId
     this.fetchData()
   },
   updated() {
-    this.$nextTick(function() {
+    this.$nextTick(function() {     
       if (this.isLoading) {
         this.headerData = []
         this.userData = []
@@ -536,11 +661,14 @@ export default {
     })
   },
   methods: {
-    fetchData() {
-        this.reloadPage = true
-      if (this.param && this.org && this.token) {
+    closeUpdateOrganization() {
+      this.$refs.updateOrgModal.hide()
+    },
+    fetchData() {       
+      if (this.org && this.token) {
+         this.reloadPage = true
         axios
-          .get('/organizations/' + this.param + '/?users=1&groups=1')
+          .get('/organizations/' + this.org + '/')
           .then(res => {
             let isAdmin
             this.headerData.push({
@@ -554,44 +682,44 @@ export default {
               .then(res => {
                 this.orgLogo = res.data
               }).catch(error => {
-                if (error.res.status === 404) {
+                if (error.response.status === 404) {
                   this.$router.push('/not_found')
-                } else if (error.res.status === 403) {
+                } else if (error.response.status === 403) {
                   this.$router.push('/forbidden')
                 } else {
                   this.$router.push('/error')
                 }
               })
-            for (const value of res.data.users) {
-              let name = ''
-              if (
-                value.fields.first_name == null ||
-              value.fields.last_name === null
-              ) {
-                name = value.fields.email
-              } else if (
-                value.fields.first_name === null &&
-              value.fields.last_name == null
-              ) {
-                name = value.fields.email
-              } else {
-                name = value.fields.first_name + ' ' + value.fields.last_name
-              }
-              if (value.fields.is_admin === true) {
-                isAdmin = true
-              }
-              this.userData.push({
-                name: name,
-                email: value.fields.email,
-                id: value.fields.id,
-                isAdmin: isAdmin
-              })
-            }
+            // for (const value of res.data.users) {
+            //   let name = ''
+            //   if (
+            //     value.fields.first_name == null ||
+            //   value.fields.last_name === null
+            //   ) {
+            //     name = value.fields.email
+            //   } else if (
+            //     value.fields.first_name === null &&
+            //   value.fields.last_name == null
+            //   ) {
+            //     name = value.fields.email
+            //   } else {
+            //     name = value.fields.first_name + ' ' + value.fields.last_name
+            //   }
+            //   if (value.fields.is_admin === true) {
+            //     isAdmin = true
+            //   }
+            //   this.userData.push({
+            //     name: name,
+            //     email: value.fields.email,
+            //     id: value.fields.id,
+            //     isAdmin: isAdmin
+            //   })
+            // }
           })
           .catch(error => {
-            if (error.res.status === 404) {
+            if (error.response.status === 404) {
               this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
+            } else if (error.response.status === 403) {
               this.$router.push('/forbidden')
             } else {
               this.$router.push('/error')
@@ -599,14 +727,14 @@ export default {
           })
 
         axios
-          .get('/organizations/' + this.param + '/config/')
+          .get('/organizations/' + this.org + '/config/')
           .then(res => {
             this.enableJira = res.data.enable_jira
             this.enableEmail = res.data.enable_email
             this.isConfCreated = true
             if (this.enableJira) {
               axios
-                .get('/organizations/' + this.param + '/jira/')
+                .get('/organizations/' + this.org + '/jira/')
                 .then(res => {
                   this.jiraURL = res.data.url
                   this.jiraUserName = '****'
@@ -614,13 +742,10 @@ export default {
                   this.post_jira_method = true
                 })
                 .catch(error => {
-        this.reloadPage = false
-
-          
-
-                  if (error.res.status === 404) {
+                    this.reloadPage = false
+                  if (error.response.status === 404) {
                     this.$router.push('/not_found')
-                  } else if (error.res.status === 403) {
+                  } else if (error.response.status === 403) {
                     this.$router.push('/forbidden')
                   } else {
                     this.$router.push('/error')
@@ -630,184 +755,292 @@ export default {
             this.reloadPage = false
           })
           .catch(error => {
+            this.reloadPage = false
+            if (error.response.status === 404) {
+              this.$router.push('/not_found')
+            } else if (error.response.status === 403) {
+              this.$router.push('/forbidden')
+            } else {
+              this.$router.push('/error')
+            }
+          })
         this.reloadPage = false
 
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
-          })
-        // this.reloadPage = false
 
+    axios.get('/organizations/options/')
+            .then(res => {
+              for (const value of res.data.timezone) {
+                this.orgTimezoneOption.push(value[1])
+              }
+              for (const value of res.data.industry) {
+                this.orgTypeOption.push({ value: value[0], label: value[1] })
+              }
+                this.reloadPage = false
+              
+            }).catch(error => {
+                this.reloadPage = false
+
+              if (error.response.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.response.status === 403) {
+                  this.$router.push('/forbidden')
+                } else {
+                  this.$router.push('/error')
+                }
+            })
       } else {
         notValidUser()
         this.$router.push('/')
       }
     },
-    createUser() {
-      this.$refs.userCreateModal.show()
-    },
-    closeCreateUser() {
-      this.$refs.userCreateModal.hide()
-    },
-    submitCreateUser() {
-      if (this.param && this.org && this.token) {
-        const form_data = {
-          first_name: this.firstName,
-          last_name: this.lastName,
-          email: this.email,
-          is_staff: true,
-          org: this.param,
-          is_admin: this.isAdmin
-        }
-        axios
-          .put('/users/', form_data)
-          .then(res => {
-            if (res.status === 200) {
-              this.$refs.userCreateModal.hide()
-              this.isLoading = true
-              this.reloadPage = true
-              this.$router.push('/settings/individual_org/' + this.param + '/')
-              this.$notify({
-                group: 'foo',
-                type: 'success',
-                title: 'success',
-                text: 'The user has been created successfully!',
-                position: 'top right'
+    updateOrg(){
+        if (this.org && this.token) {
+            this.updateOrgId = this.org
+            this.orgId = this.org
+            axios.get('/organizations/'+this.org+'/')
+              .then(res => {;
+                this.updateOrgName = res.data.name
+                this.updateOrgLocation = res.data.location
+                // this.updateOrgType = res.data.industry
+                this.updateOrgTimezone = res.data.timezone
+                this.updateOrgEndDate = res.data.end_date
+                for (const appVal of this.orgTypeOption) {
+                  if (res.data.industry === appVal.value) {
+                    this.updateOrgType = {'label':appVal.label, 'value':res.data.industry}
+                  }
+                }
+                this.$refs.updateOrgModal.show()
+              }).catch(error => {
+                if (error.response.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.response.status === 403) {
+                  this.$router.push('/forbidden')
+                } else {
+                  this.$router.push('/error')
+                }
               })
-            }
-          })
-          .catch(error => {
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
-          })
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
+          } else {
+            notValidUser()
+            this.$router.push('/')
+          }
     },
-    updateUser(event) {
-      this.userId = event.id
-      this.$refs.userUpdateModal.show()
-      if (this.param && this.org && this.token) {
-        axios
-          .get('/users/' + this.userId + '/')
-          .then(res => {
-            if (res.status === 200) {
-              this.updateFirstName = res.data.first_name
-              this.updateLastName = res.data.last_name
-              this.updateEmail = res.data.email
-              this.updateIsAdmin = res.data.is_admin
+     submitUpdateOrganization() {
+          if (this.org && this.token) {
+            const orgEndDate = new Date(this.updateOrgEndDate)
+            const d = orgEndDate.getDate()
+            const m = orgEndDate.getMonth() + 1
+            const y = orgEndDate.getFullYear()
+            const endDate = y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d)
+            const form_data = new FormData()
+              if (this.updateOrgLogo) {
+              form_data.append('logo', this.updateOrgLogo)
             }
-          })
-          .catch(error => {
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 404) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
-          })
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
-    },
-    closeUpdateUser() {
-      this.$refs.userUpdateModal.hide()
-    },
-    submitUpdateUser() {
-      const form_data = {
-        first_name: this.updateFirstName,
-        last_name: this.updateLastName,
-        email: this.updateEmail,
-        is_staff: true,
-        org: this.param,
-        is_admin: this.updateIsAdmin
-      }
-      if (this.param && this.org && this.token) {
-        axios
-          .post('/users/' + this.userId + '/', form_data)
-          .then(res => {
-            if (res.status === 200) {
-              this.$refs.userUpdateModal.hide()
-              this.isLoading = true
-              this.reloadPage = true
-              this.$router.push('/settings/individual_org/' + this.param + '/')
-              this.userId = ''
-              this.$notify({
-                group: 'foo',
-                type: 'info',
-                title: 'success',
-                text: 'The user has been updated successfully!',
-                position: 'top right'
+            form_data.append('name', this.updateOrgName)
+            // form_data.append('logo', this.updateOrgLogo)
+            form_data.append('location', this.updateOrgLocation)
+            form_data.append('industry', this.updateOrgType.value)
+            form_data.append('timezone', this.updateOrgTimezone)
+            form_data.append('end_date', endDate)
+            axios.post('/organizations/' + this.orgId + '/', form_data, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+              .then(res => {
+                this.$refs.updateOrgModal.hide()
+                this.isLoading = true
+                // this.$router.push('/settings/')
+                this.updateOrgId = ''
+                this.$notify({
+                  group: 'foo',
+                  type: 'info',
+                  title: 'success',
+                  text: 'The organization has been updated successfully!',
+                  position: 'top right'
+                })
+                this.reloadPage = true
+              }).catch(error => {
+                if (error.response.status === 404) {
+                  this.$router.push('/not_found')
+                } else if (error.response.status === 400) {
+                  // this.$router.push('/forbidden')
+                  this.$notify({
+                  group: 'foo',
+                  type: 'error',
+                  title: 'error',
+                  text: 'Validation error!!',
+                  position: 'top right'
+                })
+                } else {
+                  this.$router.push('/error')
+                }
               })
-            }
-          })
-          .catch(error => {
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
-          })
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
-    },
-    deleteUser(event) {
-      this.userId = event.id
-      this.$refs.deleteUserModal.show()
-    },
-    deleteCloseSubmitUser() {
-      this.$refs.deleteUserModal.hide()
-    },
-    deleteSubmitUser() {
-      if (this.param && this.userId && this.org && this.token) {
-        axios
-          .delete('/users/' + this.userId + '/')
-          .then(res => {
-            if (res.status === 200) {
-              this.$refs.deleteUserModal.hide()
-              this.userId = ''
-              this.isLoading = true
-              this.reloadPage = true
-              this.$router.push('/settings/individual_org/' + this.param + '/')
-              this.$notify({
-                group: 'foo',
-                type: 'info',
-                title: 'success',
-                text: 'The user has been deleted successfully!',
-                position: 'top right'
-              })
-            }
-          })
-          .catch(error => {
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 404) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
-          })
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
-    },
+          }else {
+            notValidUser()
+            this.$router.push('/')
+          }
+        },
+    // createUser() {
+    //   this.$refs.userCreateModal.show()
+    // },
+    // closeCreateUser() {
+    //   this.$refs.userCreateModal.hide()
+    // },
+    // submitCreateUser() {
+    //   if (this.org && this.org && this.token) {
+    //     const form_data = {
+    //       first_name: this.firstName,
+    //       last_name: this.lastName,
+    //       email: this.email,
+    //       is_staff: true,
+    //       org: this.org,
+    //       is_admin: this.isAdmin
+    //     }
+    //     axios
+    //       .put('/users/', form_data)
+    //       .then(res => {
+    //         if (response.status === 200) {
+    //           this.$refs.userCreateModal.hide()
+    //           this.isLoading = true
+    //           this.reloadPage = true
+    //           this.$router.push('/settings/individual_org/' + this.org + '/')
+    //           this.$notify({
+    //             group: 'foo',
+    //             type: 'success',
+    //             title: 'success',
+    //             text: 'The user has been created successfully!',
+    //             position: 'top right'
+    //           })
+    //         }
+    //       })
+    //       .catch(error => {
+    //         if (error.response.status === 404) {
+    //           this.$router.push('/not_found')
+    //         } else if (error.response.status === 403) {
+    //           this.$router.push('/forbidden')
+    //         } else {
+    //           this.$router.push('/error')
+    //         }
+    //       })
+    //   } else {
+    //     notValidUser()
+    //     this.$router.push('/')
+    //   }
+    // },
+    // updateUser(event) {
+    //   this.userId = event.id
+    //   this.$refs.userUpdateModal.show()
+    //   if (this.org && this.org && this.token) {
+    //     axios
+    //       .get('/users/' + this.userId + '/')
+    //       .then(res => {
+    //         if (response.status === 200) {
+    //           this.updateFirstName = res.data.first_name
+    //           this.updateLastName = res.data.last_name
+    //           this.updateEmail = res.data.email
+    //           this.updateIsAdmin = res.data.is_admin
+    //         }
+    //       })
+    //       .catch(error => {
+    //         if (error.response.status === 404) {
+    //           this.$router.push('/not_found')
+    //         } else if (error.response.status === 404) {
+    //           this.$router.push('/forbidden')
+    //         } else {
+    //           this.$router.push('/error')
+    //         }
+    //       })
+    //   } else {
+    //     notValidUser()
+    //     this.$router.push('/')
+    //   }
+    // },
+    // closeUpdateUser() {
+    //   this.$refs.userUpdateModal.hide()
+    // },
+    // submitUpdateUser() {
+    //   const form_data = {
+    //     first_name: this.updateFirstName,
+    //     last_name: this.updateLastName,
+    //     email: this.updateEmail,
+    //     is_staff: true,
+    //     org: this.org,
+    //     is_admin: this.updateIsAdmin
+    //   }
+    //   if (this.org && this.org && this.token) {
+    //     axios
+    //       .post('/users/' + this.userId + '/', form_data)
+    //       .then(res => {
+    //         if (response.status === 200) {
+    //           this.$refs.userUpdateModal.hide()
+    //           this.isLoading = true
+    //           this.reloadPage = true
+    //           this.$router.push('/settings/individual_org/' + this.org + '/')
+    //           this.userId = ''
+    //           this.$notify({
+    //             group: 'foo',
+    //             type: 'info',
+    //             title: 'success',
+    //             text: 'The user has been updated successfully!',
+    //             position: 'top right'
+    //           })
+    //         }
+    //       })
+    //       .catch(error => {
+    //         if (error.response.status === 404) {
+    //           this.$router.push('/not_found')
+    //         } else if (error.response.status === 403) {
+    //           this.$router.push('/forbidden')
+    //         } else {
+    //           this.$router.push('/error')
+    //         }
+    //       })
+    //   } else {
+    //     notValidUser()
+    //     this.$router.push('/')
+    //   }
+    // },
+    // deleteUser(event) {
+    //   this.userId = event.id
+    //   this.$refs.deleteUserModal.show()
+    // },
+    // deleteCloseSubmitUser() {
+    //   this.$refs.deleteUserModal.hide()
+    // },
+    // deleteSubmitUser() {
+    //   if (this.org && this.userId && this.org && this.token) {
+    //     axios
+    //       .delete('/users/' + this.userId + '/')
+    //       .then(res => {
+    //         if (response.status === 200) {
+    //           this.$refs.deleteUserModal.hide()
+    //           this.userId = ''
+    //           this.isLoading = true
+    //           this.reloadPage = true
+    //           this.$router.push('/settings/individual_org/' + this.org + '/')
+    //           this.$notify({
+    //             group: 'foo',
+    //             type: 'info',
+    //             title: 'success',
+    //             text: 'The user has been deleted successfully!',
+    //             position: 'top right'
+    //           })
+    //         }
+    //       })
+    //       .catch(error => {
+    //         if (error.response.status === 404) {
+    //           this.$router.push('/not_found')
+    //         } else if (error.response.status === 404) {
+    //           this.$router.push('/forbidden')
+    //         } else {
+    //           this.$router.push('/error')
+    //         }
+    //       })
+    //   } else {
+    //     notValidUser()
+    //     this.$router.push('/')
+    //   }
+    // },
     configureOrgSettings() {
       if (this.showConfig === true) {
         this.showConfig = false
@@ -820,15 +1053,15 @@ export default {
         'enable_jira': this.enableJira,
         'enable_email': this.enableEmail
       }
-      if (this.param && this.org && this.token) {
+      if (this.org && this.org && this.token) {
         if (this.isConfCreated) {
           axios
-            .post('/organizations/' + this.param + '/config/', form_data)
+            .post('/organizations/' + this.org + '/config/', form_data)
             .then(res => {
-              if (res.status === 200) {
+              if (response.status === 200) {
                 this.showConfig = false
                 this.isLoading = true
-                this.$router.go('/settings/individual_org/' + this.param + '/')
+                this.$router.go('/settings/individual_org/' + this.org + '/')
                 this.$notify({
                   group: 'foo',
                   type: 'success',
@@ -839,9 +1072,9 @@ export default {
               }
             })
             .catch(error => {
-              if (error.res.status === 404) {
+              if (error.response.status === 404) {
                 this.$router.push('/not_found')
-              } else if (error.res.status === 404) {
+              } else if (error.response.status === 403) {
                 this.$router.push('/forbidden')
               } else {
                 this.$router.push('/error')
@@ -849,12 +1082,12 @@ export default {
             })
         } else {
           axios
-            .put('/organizations/' + this.param + '/config/', form_data)
+            .put('/organizations/' + this.org + '/config/', form_data)
             .then(res => {
-              if (res.status === 200) {
+              if (response.status === 200) {
                 this.showConfig = false
                 this.isLoading = true
-                this.$router.go('/settings/individual_org/' + this.param + '/')
+                this.$router.go('/settings/individual_org/' + this.org + '/')
                 this.$notify({
                   group: 'foo',
                   type: 'success',
@@ -865,9 +1098,9 @@ export default {
               }
             })
             .catch(error => {
-              if (error.res.status === 404) {
+              if (error.response.status === 404) {
                 this.$router.push('/not_found')
-              } else if (error.res.status === 404) {
+              } else if (error.response.status === 404) {
                 this.$router.push('/forbidden')
               } else {
                 this.$router.push('/error')
@@ -880,7 +1113,7 @@ export default {
       }
     },
     testJiraConnection() {
-      if (this.param && this.org && this.token) {
+      if (this.org && this.org && this.token) {
         this.isLoading = true
         const form_data = {
           url: this.jiraURL,
@@ -909,7 +1142,7 @@ export default {
       }
     },
     submitJiraConfig() {
-      if (this.param && this.org && this.token) {
+      if (this.org && this.token) {
         const form_data = {
           url: this.jiraURL,
           username: this.jiraUserName,
@@ -918,12 +1151,12 @@ export default {
         if(this.post_jira_method){
 
         axios
-          .post('/organizations/' + this.param + '/jira/', form_data)
+          .post('/organizations/' + this.org + '/jira/', form_data)
           .then(res => {
-            // if (res.status === 200) {
+            // if (response.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
-              this.$router.go('/settings/individual_org/' + this.param + '/')
+              this.$router.go('/settings/individual_org/' + this.org + '/')
               this.$notify({
                 group: 'foo',
                 type: 'success',
@@ -935,9 +1168,9 @@ export default {
             // }
           })
           .catch(error => {
-            if (error.res.status === 404) {
+            if (error.response.status === 404) {
               this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
+            } else if (error.response.status === 403) {
               this.$router.push('/forbidden')
             } else {
               this.$router.push('/error')
@@ -946,12 +1179,12 @@ export default {
         }
         else{
              axios
-          .put('/organizations/' + this.param + '/jira/', form_data)
+          .put('/organizations/' + this.org + '/jira/', form_data)
           .then(res => {
-            // if (res.status === 200) {
+            // if (response.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
-              this.$router.go('/settings/individual_org/' + this.param + '/')
+              this.$router.go('/settings/individual_org/' + this.org + '/')
               this.$notify({
                 group: 'foo',
                 type: 'success',
@@ -963,9 +1196,9 @@ export default {
             // }
           })
           .catch(error => {
-            if (error.res.status === 404) {
+            if (error.response.status === 404) {
               this.$router.push('/not_found')
-            } else if (error.res.status === 403) {
+            } else if (error.response.status === 403) {
               this.$router.push('/forbidden')
             } else {
               this.$router.push('/error')
@@ -978,7 +1211,7 @@ export default {
       }
     },
     submitWithPasswordSMTP() {
-      if (this.param && this.org && this.token) {
+      if (this.org && this.org && this.token) {
         const form_data = new FormData()
         form_data.append('host', this.emailHost)
         form_data.append('username', this.emailUser)
@@ -988,12 +1221,12 @@ export default {
         form_data.append('display_name', this.emailDisplayName)
         form_data.append('certs', this.emailTlsSsl)
         axios
-          .put('/organizations/' + this.param + '/email/', form_data)
+          .put('/organizations/' + this.org + '/email/', form_data)
           .then(res => {
-            if (res.status === 200) {
+            if (response.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
-              this.$router.go('/settings/individual_org/' + this.param + '/')
+              this.$router.go('/settings/individual_org/' + this.org + '/')
               this.$notify({
                 group: 'foo',
                 type: 'success',
@@ -1005,9 +1238,9 @@ export default {
             }
           })
           .catch(error => {
-            if (error.res.status === 404) {
+            if (error.response.status === 404) {
               this.$router.push('/not_found')
-            } else if (error.res.status === 404) {
+            } else if (error.response.status === 404) {
               this.$router.push('/forbidden')
             } else {
               this.$router.push('/error')

@@ -26,12 +26,13 @@
                                 <span class="app-divider">:</span>
                                 <span class="app-value">{{ settings.location }}</span>
                             </p>
-                            <p class="wordwrap">
+                            <!-- <p class="wordwrap">
                                 <span class="app-created-on">Subscription Date</span>
                                 <span class="app-divider">:</span> <span class="app-value">{{ settings.endDate }}</span>
-                            </p>
+                            </p> -->
                         </b-col>
                         <b-btn @click="configureSettings" class="btn-orange">Configure</b-btn>
+                         <b-btn @click="updateOrg" class="btn-orange pull-right" id="org_update" style="margin-left: 2%;">Update</b-btn>
                     </b-row>
                 </b-col>
             </b-row>
@@ -83,6 +84,10 @@
         configureSettings() {
           const showConfig = true
           this.$emit('configureSettings', showConfig)
+        },
+        updateOrg() {
+          const showConfig = true
+          this.$emit('updateOrg', showConfig)
         }
       }
     }

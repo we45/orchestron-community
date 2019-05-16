@@ -97,7 +97,7 @@ export const constantRouterMap = [
       {
         path: 'individual_vul/:appName/:vulName/:cwe',
         component: IndividualVulnerability,
-        name: 'IndividualVulnerability',
+        name: 'Individual Vulnerability',
         meta: {
           title: 'Individual Vulnerability',
           icon: 'Individual Vulnerability'
@@ -106,7 +106,7 @@ export const constantRouterMap = [
       {
         path: 'individual/closed_vul/:appName/:vulName/:cwe',
         component: ClosedIndividualVul,
-        name: 'Closed IndividualVulnerability',
+        name: 'Closed Individual Vulnerability',
         meta: {
           title: 'Closed Individual Vulnerability',
           icon: 'Closed Individual Vulnerability'
@@ -115,7 +115,7 @@ export const constantRouterMap = [
       {
         path: 'individual_vul_req_resp/:appName/:vulName/:cwe/:url',
         component: IndividualReqResp,
-        name: 'IndividualVulnerability Request and Response',
+        name: 'Individual Vulnerability Request and Response',
         meta: {
           title: 'IndividualVulnerability Request and Response',
           icon: 'IndividualVulnerability Request and Response'
@@ -196,7 +196,7 @@ export const constantRouterMap = [
       },
       {
         path: 'individual_application/:applicationId/severity_wise/:sev',
-        name: 'individual_application_severity',
+        name: 'Individual Application Severity',
         component: AppSeverityWise,
         meta: { title: 'Applications Severity' }
       },
@@ -308,16 +308,10 @@ export const constantRouterMap = [
     children: [
       {
         path: '',
-        name: 'Settings',
-        component: Settings,
-        meta: { title: 'Settings', icon: 'settings' }
-      },
-      {
-        path: '/settings/individual_org/:orgId',
         component: IndividualOrg,
-        name: 'Individual Organization',
+        name: 'Settings',
         meta: {
-          title: 'Individual Organization',
+          title: 'settings',
           icon: 'settings'
         }
       }
