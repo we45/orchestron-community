@@ -32,7 +32,7 @@
                                 <label class="label">Logo:</label>
                                 <b-col sm="12">
                                     <b-form-file
-                                      ref="fileinput"
+                                      ref="file-input"
                                       v-model="appLogo"
                                       accept="image/jpeg, image/png,image/jpg,"
                                       :state="!$v.appLogo.$invalid"
@@ -505,7 +505,8 @@
           this.appPlatformTags = null
           this.appIpv4 = ''
           this.appOsInfo =''
-          this.$refs.fileinput.reset();
+          // this.$refs.fileinput.reset();
+          this.$refs['file-input'].reset();
           axios.get('/hosttypes/')
             .then(res => {
               this.appTargetOption = res.data
