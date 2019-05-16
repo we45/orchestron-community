@@ -574,6 +574,8 @@
               this.isClicked = false
               this.reloadPage = false
               this.fetchData()
+              this.reloadPage = false
+
 
             }).catch(error => {
               this.isClicked = false
@@ -727,6 +729,7 @@
               })
               this.reloadPage = false
               this.fetchData()
+              this.reloadPage = false
 
             }).catch(error => {
                var status_info = error.response.status

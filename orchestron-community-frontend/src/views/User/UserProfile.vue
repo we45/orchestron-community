@@ -17,7 +17,7 @@
               <br>
               <row>
                 <!-- <br> -->
-                  <btn class="btn btn-success btn-sm" style="color: #FFFFFF;cursor: pointer;" v-b-modal.modal1>
+                  <btn class="btn btn-orange-submit btn-sm" style="color: #FFFFFF;cursor: pointer;" v-b-modal.modal1>
                         Change Password
                   </btn>
 
