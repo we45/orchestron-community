@@ -30,7 +30,10 @@ import io
 from api.jira_utils import get_jira_con
 from time import sleep
 from api.orl import get_open_vul_info_from_api
-
+from django.conf import settings
+from api.models import User
+from django.contrib.sites.models import Site
+from base64 import b64encode
 
 @background()
 def sync_jira_users(org_id):
@@ -301,4 +304,59 @@ def webhook_process_json(user, application, json_dict, init_es, tool, scan_name,
     info_debug_log(event='Webhooks - json process',status='success')
 
 
+
+
+from django.core.mail import EmailMultiAlternatives, EmailMessage,get_connection
+from django.contrib.auth.tokens import default_token_generator    
+from django.template import loader
+
+def make_token(user):
+    token = default_token_generator.make_token(user)
+    return token
+
+@background()
+def forgot_email_reset(email,subject,domain_override,email_template_name,use_https):
+    try:
+        user = User.objects.get(email=email)
+        if user:
+            email_certs = 'TLS'
+            EMAIL_HOST_TYPE = 'SMTP'
+            EMAIL_HOST = settings.EMAIL_HOST
+            EMAIL_PORT = settings.EMAIL_PORT
+            EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+            EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+            EMAIL_USE_TLS = True
+            from_email = 'notifications@orchestron.io'
+            display_email = 'Orchestron'
+            if EMAIL_HOST_TYPE == 'SMTP':
+                USE_TLS = email_certs != 'SSL'
+                USE_SSL = email_certs == 'SSL'
+                connection = get_connection(host=EMAIL_HOST,port=EMAIL_PORT,username=EMAIL_HOST_USER,password=EMAIL_HOST_PASSWORD,
+                    use_tls=EMAIL_USE_TLS, fail_silently=False,timeout=None)
+                connection.open()
+                from_full_email = '{0} <{1}>'.format(display_email,from_email)
+                if domain_override is None:
+                    current_site = Site.objects.get_current()
+                    site_name = current_site.name
+                    domain = current_site.domain
+                else:
+                    site_name = domain = domain_override
+                from django.core.mail import send_mail
+                t = loader.get_template(email_template_name)
+                c = {
+                    'email': user.email,
+                    'name':user.username,
+                    'domain': 'http://'+domain,
+                    'site_name': site_name,
+                    'uid': str(b64encode(bytes(str(user.id).encode('utf-8'))),'utf-8'),
+                    'user': user,
+                    'token': make_token(user),
+                    'protocol': use_https and 'https' or 'http'
+                }
+                email = EmailMultiAlternatives(subject, '', from_full_email, [user.email],connection=connection)
+                email.attach_alternative(t.render(c), "text/html")
+                email.send()
+                connection.close()
+    except Exception as e:
+        critical_debug_log(user=user,event=e,status='failure')
       

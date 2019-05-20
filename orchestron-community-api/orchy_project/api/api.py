@@ -29,14 +29,14 @@ from api.serializers import OrganizationSerializer, ProjectSerializer, Applicati
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
     ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
     JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer,\
-    DjangoSiteSerializer
+    DjangoSiteSerializer, ForgotPasswordSerializer, SetPasswordSerializer
 from django.contrib.sites.models import Site    
 from api.exceptions import Unauthorized, QueryMisMatchError, OrgConfigExistsError, OrgConfigDoesNotExists, \
     JIRAConfigNotEnabled, JIRAConfigExistsError, EmailConfigNotEnabled, EmailConfigExistsError, \
     PasswordMisMatchError, ORLConfigNotEnabled, ORLConfigExistsError, JiraProjectsConfigExistsError, JiraConfigNotEnabled
 from api.utils import get_request_response, get_single_vul_context, \
     validate_allowed_files, remove_file, get_severity_by_name, get_closed_vul_context
-from api.tasks import webhook_upload, webhook_process_json, \
+from api.tasks import webhook_upload, webhook_process_json, forgot_email_reset, \
     parse_xmls, sync_jira_users
 from api.utils import log_exception, get_severity_by_num
 from api.authentications import AccessKeyAuthentication
@@ -60,7 +60,9 @@ from api.stats import StatView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import binascii
 from api.utils import get_ip
-
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 class IPAdressView(APIView):
     def get(self, request):
         return Response({'ip':request.get_host()})
@@ -495,6 +497,68 @@ class UserUtilityView(viewsets.ViewSet):
         obj.set_password(serializer.validated_data.get("new_password"))
         obj.save()
         return Response({"message":"Password changed successfully"}, status=status.HTTP_200_OK)
+
+
+class UserUtilityForgotView(viewsets.ViewSet):
+    change_password_serializer = ForgotPasswordSerializer
+    authentication_classes= ()
+    permission_classes = ()
+
+    def post(self, request):
+        try:
+            serializer = self.change_password_serializer(data=request.data, context={'request': self.request})
+            if serializer.is_valid():
+                email = serializer.validated_data.get('email')
+                user = User.objects.get(email=serializer.validated_data.get('email'))
+                subject = 'Reset Your Password'
+                domain_override = None
+                email_template_name = 'forgot_password.html'
+                use_https= False
+                forgot_email_reset(serializer.validated_data.get('email'), subject, domain_override, email_template_name, use_https)
+                return Response({"message": "please check your mail reset link has been sent"},
+                                        status=status.HTTP_200_OK)
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print("Line no :{0} Exception {1}".format(exc_traceback.tb_lineno,e))
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+
+def check_token(user, token):
+    try:
+        return default_token_generator.check_token(user, token)
+    except BaseException as e:
+        return False
+
+class PasswordUtilityView(viewsets.ViewSet):
+    permission_classes = ()
+    authentication_classes = ()
+    set_password_serializer = SetPasswordSerializer
+
+    def set_password(self, request, uidb64, token):
+        try:
+            try:
+                uid = str(b64decode(uidb64), 'utf-8')
+                user = User.objects.get(id=uid)
+            except BaseException as e:
+                user = None
+            status_token = check_token(user, token)
+            if user:
+                serializer = self.set_password_serializer(data=request.data, context={'request': self.request})
+                if serializer.is_valid():
+                    new_password2 = serializer.validated_data.get('new_password2')
+                    user.set_password(new_password2)
+                    user.save()
+                    return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error':'Invalid link!'},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print("exceptions as e", e)
+            return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class OrganizationOptionView(viewsets.ViewSet):
