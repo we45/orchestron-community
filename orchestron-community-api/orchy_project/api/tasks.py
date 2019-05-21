@@ -315,7 +315,7 @@ def make_token(user):
     return token
 
 @background()
-def forgot_email_reset(email,subject,domain_override,email_template_name,use_https):
+def forgot_email_reset(email,subject,domain_override,email_template_name,use_https, protocol_type):
     try:
         user = User.objects.get(email=email)
         if user:
@@ -325,8 +325,8 @@ def forgot_email_reset(email,subject,domain_override,email_template_name,use_htt
             EMAIL_PORT = settings.EMAIL_PORT
             EMAIL_HOST_USER = settings.EMAIL_HOST_USER
             EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+            from_email = settings.FROM_EMAIL
             EMAIL_USE_TLS = True
-            from_email = 'notifications@orchestron.io'
             display_email = 'Orchestron'
             if EMAIL_HOST_TYPE == 'SMTP':
                 USE_TLS = email_certs != 'SSL'
@@ -346,7 +346,7 @@ def forgot_email_reset(email,subject,domain_override,email_template_name,use_htt
                 c = {
                     'email': user.email,
                     'name':user.username,
-                    'domain': 'http://'+domain,
+                    'domain': protocol_type+'://'+domain,
                     'site_name': site_name,
                     'uid': str(b64encode(bytes(str(user.id).encode('utf-8'))),'utf-8'),
                     'user': user,

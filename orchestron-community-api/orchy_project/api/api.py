@@ -63,9 +63,11 @@ from api.utils import get_ip
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+
 class IPAdressView(APIView):
     def get(self, request):
-        return Response({'ip':request.get_host()})
+        protocol = request.is_secure() and "https" or "http"
+        return Response({'ip':request.get_host(), 'protocol':protocol})
 
 class TokenRenewView(APIView):
     def get(self, request):
@@ -514,7 +516,8 @@ class UserUtilityForgotView(viewsets.ViewSet):
                 domain_override = None
                 email_template_name = 'forgot_password.html'
                 use_https= False
-                forgot_email_reset(serializer.validated_data.get('email'), subject, domain_override, email_template_name, use_https)
+                protocol = request.is_secure() and "https" or "http"
+                forgot_email_reset(serializer.validated_data.get('email'), subject, domain_override, email_template_name, use_https, protocol)
                 return Response({"message": "please check your mail reset link has been sent"},
                                         status=status.HTTP_200_OK)
         except Exception as e:
