@@ -1,5 +1,6 @@
 <template>
     <div>
+        <loading :active.sync="isLoading" :can-cancel="true"></loading>
         <b-row>
             <b-col cols="3"></b-col>
             <b-col cols="6">
@@ -26,6 +27,40 @@
                         disabled="disabled">Login</button>
                     <button class="login-button" v-if="!$v.email.$invalid && !$v.password.$invalid" @click="onSubmit">Login</button>
                 </form>
+                <div>
+                      <br>
+                      <div style="text-align: right;">
+                       <label v-b-modal.passwordForgot @click="forgotPass" style="text-align: right;color: #FB3200;cursor: pointer;">Forgot Password ?</label>
+                      </div>
+                      <b-modal
+                      ref="forgotPasswordModel"
+                      title="Forgot Password"
+                      size="lg"
+                      centered
+                      id="passwordForgot">
+                        <br>
+                        <form  @submit.prevent="submitForgotPassword">
+                            <b-form-input
+                                    v-model="forgotPassword"
+                                    type="email"
+                                    class="inline-form-control"
+                                    placeholder="Enter Email" :state="!$v.forgotPassword.$invalid"></b-form-input>
+                        </form>
+                        <b-col cols="12" slot="modal-footer">
+                            <div class="pull-right" style="float: right">
+                                <button type="button" class="btn btn-orange-close pull-right" @click=" closeForgotPassword() "> Close</button>
+                                <button type="button"
+                                        class="btn btn-orange-submit pull-right"
+                                        data-dismiss="modal"
+                                        @click=" submitForgotPassword() "
+                                        v-if="!$v.forgotPassword.$invalid">
+                                Submit
+                                </button>
+                            </div>
+                        </b-col>
+                        <br>
+                      </b-modal>
+                    </div>
                 </b-card>
             </b-col>
             <b-col cols="3"></b-col>
@@ -38,14 +73,21 @@
 import axios from 'axios'
 import validUserCheck from '@/utils/auth'
 import { required, minLength, email } from 'vuelidate/lib/validators'
+import Loading from 'vue-loading-overlay'
 export default {
   name: 'Login',
+   components: {
+    Loading
+  },
   data() {
     return {
       email: '',
       password: '',
       isFormInvalid: false,
-      isLogin: false
+      isLogin: false,
+      forgotPassword: '',
+      isLoading: false,
+       forgotPassword: '',
     }
   },
   validations: {
@@ -56,6 +98,11 @@ export default {
     },
     password: {
       required,
+      minLength: minLength(1)
+    },
+    forgotPassword: {
+      required,
+      email,
       minLength: minLength(1)
     }
   },
@@ -128,7 +175,44 @@ export default {
         })
         }
       }
-    }
+    },
+    forgotPass() {
+      this.forgotPassword = ''
+    },
+     closeForgotPassword() {
+      this.$refs.forgotPasswordModel.hide()
+    },
+     submitForgotPassword() {
+      const baseURL = conf.API_URL
+      const email = btoa(unescape(encodeURIComponent(this.forgotPassword)))
+      const forgotUrl = baseURL + '/api/user/password/forgot/'
+      this.isLoading = true
+      axios.post(forgotUrl, {
+        email: this.forgotPassword
+      }).then(res => {
+        this.$refs.forgotPasswordModel.hide()
+        this.forgotPassword = ''
+        this.isLoading = false
+         this.$notify({
+              group: 'foo',
+              type: 'success',
+              title: 'success',
+              text: 'Please check your email !!',
+              position: 'top right'
+            })
+      })
+        .catch(error => {
+          this.$notify({
+              group: 'foo',
+              type: 'error',
+              title: 'Error',
+              text: 'Invalid  email !!',
+              position: 'top right'
+            })
+          console.log("error", error.response)
+          this.isLoading = false
+        })
+    },
   }
 }
 </script>
@@ -235,4 +319,78 @@ export default {
     opacity: 1;
     transition: 0s
 }
+  .error{
+    color: #F04E23;
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .btn-orange-close {
+    color: #ff542c;
+    background-color: #FFFFFF;
+    border-color: #ff542c;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+
+  .btn-orange-close:focus,
+  .btn-orange-close.focus {
+    color: #ff542c;
+    background-color: #FFFFFF;
+    border-color: #ff542c;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+
+  .btn-orange-close:hover {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+   .btn-orange-submit {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+
+  }
+
+  .btn-orange-submit:focus,
+  .btn-orange-submit.focus {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
+
+  .btn-orange-submit:hover {
+    color: #FFFFFF;
+    background-color: #ff542c;
+    border-color: #FFFFFF;
+    font-family: 'Avenir';
+    border-radius: 14px;
+    padding: 3px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+  }
 </style>

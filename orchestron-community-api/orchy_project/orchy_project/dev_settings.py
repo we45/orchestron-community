@@ -100,7 +100,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'orchy_project.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -117,9 +116,14 @@ TEMPLATES = [
     },
 ]
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 WSGI_APPLICATION = 'orchy_project.wsgi.application'
-
 DB_IP = os.environ.get('DB_IP', '127.0.0.1')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+FROM_EMAIL = os.environ.get('FROM_EMAIL')
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -335,6 +339,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'api/media/')
 PARSERS_ROOT = os.path.join(BASE_DIR, 'parsers/')
 FONT_ROOT = os.path.join(BASE_DIR, 'api/fonts/')
+EMAIL_TEMPLATE = os.path.join(BASE_DIR, 'api/template/')
 MEDIA_URL = '/media/'
 PROJECT_MEDIA_URL = 'project_logo/'
 APPLICATION_MEDIA_URL = 'app_logo/'

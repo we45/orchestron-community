@@ -34,9 +34,9 @@
                                     v-model="projectLogo"
                                     placeholder="Choose a logo..."
                                     accept="image/jpeg, image/png,image/jpg,"
-                                    :state="!$v.projectLogo.$invalid"></b-form-file>
+                                    ></b-form-file>
                                 <br>
-                                <p>{{ projectLogo.name }}</p>
+                                <p v-if="projectLogo">{{ projectLogo.name }}</p>
                             </b-col>
                         </b-row>
                         <br>
@@ -45,7 +45,7 @@
                 <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateProject() "> Close</button>
-                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" submitCreateProject() " v-if="!$v.projectName.$invalid && !$v.projectLogo.$invalid">
+                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" submitCreateProject() " v-if="!$v.projectName.$invalid">
                         Submit
                         </button>
                     </div>
@@ -183,9 +183,6 @@ export default {
         required,
         minLength: minLength(1)
       },
-      projectLogo: {
-        
-      },
       updateProjectName: {
         required,
         minLength: minLength(3)
@@ -279,6 +276,7 @@ export default {
               })
               this.projectLogo = ''
               this.projectName = ''
+              // this.$router.go('/projects/')
             }).catch(error => {
               var status_info = error.response.status
               if(status_info === 400){

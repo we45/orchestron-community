@@ -629,8 +629,14 @@
          axios.get('/get/ip/').then(res => {
             console.log("res", res.data)
            this.ipWebhook = res.data.ip
+           if(res.data.protocol){
+            var protocall = res.data.protocol +'://'
+           }
+           else{
+             protocall = 'http://'
+           }
            this.curlCmd_secret_access_key = 
-           'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/'
+           'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -v -F file=@<file_path> ' + protocall+this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/'
           }).catch(error => {
             if (error.response.data.detail === 'Signature has expired.') {
               this.$router.push('/')

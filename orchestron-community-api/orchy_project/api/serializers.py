@@ -314,6 +314,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     	return data
 
 
+
 class SuperUserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
@@ -672,6 +673,28 @@ class ReportSerializer(serializers.Serializer):
 		return data
 
 
+class SetPasswordSerializer(serializers.Serializer):
+	new_password1 = serializers.CharField(required=True,style={'input_type': 'password'})
+	new_password2 = serializers.CharField(required=True,style={'input_type': 'password'})
+
+	def __init__(self, *args, **kwargs):
+		super(SetPasswordSerializer, self).__init__(*args, **kwargs)
+		self.user = self.context.get('request').user
+
+	def validate(self, data):
+		new_password1 = data.get('new_password1')
+		new_password2 = data.get('new_password2')
+		if new_password1 != new_password2:
+			raise serializers.ValidationError('Passwords did not match')
+		return data
 
 
 
+class ForgotPasswordSerializer(serializers.Serializer):
+	email = serializers.EmailField(required=True)
+
+	def validate(self, data):
+		email = data.get('email')
+		if not User.objects.filter(email=email).exists():
+			raise serializers.ValidationError('Invalid Email')
+		return data

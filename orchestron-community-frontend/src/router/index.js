@@ -36,6 +36,7 @@ import Settings from '../views/Settings/index'
 import IndividualOrg from '../views/Settings/IndividualOrg'
 import AllApplicationsData from '../views/Projects/AllApplication'
 import uncategorizedOpenVulnerabilities from '../views/uncategorized/index'
+import ForgotPassword from '../views/User/ForgotPassword'
 // import ReportView from '../views/ReportView/index'
 // import UncategorizedSeverityWise from '../views/uncategorized/severityWise'
 
@@ -46,6 +47,7 @@ export const constantRouterMap = [
   { path: '/forbidden', component: Forbidden },
   { path: '/not_found', component: NotFound },
   { path: '/error', component: Error },
+  { path: '/forgot_password/:userToken/', component: ForgotPassword, hidden: true },
   {
     path: '/org',
     component: Layout,
