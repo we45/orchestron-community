@@ -6,12 +6,12 @@ from api.api import OrganizationView, ProjectView, ApplicationView, ScanView, En
 	WebhookView, WebhookUploadView, VulnerabilityView, VulnerabilityEvidenceView, \
     VulnerabilityRemediationView, VulnerabilityEvidenceRemediationView, UserView, OrganizationConfigurationView, \
     JiraIssueTypesView, EmailConfigurationView, OpenVulnerabilityView, RequestResponseView, RemediateOpenVulnerabilityView,\
-    ClosedVulnerabilityView, UserUtilityView, UserProfileView, MediaServeView, OrganizationOptionView, \
+    ClosedVulnerabilityView, UserUtilityView, UserProfileView, MediaServeView, OrganizationOptionView,UserUtilityForgotView, \
     OptionsListView, ParserView, JiraConnectionTestView, \
     ORLConfigView, ScanResultView, JiraProjectsView, JIRAListView, \
     ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView, ExecutiveReportView,\
     CategorizeVulnerability, TokenRenewView, GetTokenView, DjangoSiteChangeView, \
-    IPAdressView
+    IPAdressView, PasswordUtilityView
 from rest_framework_jwt.views import obtain_jwt_token
 from api.analytics import OrganizationAnalyticsView, ProjectAnalyticsView, ApplicationAnalyticsView, \
     EngagementAnalyticsView, ScanAnalyticsView, VulnerabilityAnalyticsView
@@ -28,6 +28,8 @@ urlpatterns = [
     re_path(r'^api/get/token/$', GetTokenView.as_view()),    
     re_path(r'^media/(?P<path>.*)$', MediaServeView.as_view()),
     re_path(r'^api/user/password/change/(?P<email>.*)/$', UserUtilityView.as_view({'post':'change_password'})),
+    re_path(r'^api/user/password/forgot/$', UserUtilityForgotView.as_view({'post':'post'})),
+    re_path(r'^api/user/password/reset/(?P<uidb64>[0-9A-Za-z=]+)-(?P<token>.+)/$',PasswordUtilityView.as_view({'post':'set_password'})),
     re_path(r'^api/user/token/', obtain_jwt_token),
     re_path(r'^api/user/profile/', UserProfileView.as_view()),
 
