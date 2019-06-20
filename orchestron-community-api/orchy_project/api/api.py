@@ -63,6 +63,7 @@ from api.utils import get_ip
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
 
 class IPAdressView(APIView):
     def get(self, request):
@@ -517,7 +518,7 @@ class UserUtilityForgotView(viewsets.ViewSet):
                 email_template_name = 'forgot_password.html'
                 use_https= False
                 protocol = request.is_secure() and "https" or "http"
-                forgot_email_reset(serializer.validated_data.get('email'), subject, domain_override, email_template_name, use_https, protocol)
+                forgot_email_reset.delay(serializer.validated_data.get('email'), subject, domain_override, email_template_name, use_https, protocol)
                 return Response({"message": "please check your mail reset link has been sent"},
                                         status=status.HTTP_200_OK)
         except Exception as e:
@@ -527,12 +528,6 @@ class UserUtilityForgotView(viewsets.ViewSet):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
-
-def check_token(user, token):
-    try:
-        return default_token_generator.check_token(user, token)
-    except BaseException as e:
-        return False
 
 class PasswordUtilityView(viewsets.ViewSet):
     permission_classes = ()
@@ -546,8 +541,8 @@ class PasswordUtilityView(viewsets.ViewSet):
                 user = User.objects.get(id=uid)
             except BaseException as e:
                 user = None
-            status_token = check_token(user, token)
-            if user:
+            status_of_token = default_token_generator.check_token(user, token)
+            if user is not None and status_of_token:
                 serializer = self.set_password_serializer(data=request.data, context={'request': self.request})
                 if serializer.is_valid():
                     new_password2 = serializer.validated_data.get('new_password2')
@@ -555,6 +550,7 @@ class PasswordUtilityView(viewsets.ViewSet):
                     user.save()
                     return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
                 else:
+                    print("serializer.errors", serializer.errors)
                     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'error':'Invalid link!'},status=status.HTTP_400_BAD_REQUEST)
@@ -1426,7 +1422,7 @@ class ParserView(viewsets.ViewSet):
             scan_log.save()
             error_debug_log(ip=request.get_host(), user=request.user.username, event='Unsupported file format', status='failure')
             return Response({'Error':'Unsupported file format, supported file formats are {0}'.format(file_format)}, status=status.HTTP_403_FORBIDDEN)
-        parse_xmls(None, application.id, complete_path, init_json, tool, scan_name, request.get_host(), request.user.username)
+        parse_xmls.delay(None, application.id, complete_path, init_json, tool, scan_name, request.get_host(), request.user.username)
         info_debug_log(ip=request.get_host(), user=request.user.username, event='Push results', status='success')
         return Response({'message':'Parsing is in progress','scan_name':scan_name},status=status.HTTP_200_OK)
 
