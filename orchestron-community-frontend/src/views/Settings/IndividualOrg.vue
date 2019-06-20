@@ -681,15 +681,16 @@ export default {
             axios.get(res.data.logo)
               .then(res => {
                 this.orgLogo = res.data
-              }).catch(error => {
-                if (error.response.status === 404) {
-                  this.$router.push('/not_found')
-                } else if (error.response.status === 403) {
-                  this.$router.push('/forbidden')
-                } else {
-                  this.$router.push('/error')
-                }
               })
+              // .catch(error => {
+              //   if (error.response.status === 404) {
+              //     this.$router.push('/not_found')
+              //   } else if (error.response.status === 403) {
+              //     this.$router.push('/forbidden')
+              //   } else {
+              //     this.$router.push('/error')
+              //   }
+              // })
             // for (const value of res.data.users) {
             //   let name = ''
             //   if (
@@ -741,16 +742,16 @@ export default {
                   this.jiraPassword = ''
                   this.post_jira_method = true
                 })
-                .catch(error => {
-                    this.reloadPage = false
-                  if (error.response.status === 404) {
-                    this.$router.push('/not_found')
-                  } else if (error.response.status === 403) {
-                    this.$router.push('/forbidden')
-                  } else {
-                    this.$router.push('/error')
-                  }
-                })
+                // .catch(error => {
+                //     this.reloadPage = false
+                //   if (error.response.status === 404) {
+                //     this.$router.push('/not_found')
+                //   } else if (error.response.status === 403) {
+                //     this.$router.push('/forbidden')
+                //   } else {
+                //     this.$router.push('/error')
+                //   }
+                // })
             }
             this.reloadPage = false
           })
@@ -1058,7 +1059,7 @@ export default {
           axios
             .post('/organizations/' + this.org + '/config/', form_data)
             .then(res => {
-              if (response.status === 200) {
+              // if (response.status === 200) {
                 this.showConfig = false
                 this.isLoading = true
                 this.$router.go('/settings/individual_org/' + this.org + '/')
@@ -1069,7 +1070,7 @@ export default {
                   text: 'The organization has been created successfully!',
                   position: 'top right'
                 })
-              }
+              // }
             })
             .catch(error => {
               if (error.response.status === 404) {
@@ -1084,7 +1085,7 @@ export default {
           axios
             .put('/organizations/' + this.org + '/config/', form_data)
             .then(res => {
-              if (response.status === 200) {
+              // if (response.status === 200) {
                 this.showConfig = false
                 this.isLoading = true
                 this.$router.go('/settings/individual_org/' + this.org + '/')
@@ -1095,7 +1096,7 @@ export default {
                   text: 'The organization has been created successfully!',
                   position: 'top right'
                 })
-              }
+              // }
             })
             .catch(error => {
               if (error.response.status === 404) {
@@ -1223,7 +1224,7 @@ export default {
         axios
           .put('/organizations/' + this.org + '/email/', form_data)
           .then(res => {
-            if (response.status === 200) {
+            // if (response.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
               this.$router.go('/settings/individual_org/' + this.org + '/')
@@ -1235,7 +1236,7 @@ export default {
                 position: 'top right'
               })
               this.isLoading = false
-            }
+            // }
           })
           .catch(error => {
             if (error.response.status === 404) {
