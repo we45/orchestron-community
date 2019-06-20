@@ -236,7 +236,6 @@ MINIO = {
 
 
 WEBHOOK_TOOLS = {
-    'Orchestron JSON':'json',
     'ZAP':'json,xml',
     'Burp':'json,xml',
     'Bandit':'json',
