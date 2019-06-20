@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import datetime
+import djcelery
+djcelery.setup_loader()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CELERY_IMPORTS = ("api.tasks")
 
 
 # Quick-start development settings - unsuitable for production
@@ -21,6 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'j%5fm=ryk!m*_ad=^yy%m(^@8_-!rx))&hm$t29f%e$1!x-hkh'
+CELERY_ACCEPT_CONTENT = ['json','pickle']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -63,9 +67,17 @@ INSTALLED_APPS = [
     'background_task',
     'api',
     'corsheaders',
+    'djcelery'
     # 'rest_framework_filters',
     # 'django_extensions'
 ]
+AMQP_HOST = os.environ.get('AMQP_IP', '127.0.0.1')
+AMQP_PORT = os.environ.get('AMQP_PORT', 5672)
+AMQP_USER = os.environ.get('AMQP_USER', "guest")
+AMQP_PASSWORD = os.environ.get('AMQP_PASSWORD', "guest")
+
+BROKER_URL = 'amqp://{0}:{1}@{2}:{3}/'.format(AMQP_USER,AMQP_PASSWORD,AMQP_HOST,AMQP_PORT)
+
 
 SITE_ID = 1
 

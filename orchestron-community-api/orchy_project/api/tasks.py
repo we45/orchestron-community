@@ -20,8 +20,9 @@ from django.conf import settings
 from api.models import User
 from django.contrib.sites.models import Site
 from base64 import b64encode
+import celery
 
-@background()
+@celery.task
 def sync_jira_users(org_id):
     print('Sync JIRA Users')
     jira_config = JiraIssueTypes.objects.get(org__id=org_id)
@@ -46,7 +47,7 @@ def sync_jira_users(org_id):
             log_exception(e)
 
 
-@background()
+@celery.task
 def raise_jira_ticket(obj,org_id):
     """
     Raises the jira ticket on accurance of vul
@@ -226,7 +227,7 @@ def process_json(user, application, json_dict, init_es, tool, scan_name, user_ho
             hook_log.save()  
     
 
-@background()
+@celery.task
 def parse_xmls(user, application, complete_path, init_es, tool, scan_name, user_host, to_name):
     """
     calls the parsers to parse the xml file according to the tool selected
@@ -235,7 +236,7 @@ def parse_xmls(user, application, complete_path, init_es, tool, scan_name, user_
     info_debug_log(event='Parse xmls',status='success')
 
 
-@background()
+@celery.task
 def webhook_upload(user, application, complete_path, init_es, tool, scan_name, user_host, to_name,hook_log):
     """
     webhook uploades the xml  files for parsing and saves the log by event handling
@@ -248,7 +249,7 @@ def webhook_upload(user, application, complete_path, init_es, tool, scan_name, u
     info_debug_log(event='Webhook upload',status='success')
 
 
-@background()
+@celery.task
 def webhook_process_json(user, application, json_dict, init_es, tool, scan_name, user_host, to_name,hook_log):
     """
     webhook processes the json for parsing and saves the log by event handling
@@ -271,7 +272,7 @@ def make_token(user):
     token = default_token_generator.make_token(user)
     return token
 
-@background()
+@celery.task
 def forgot_email_reset(email,subject,domain_override,email_template_name,use_https, protocol_type):
     try:
         user = User.objects.get(email=email)
