@@ -27,8 +27,6 @@
                     :current-page="currentPage"
                     :per-page="perPage"
                     :filter="filter"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
                     class="m2_top">
                     <template slot="sev" slot-scope="row">
                         <div class="high-vul-severity-line" v-if="row.item.sev===3"></div>

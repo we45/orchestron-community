@@ -1,6 +1,5 @@
 import re
 from jira import JIRA
-# from app_utils.extra import log_exception
 from django.conf import settings
 import hashlib
 from jira.exceptions import JIRAError
@@ -9,7 +8,7 @@ from uuid import uuid4
 from time import sleep
 from api.app_log import *
 from api.ciphertext_manager import JIRACipher
-# from sarpastra_new.tasks import general_error_messages
+
 
 def get_jira_con(jira_config):
 	try:

@@ -22,7 +22,7 @@ from api.storage import OverwriteStorage
 from api.managers import OrganizationManager, ProjectManager, ApplicationManager, VulnerabilityManager, ScanManager, \
     EngagementManager, WebhookManager, VulnerabilityEvidenceManager, VulnerabilityRemediationManager, \
     VulnerabilityEvidenceRemediationManager, OrganizationConfigurationManager, JiraIssueTypesManager, \
-    EmailConfigurationManager, ORLConfigurationManager, JiraProjectsManager, ScanLogManager
+    JiraProjectsManager, ScanLogManager
 
 
 def get_uniq_name():
@@ -508,9 +508,7 @@ class OrganizationConfiguration(BaseModel):
     """
     This view creates a model of OrganizationConfiguration
     """
-    enable_jira = models.BooleanField(default=False)
-    enable_email = models.BooleanField(default=False)
-    enable_orl = models.BooleanField(default=False)
+    enable_jira = models.BooleanField(default=True)
     org = models.OneToOneField(Organization,on_delete=models.CASCADE,primary_key=True)
     objects = OrganizationConfigurationManager()
 
@@ -519,21 +517,6 @@ class OrganizationConfiguration(BaseModel):
 
     class Meta:
         ordering = ('-org',)              
-
-
-class ORLConfig(BaseModel):
-    host = models.CharField(max_length=200)
-    port = models.CharField(max_length=200)
-    protocol = models.CharField(max_length=200,choices=[('http','http'),('https','https')])
-    org = models.OneToOneField(Organization,on_delete=models.CASCADE,primary_key=True)
-    objects = ORLConfigurationManager()
-
-    def __unicode__(self):
-        return self.org.name
-
-    def get_config_url(self):
-        return '{0}://{1}:{2}'.format(self.protocol,self.host,self.port)                
-
 
 class JiraIssueTypes(BaseModel):
     """
@@ -610,35 +593,3 @@ class JiraConfigurations(BaseModel):
 
     def __str__(self):
         return self.name
-
-
-class EmailConfiguration(BaseModel):
-    """
-    This view creates a model of EmailConfiguration
-    """
-    host = models.CharField(max_length=200)
-    port = models.CharField(max_length=250)
-    username = models.CharField(max_length=200)
-    password = models.CharField(max_length=200)
-    from_email = models.EmailField(max_length=200,default='Orchestron')
-    display_name = models.CharField(max_length=200,default='Orchestron')
-    certs = models.CharField(max_length=100, null=True, blank=True)
-    org = models.OneToOneField(Organization,on_delete=models.CASCADE, primary_key=True)
-    objects = EmailConfigurationManager()
-
-    def __str__(self):
-        return self.host
-
-    class Meta:
-        ordering = ('-org',)
-
-    def save(self, *args, **kwargs):
-        email_response = test_email_connection(self.host,self.port,self.username,self.password,self.certs,self.from_email)
-        if not email_response:
-            raise AuthenticationError
-        cipher = EmailCipher()
-        self.username = cipher.encrypt(self.username)
-        self.password = cipher.encrypt(self.password)
-        self.host = cipher.encrypt(self.host)
-        self.port = cipher.encrypt(self.port)
-        super(EmailConfiguration, self).save(*args, **kwargs)           

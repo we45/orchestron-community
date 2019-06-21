@@ -11,7 +11,6 @@ class ExceptionMiddleware(object):
 		self.get_response = get_response
 
 	def __call__(self, request):
-		# log.info('{0} has been accessed by {1}'.format(request.path,request.user))
 		return self.get_response(request)	
 
 	def process_exception(self, request, exception):

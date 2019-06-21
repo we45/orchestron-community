@@ -1,4 +1,5 @@
 import os
+import sys
 from uuid import uuid4
 from datetime import datetime
 from django.utils import timezone
@@ -18,16 +19,16 @@ from django.contrib.contenttypes.models import ContentType as DjangoContentType
 from django.contrib.auth.models import Permission as DjangoPermission
 from api.models import Application, Project, Organization, Scan, Engagement, Webhook, WebhookLog, \
     Vulnerability,  VulnerabilityEvidence, VulnerabilityRemediation, VulnerabilityEvidenceRemediation, \
-    User, OrganizationConfiguration, JiraIssueTypes, EmailConfiguration, ORLConfig, JiraProjects, \
+    User, OrganizationConfiguration, JiraIssueTypes, JiraProjects, \
     JiraUsers, ScanLog, AccessToken
 from api.serializers import OrganizationSerializer, ProjectSerializer, ApplicationSerializer, ScanSerializer, \
     EngagementSerializer, WebhookSerializer, VulnerabilitySerializer, VulnerabilityEvidenceSerializer, \
     VulnerabilityRemediationSerializer, VulnerabilityEvidenceRemediationSerializer, UserSerializer, \
     OrganizationQueryParamSerializer, ProjectQueryParamSerializer, ApplicationsQueryParamSerializer, \
-    OrganizationConfigurationSerializer, JiraIssueTypesSerializer, EmailConfigurationSerializer, \
+    OrganizationConfigurationSerializer, JiraIssueTypesSerializer,\
     EngagementQueryParamSerializer, AssignScansSerializer, OpenVulnerabilityRemediationSerializer, \
     UpdateOpenVulnerabilitySerializer, ChangePasswordSerializer, UserProfileSerializer, \
-    ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, ORLConfigSerializer, \
+    ScanQueryParamSerializer, ParserSerializer, JiraConnectionTestSerializer, \
     JiraProjectsSerializer, ReportSerializer, CategorizeVulnerabilitySerializer,\
     DjangoSiteSerializer, ForgotPasswordSerializer, SetPasswordSerializer
 from django.contrib.sites.models import Site    
@@ -39,6 +40,7 @@ from api.utils import get_request_response, get_single_vul_context, \
 from api.tasks import webhook_upload, webhook_process_json, forgot_email_reset, \
     parse_xmls, sync_jira_users
 from api.utils import log_exception, get_severity_by_num
+from django.core.exceptions import ObjectDoesNotExist
 from api.authentications import AccessKeyAuthentication
 from api.minio_utils import MinioUtil
 from api.app_log import error_debug_log, info_debug_log, critical_debug_log
@@ -51,7 +53,6 @@ from api.analytics import OpenVulnerabilityStatView, ClosedVulnerabilityStatView
 from api.signals import *
 import pytz
 from django.utils import timezone
-from api.orl import get_open_vul_info_from_api, get_open_vul_name_from_api
 from api import jira_utils as jira
 from api.db_funcs import Aging
 from six import string_types
@@ -82,7 +83,6 @@ class TokenRenewView(APIView):
                 token.access_key = data_dict.get('access_key')
                 token.secret_key = data_dict.get('secret_key')
                 token.save()
-                # info_log('User `{0}` renewed the access token'.format(request.user.email),request)
                 return Response(data_dict)
             except:
                 raise Unauthorized
@@ -523,7 +523,6 @@ class UserUtilityForgotView(viewsets.ViewSet):
                                         status=status.HTTP_200_OK)
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            print("Line no :{0} Exception {1}".format(exc_traceback.tb_lineno,e))
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
@@ -550,12 +549,10 @@ class PasswordUtilityView(viewsets.ViewSet):
                     user.save()
                     return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
                 else:
-                    print("serializer.errors", serializer.errors)
                     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'error':'Invalid link!'},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print("exceptions as e", e)
             return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -582,7 +579,7 @@ class OrganizationOptionView(viewsets.ViewSet):
 class OptionsListView(viewsets.ViewSet):
 
     def tools(self,request):
-        data = [(t,t) for t in settings.WEBHOOK_TOOLS.keys()]
+        data = [(t[0],t[1]) for t in settings.WEBHOOK_TOOLS.items()]
         return Response(data,status=status.HTTP_200_OK)
 
     def hosttypes(self,request):
@@ -802,6 +799,27 @@ class OrganizationConfigurationView(BaseView):
     serializer_class = OrganizationConfigurationSerializer
     model_class = OrganizationConfiguration
 
+    def retrieve(self, request, pk=None):
+        """
+        This view returns a particular model instance serialized data
+
+        Parameters :
+            - pk
+                type : integer
+
+                desc : Primary key of the model instance
+        return type :
+            json
+        """
+        queryset = self.get_queryset()
+        try:
+            obj = queryset.get(pk=pk)
+            serializer = self.serializer_class(obj,context={'request':request})
+            log.info('Retrieved a single object of {0} with primary key {1}'.format(self.model_class.__name__,pk))
+            return Response(serializer.data)
+        except ObjectDoesNotExist:
+            return Response({'message':'No config exists'})
+
     def config(self, request, pk):
         obj = Organization.objects.get(pk=pk)
         config_exists = self.model_class.objects.filter(pk=pk).exists()
@@ -828,13 +846,6 @@ class JiraIssueTypesView(BaseView):
     def config(self, request, pk):
         obj = Organization.objects.get(pk=pk)
         config = OrganizationConfiguration.objects.filter(pk=pk)
-        jira_config_exists = self.model_class.objects.filter(pk=pk).exists()
-        if jira_config_exists:
-            raise JIRAConfigExistsError
-        if not config.exists():
-            raise OrgConfigDoesNotExists
-        if not config[0].enable_jira:
-            raise JIRAConfigNotEnabled
         serializer = self.serializer_class(data=request.data,context={'request':request})
         if serializer.is_valid():
             serializer.validated_data['org'] = obj
@@ -847,61 +858,6 @@ class JiraIssueTypesView(BaseView):
         obj = get_object_or_404(queryset, pk=pk)
         obj.delete()
         return Response({'message':'Organization JIRA Config Successfully Deleted'}, status=status.HTTP_200_OK)
-
-
-class EmailConfigurationView(BaseView):
-    serializer_class = EmailConfigurationSerializer
-    model_class = EmailConfiguration
-
-    def config(self, request, pk):
-        obj = Organization.objects.get(pk=pk)
-        config = OrganizationConfiguration.objects.filter(pk=pk)
-        email_config_exists = self.model_class.objects.filter(pk=pk).exists()
-        if email_config_exists:
-            raise EmailConfigExistsError
-        if not config.exists():
-            raise OrgConfigDoesNotExists
-        if not config[0].enable_email:
-            raise EmailConfigNotEnabled
-        serializer = self.serializer_class(data=request.data,context={'request':request})
-        if serializer.is_valid():
-            serializer.validated_data['org'] = obj
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        queryset = self.get_queryset()
-        obj = get_object_or_404(queryset, pk=pk)
-        obj.delete()
-        return Response({'message':'Organization Email Config Successfully Deleted'}, status=status.HTTP_200_OK)
-
-
-class ORLConfigView(BaseView):
-    serializer_class = ORLConfigSerializer
-    model_class = ORLConfig
-
-    def config(self, request, pk):
-        obj = Organization.objects.get(pk=pk)
-        config = OrganizationConfiguration.objects.filter(pk=pk)
-        orl_config_exists = self.model_class.objects.filter(pk=pk).exists()
-        if orl_config_exists:
-            raise ORLConfigExistsError
-        if not config.exists():
-            raise OrgConfigDoesNotExists
-        if not config[0].enable_orl:
-            raise ORLConfigNotEnabled
-        serializer = self.serializer_class(data=request.data,context={'request':request})
-        serializer.is_valid(raise_exception=True)
-        serializer.validated_data['org'] = obj
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def destroy(self, request, pk=None):
-        queryset = self.get_queryset()
-        obj = get_object_or_404(queryset, pk=pk)
-        obj.delete()
-        return Response({'message':'Organization Email Config Successfully Deleted'}, status=status.HTTP_200_OK)
 
 
 class ProjectView(BaseView):
@@ -1209,7 +1165,6 @@ class CategorizeVulnerability(APIView):
             else:
                 return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except BaseException as e:
-            print("Error", e)
             return Response({'error':'Something went wrong!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -1373,7 +1328,8 @@ class ParserView(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
         result_file = serializer.validated_data.get('file')
         tool = serializer.validated_data.get('tool')
-        scan_short_name = '{0}_{1}_Upload_{2}'.format(tool, application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
+        name_scan = serializer.validated_data.get('name')
+        scan_short_name = '{0}_{1}_Upload_{2}'.format(name_scan, tool, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
         obj_dict = {
             'application': application,
             'tool': tool,
@@ -1437,10 +1393,6 @@ class JiraProjectsView(BaseView):
         jira_app_config_exists = self.model_class.objects.filter(pk=pk).exists()
         if jira_app_config_exists:
             raise JIRAConfigExistsError
-        if not config.exists():
-            raise OrgConfigDoesNotExists
-        if not config[0].enable_jira:
-            raise JiraConfigNotEnabled
         serializer = self.serializer_class(data=request.data,context={'request':request})
         serializer.is_valid(raise_exception=True)
         serializer.validated_data['application'] = obj
@@ -1605,13 +1557,6 @@ class VulnerabilityView(BaseView):
         serializer.validated_data['tool'] = 'Manual'
         description = serializer.validated_data.get('description')
         org_obj = request.user.org
-        if org_obj.orl_config_exists():
-            vul_info = get_open_vul_info_from_api(cwe,org_obj)
-            common_name = get_open_vul_name_from_api(cwe,org_obj)
-            serializer.validated_data['common_name'] = common_name
-            serializer.validated_data['dread'] = vul_info.get('dread_score')
-            if not description:
-                serializer.validated_data['description'] = vul_info.get('description')
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -1631,13 +1576,6 @@ class VulnerabilityView(BaseView):
         serializer.validated_data['tool'] = 'Manual'
         description = serializer.validated_data.get('description')
         org_obj = request.user.org
-        if org_obj.orl_config_exists():
-            vul_info = get_open_vul_info_from_api(cwe,org_obj)
-            common_name = get_open_vul_name_from_api(cwe,org_obj)
-            serializer.validated_data['common_name'] = common_name
-            serializer.validated_data['dread'] = vul_info.get('dread_score')
-            if not description:
-                serializer.validated_data['description'] = vul_info.get('description')
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -1915,94 +1853,6 @@ class WebhookUploadView(APIView):
             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-# class WebhookUploadView(APIView):
-
-#     def post(self, request, pk, format=None):
-#         obj = Webhook.objects.get(pk=pk)
-#         log_dict = {
-#             'file_upload_event':False,
-#             'file_upload_exception':'',
-#             'file_upload_datetime':timezone.now(),
-#             'webhook':obj
-#         }
-#         log_obj = WebhookLog.objects.create(**log_dict)
-#         try:
-#             es_reference = str(uuid4())
-#             engagement_id = request.META.get('HTTP_ENGAGEMENT', '')
-#             webhook_scan_name = request.META.get('HTTP_SCAN', '')
-#             if webhook_scan_name:
-#                 scan_short_name = webhook_scan_name
-#             else:
-#                 scan_short_name = '{0}_{1}_webhook_{2}'.format(obj.tool, obj.application.name, timezone.now().strftime('%d_%b_%Y_%H:%M:%S'))
-#             obj_dict = {
-#                 'application': obj.application,
-#                 'tool': obj.tool,
-#                 'scan_type': 'Webhook',
-#                 'short_name': scan_short_name,
-#             }
-#             scan = Scan.objects.create(**obj_dict)
-#             if engagement_id:
-#                 engagement = Engagement.objects.filter(uniq_id=engagement_id, closed=False).last()
-#                 if engagement:
-#                     scan.engagements.add(engagement)
-#             scan_name = scan.name
-#             init_json = {
-#                 'scan_reference':{
-#                     'es_reference':scan_name,
-#                 },
-#                 'organization':{
-#                     'name':request.user.org.name,
-#                 },
-#                 'host':{
-#                     'app_uri':obj.application.url,
-#                     'name':obj.application.name,
-#                 }
-#             }
-#             if obj.tool == 'Orchestron JSON':
-#                 json_dict = request.data.get('vuls')
-#                 if not json_dict or request.content_type != 'application/json':
-#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
-#                     return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)
-#                 tool = request.data.get('vuls', {}).get('tool', 'Unknown')
-#                 vulnerabilities = request.data.get('vuls', {}).get('vulnerabilities')
-#                 if not vulnerabilities:
-#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='No data to process', status='failure')
-#                     return Response({'Error':'No data to process'}, status=status.HTTP_403_FORBIDDEN)
-#                 webhook_process_json(request.user, obj.application.id, json_dict, init_json, tool, scan_name, request.get_host(), request.user.username, log_obj.id)
-#             else:
-#                 result_file = request.data.get('file')
-#                 dir_path = settings.XML_ROOT
-#                 if not os.path.isdir(dir_path):
-#                     os.mkdir(dir_path)
-#                 ext = result_file.name.split('.')[-1]
-#                 complete_path = os.path.join(dir_path, '{0}.{1}'.format(es_reference, ext))
-#                 with open(complete_path, 'wb') as fp:
-#                     fp.write(result_file.read())
-#                 tool = validate_allowed_files(complete_path)
-#                 if tool != obj.tool:
-#                     remove_file(complete_path)
-#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='Invalid file', status='failure')
-#                     return Response({'Error':'Sorry!!! This is not a {0} file'.format(obj.tool)}, status=status.HTTP_403_FORBIDDEN)
-#                 file_format = settings.WEBHOOK_TOOLS.get(obj.tool)
-#                 if ext not in file_format:
-#                     error_debug_log(ip=request.get_host(), user=request.user.username, event='Unsupported file format', status='failure')
-#                     return Response({'Error':'Unsupported file format, supported file formats are {0}'.format(file_format)}, status=status.HTTP_403_FORBIDDEN)
-#                 webhook_upload(None, obj.application.id, complete_path, init_json, obj.tool, scan_name, request.get_host(), request.user.username, log_obj.id)
-#                 info_debug_log(ip=request.get_host(), user=request.user.username, event='Push results', status='success')
-#             return Response({'Success':'Result pushed successfully', 'scan_id':scan_name}, status=status.HTTP_200_OK)
-#         except BaseException as e:
-#             critical_debug_log(ip=request.get_host(), user=request.user.username, event=e, status='failure')
-#             log_obj.file_upload_exception = e
-#             log_obj.file_upload_datetime = timezone.now()
-#             log_obj.save()
-#             log_exception(e)
-#             return Response({'Error':'Unable to push the result'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
-
-import sys
 class ExecutiveReportView(APIView):
     authentication_classes = (JSONWebTokenAuthentication,)
     serializer_class = ReportSerializer
@@ -2045,16 +1895,11 @@ class ExecutiveReportView(APIView):
                     data_dict.update(s.get_severity_stats(user,kwargs=kwargs))
                     data_dict.update(s.get_owasp_stats(user,kwargs=kwargs))
                     data_dict.update(s.get_ageing_stats(user,kwargs=kwargs))
-                    # data_dict.update(s.get_avg_ageing_stats(user,kwargs=kwargs))
                     data_dict.update(s.get_open_vul_stats(user,kwargs=kwargs))
                     data_dict.update(s.get_closed_vuls_stats(user,kwargs=kwargs))
                     data_dict.update(s.get_false_positive_stats(user,kwargs=kwargs))
-                    # data_dict.update(s.get_months_stats(user,kwargs=kwargs))
-                    # info_log('Executive report generated',request)
                     return Response(data_dict, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except BaseException as e:
-            # log_exception(e, request=request, module_name=inspect.stack()[0][3])
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            print("Line no :{0} Exception {1}".format(exc_traceback.tb_lineno,e))

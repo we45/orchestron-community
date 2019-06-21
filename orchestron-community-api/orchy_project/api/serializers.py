@@ -10,7 +10,7 @@ from rest_framework import serializers, viewsets,status
 from rest_framework.parsers import JSONParser, MultiPartParser
 from api.models import Organization, User, Project, Application, Engagement, Scan, \
 	Webhook,Vulnerability, VulnerabilityEvidence,VulnerabilityRemediation, VulnerabilityEvidenceRemediation, \
-	OrganizationConfiguration, JiraIssueTypes, EmailConfiguration, ORLConfig, JiraProjects
+	OrganizationConfiguration, JiraIssueTypes, JiraProjects
 from api.validators import text_file_validator, image_file_validator, start_date_validator, end_date_validator, \
 	flat_file_validator
 from api.messages import *
@@ -232,42 +232,6 @@ class JiraConnectionTestSerializer(serializers.Serializer):
 		fields = ['url','username','password']
 
 
-class EmailConfigurationSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = EmailConfiguration
-		fields = ['host','username','password','port','from_email','display_name','certs','created_on','edited_on','org']
-		read_only_fields = ['created_on','edited_on','org']
-
-	def __init__(self, *args, **kwargs):
-		super(EmailConfigurationSerializer, self).__init__(*args, **kwargs)
-
-
-class ORLConfigSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = ORLConfig
-		fields = ['host','port','protocol','created_on','edited_on','org']
-		read_only_fields = ['created_on','edited_on','org']
-
-	def __init__(self, *args, **kwargs):
-		super(ORLConfigSerializer, self).__init__(*args, **kwargs)
-
-	def validate_host(self, data):
-		try:
-			socket.gethostbyname(data)
-		except:
-			raise serializers.ValidationError('Invalid host name')
-		return data
-
-	def validate_port(self, data):
-		try:
-			data = int(data)
-			if data >= 65535:
-				raise serializers.ValidationError('Invalid port number')
-		except:
-			raise serializers.ValidationError('Invalid port number')
-		return data
-
-
 class UserSerializer(serializers.ModelSerializer):
 
 	class Meta:
@@ -327,7 +291,6 @@ class SuperUserSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
 	parser_classes = (MultiPartParser,JSONParser)
-	# logo = serializers.ImageField(req)
 
 	class Meta:
 		model = Project
@@ -357,8 +320,6 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class ApplicationSerializer(serializers.ModelSerializer):
 	parser_classes = (MultiPartParser,JSONParser)
-	# project_details = serializers.SerializerMethodField()
-	# org_details = serializers.SerializerMethodField()
 	stats = serializers.SerializerMethodField()
 
 	class Meta:
@@ -476,7 +437,6 @@ class ScanSerializer(serializers.ModelSerializer):
 
 
 class WebhookSerializer(serializers.ModelSerializer):
-	# tool = serializers.ChoiceField(choices=[(t,t) for t in settings.WEBHOOK_TOOLS.keys()])
 	parser_classes = (JSONParser,)
 
 	class Meta:
@@ -577,7 +537,6 @@ class VulnerabilityEvidenceSerializer(serializers.ModelSerializer):
 
 class VulnerabilityRemediationSerializer(serializers.ModelSerializer):
 	parser_classes = (MultiPartParser,)
-	# file = serializers.FileField(required=False)
 
 	class Meta:
 		model = VulnerabilityRemediation
@@ -625,7 +584,6 @@ class OpenVulnerabilityRemediationSerializer(serializers.ModelSerializer):
 
 class VulnerabilityEvidenceRemediationSerializer(serializers.ModelSerializer):
 	parser_classes = (MultiPartParser,)
-	# file = serializers.FileField(required=False)
 
 	class Meta:
 		model = VulnerabilityEvidenceRemediation

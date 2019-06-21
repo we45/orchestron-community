@@ -31,7 +31,7 @@
                                 <span class="app-divider">:</span> <span class="app-value">{{ settings.endDate }}</span>
                             </p> -->
                         </b-col>
-                        <b-btn @click="configureSettings" class="btn-orange">Configure</b-btn>
+                        <!-- <b-btn @click="configureSettings" class="btn-orange">Configure</b-btn> -->
                          <b-btn @click="updateOrg" class="btn-orange pull-right" id="org_update" style="margin-left: 2%;">Update</b-btn>
                     </b-row>
                 </b-col>

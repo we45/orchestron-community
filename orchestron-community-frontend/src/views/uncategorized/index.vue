@@ -54,11 +54,12 @@
                             <b-col sm="2"><label class="label">CWE:</label></b-col>
                             <b-col sm="8">
                               <b-form-input
-          id="input-1"
-          v-model="updateUncategorizedVulCWE"
-          type="number"
-          placeholder="Enter CWE"
-        ></b-form-input>
+                                id="input-1"
+                                v-model="updateUncategorizedVulCWE"
+                                type="number"
+                                placeholder="Enter CWE"
+                                :state="!$v.updateUncategorizedVulCWE.$invalid"
+                              ></b-form-input>
                             </b-col>
                           <b-col cols="2">
 
@@ -70,7 +71,7 @@
                 <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeUncategorizedUpdateVul() ">Close</button>
-                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" promptUncategorizedUpdateVul() "
+                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal"  v-if="!$v.updateUncategorizedVulCWE.$invalid" @click=" promptUncategorizedUpdateVul() "
                               >
                         Submit
                         </button>
@@ -108,6 +109,7 @@
   import axios from '@/utils/auth'
   import {notValidUser} from '@/utils/checkAuthUser'
   import Loading from 'vue-loading-overlay'
+  import { required, minLength, url, ipAddress, between, integer} from 'vuelidate/lib/validators'
 
   export default {
     name: 'OpenVulnerabilities',
@@ -135,6 +137,13 @@
         reloadPage: false,
         updateUncategorizedVulName: '',
         updateUncategorizedVulCWE: '',
+      }
+    },
+     validations: {
+      updateUncategorizedVulCWE:{
+        required,
+        integer,
+        between: between(0, 1000)
       }
     },
     created() {

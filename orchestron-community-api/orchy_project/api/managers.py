@@ -22,16 +22,6 @@ class JiraProjectsManager(models.Manager):
 		return super().get_queryset().select_related('application','jira_config')
 
 
-class EmailConfigurationManager(models.Manager):
-	def get_queryset(self):
-		return super().get_queryset().select_related('org')		
-
-
-class ORLConfigurationManager(models.Manager):
-	def get_queryset(self):
-		return super().get_queryset().select_related('org')
-
-
 class ProjectManager(models.Manager):
 	def get_queryset(self):
 		return super().get_queryset().select_related('org')

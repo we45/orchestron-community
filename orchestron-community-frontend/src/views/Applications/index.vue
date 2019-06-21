@@ -88,6 +88,7 @@
                                         <v-select :options="toolOption"
                                             placeholder="Select Tool"
                                             v-model="uploadTool"
+                                            label="label"
                                             :state="!$v.uploadTool.$invalid"></v-select>
                                     </b-col>
                                 </b-row>
@@ -775,43 +776,14 @@
               }
             })
 
-         axios
-            .get('/organizations/' + this.org + '/config/')
-            .then(res => {
-              this.enable_Jira = res.data.enable_jira
-              // if (res.data.enable_jira) {
-              //   axios
-              //     .get('/organizations/' + this.org + '/jira/')
-              //     .then(res => {
-              //       axios
-              //         .get('jira/projects/' + this.param + '/')
-              //         .then(res => {
-              //           this.appJiraProjectOptions = res.data
-              //           this.isLoading = false
-              //         })
-              //         .catch(error => {
-              //           this.isLoading = false
-              //           if (error.res.status === 404) {
-              //             this.$router.push('/not_found')
-              //           } else if (error.res.status === 403) {
-              //             this.$router.push('/forbidden')
-              //           } else {
-              //             this.$router.push('/error')
-              //           }
-              //         })
-              //     })
-              //     .catch(error => {
-              //       this.isLoading = false
-              //       if (error.res.status === 404) {
-              //         this.$router.push('/not_found')
-              //       } else if (error.res.status === 403) {
-              //         this.$router.push('/forbidden')
-              //       } else {
-              //         this.$router.push('/error')
-              //       }
-              //     })
-              // }
-            })
+       
+                axios
+                  .get('/organizations/' + this.org + '/jira/')
+                  .then(res => {
+                    this.enable_Jira = true
+                     
+                  })
+           
         } else {
           notValidUser()
           this.$router.push('/')
@@ -824,11 +796,11 @@
           this.isLoading = true
           this.showConfig = true
                 this.reloadPage = true
-          axios
-            .get('/organizations/' + this.org + '/config/')
-            .then(res => {
-              this.enable_Jira = res.data.enable_jira
-              if (res.data.enable_jira) {
+          // axios
+          //   .get('/organizations/' + this.org + '/config/')
+          //   .then(res => {
+          //     this.enable_Jira = res.data.enable_jira
+              // if (res.data.enable_jira) {
                 axios
                   .get('/organizations/' + this.org + '/jira/')
                   .then(res => {
@@ -853,30 +825,30 @@
                       })
 
                   })
-                  .catch(error => {
-                    this.reloadPage = false
-                    this.isLoading = false
-                    if (error.res.status === 404) {
-                      this.$router.push('/not_found')
-                    } else if (error.res.status === 403) {
-                      this.$router.push('/forbidden')
-                    } else {
-                      this.$router.push('/error')
-                    }
-                  })
-              }
-            })
-            .catch(error => {
-                this.reloadPage = false
-              this.isLoading = false
-              if (error.res.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.res.status === 403) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
+                  // .catch(error => {
+                  //   this.reloadPage = false
+                  //   this.isLoading = false
+                  //   if (error.res.status === 404) {
+                  //     this.$router.push('/not_found')
+                  //   } else if (error.res.status === 403) {
+                  //     this.$router.push('/forbidden')
+                  //   } else {
+                  //     this.$router.push('/error')
+                  //   }
+                  // })
+              // }
+            // })
+            // .catch(error => {
+            //     this.reloadPage = false
+            //   this.isLoading = false
+            //   if (error.res.status === 404) {
+            //     this.$router.push('/not_found')
+            //   } else if (error.res.status === 403) {
+            //     this.$router.push('/forbidden')
+            //   } else {
+            //     this.$router.push('/error')
+            //   }
+            // })
         }
       },
       submitAppJiraConfig() {
@@ -896,6 +868,7 @@
                 position: 'top right'
               })
             }).catch(error => {
+                console.log("error", error)
                 // if(error.res.status === 400) {
                      axios.post('/applications/' + this.param + '/jira/', formData)
                     .then(res => {
@@ -928,8 +901,13 @@
           axios.get('/tools/')
             .then(res => {
               this.toolOption = []
+              console.log("res", res.data)
               for (const value of res.data) {
-                this.toolOption.push(value[0])
+                // this.toolOption.push(value[0])
+                this.toolOption.push({
+                  label: value[0] + ' (' + value[1] + ')',
+                  value: value[0]
+                })
               }
             }).catch(error => {
               if (error.res.status === 404) {
@@ -980,7 +958,7 @@
           const form_data = new FormData()
           form_data.append('file', this.uploadFile)
           form_data.append('name', this.uploadName)
-          form_data.append('tool', this.uploadTool)
+          form_data.append('tool', this.uploadTool.value)
           axios.post('/applications/' + this.param + '/parsers/', form_data, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -997,7 +975,7 @@
               })
               this.uploadFile = ''
               this.uploadName = ''
-              this.uploadTool = ''
+              this.uploadTool = false
               this.parsingStatus = res.data.message
               this.parsingScanId = res.data.scan_name
             }).catch(error => {

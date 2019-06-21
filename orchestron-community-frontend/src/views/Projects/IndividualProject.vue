@@ -336,11 +336,9 @@
     validations: {
       appUrl:{
         required,
-        url
       },
       appUpdateUrl:{
         required,
-        url
       },
       appName: {
         required,
@@ -764,12 +762,15 @@
         this.$refs.beforedeleteApplicationModal.hide()
       },
       BeforeSubmitDeleteApplication() {
+        this.$refs.beforedeleteApplicationModal.hide()
         this.$refs.deleteApplicationModal.show()
       },
       submitDeleteApplication() {
         if (this.param && this.org && this.token && this.deleteApplicationId) {
           axios.delete('/applications/' + this.deleteApplicationId + '/')
             .then(res => {
+              this.$refs.deleteApplicationModal.hide()
+              this.$refs.beforedeleteApplicationModal.hide()
               this.$refs.deleteApplicationModal.hide()
               this.reloadPage = true
               this.isLoading = true
