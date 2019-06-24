@@ -40,6 +40,8 @@
                                             type="text"
                                             class="inline-form-control"
                                             placeholder="Enter Vulnerability Name" :state="!$v.manualVulName.$invalid"></b-form-input>
+                                                  <p v-if="error_msgs['vul']" style="text-align:left;" class="error"> * {{ error_msgs['vul_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -51,6 +53,8 @@
                                             type="number"
                                             class="inline-form-control"
                                             placeholder="Enter CWE" :state="!$v.manualCwe.$invalid"></b-form-input>
+                                              <p v-if="error_msgs['cwe']" style="text-align:left;" class="error"> * {{ error_msgs['cwe_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -61,6 +65,8 @@
                                         :options="manualSeverityList"
                                         v-model="manualSeverity"
                                         placeholder="Select Severity" :state="!$v.manualSeverity.$invalid"></v-select>
+                                                                                 <p v-if="error_msgs['sev']" style="text-align:left;" class="error"> * {{ error_msgs['sev_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -71,6 +77,8 @@
                                         :options="manualOwaspList"
                                         v-model="manualOwasp"
                                         placeholder="Select OWASP" :state="!$v.manualOwasp.$invalid"></v-select>
+                                          <p v-if="error_msgs['owasp']" style="text-align:left;" class="error"> * {{ error_msgs['owasp_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -98,6 +106,8 @@
                                             :rows="3"
                                             :max-rows="6"
                                             placeholder="Enter Description" :state="!$v.manualVulDesc.$invalid"></b-form-textarea>
+                                             <p v-if="error_msgs['desc']" style="text-align:left;" class="error"> * {{ error_msgs['desc_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -111,6 +121,8 @@
                                             :rows="3"
                                             :max-rows="6"
                                             placeholder="Enter Description" :state="!$v.manualVulRemedy.$invalid"></b-form-textarea>
+                                            <p v-if="error_msgs['rem']" style="text-align:left;" class="error"> * {{ error_msgs['rem_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -187,7 +199,7 @@
                               <button type="button"
                                       style="float: right;"
                                         class="btn btn-orange-close pull-right"
-                                        @click="submitAddVulnerabilities() " v-if="!$v.manualVulUrl.$invalid && !$v.manualVulParam.$invalid && !$v.manualVulUrlDesc.$invalid && !$v.manualVulUrlFile.$invalid">
+                                        @click="submitAddVulnerabilities() " v-if="!$v.manualVulUrl.$invalid && !$v.manualVulParam.$invalid && !$v.manualVulUrlDesc.$invalid && !$v.manualVulUrlFile.$invalid && validated_evidence_file">
                                     Submit
                                     </button>
                             </form>
@@ -212,7 +224,7 @@
     import AppBarChart from '@/components/Charts/chart3DCWE'
     import ScanHeader from '@/components/Scans/Header'
     import VulTable from '@/components/Scans/VulTable'
-    import { required, minLength, url } from 'vuelidate/lib/validators'
+    import { required, minLength, url, between, integer} from 'vuelidate/lib/validators'
     import axios from '@/utils/auth'
     import { notValidUser } from '@/utils/checkAuthUser'
     import Loading from 'vue-loading-overlay'
@@ -257,6 +269,24 @@
             'Unvalidated Redirects and Forwards',
             'Uncategorized'
         ],
+        error_msgs: {
+          'scan': false,
+          'scan_msg': '',
+          'vul': false,
+          'vul_msg': '',
+          'cwe': false,
+          'cwe_msg': '',
+          'sev': false,
+          'sev_msg': '',
+          'owasp': false,
+          'owasp_msg': '',
+          'desc': false,
+          'desc_msg': '',
+          'rem': false,
+          'rem_msg': '',
+          'manual': false,
+          'manual_msg': ''
+        },
           manualOwasp: '',
           manualStepOne: false,
           manualStepTwo: false,
@@ -268,6 +298,7 @@
           manualVulParam: '',
           manualVulUrlDesc: '',
           manualVulUrlFile: '',
+          validated_evidence_file: false,
           cweChart: []
         }
       },
@@ -278,7 +309,9 @@
         },
         manualCwe: {
           required,
-          minLength: minLength(1)
+          minLength: minLength(1),
+          integer,
+          between: between(0, 1000)
         },
         manualSeverity: {
           required,
@@ -318,6 +351,37 @@
         this.token = localStorage.getItem('token')
         this.param = this.$route.params.scanId
         this.fetchData()
+      },
+      watch: {
+        'manualVulUrlFile': function(value_name) {
+            var ext = value_name.name.split(".")
+            var realData = ext[(ext.length)-1]
+            var validated_data =  ['png','jpg','jpeg','bmp','gif','tiff']
+            var data_form_submit = validated_data.includes(realData);
+            var size_of_file = 1024 * 1024 * 20
+            if(data_form_submit &&  (value_name.size < size_of_file)){
+                this.validated_evidence_file = true
+            }
+            else{
+                this.validated_evidence_file = false
+            }
+        },
+          'manualScanName': function(value_name) {
+        if (value_name.length > 255) {
+          this.error_msgs['manual'] = true
+          this.error_msgs['manual_msg'] = 'Max Length is 255 Characters'
+        } else {
+          this.error_msgs['manual'] = false
+        }
+      },
+      'manualVulName': function(value_name) {
+        if (value_name.length > 255) {
+          this.error_msgs['vul'] = true
+          this.error_msgs['vul_msg'] = 'Max Length is 255 Characters'
+          } else {
+            this.error_msgs['vul'] = false
+          }
+        },
       },
       methods: {
         fetchData() {
@@ -459,7 +523,34 @@
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
                   this.$router.push('/forbidden')
-                } else {
+                }
+                else if (error.response.status === 400) {
+                    if (error.response.data['name']) {
+                      this.error_msgs['vul'] = true
+                      this.error_msgs['vul_msg'] = error.response.data['name'][0]
+                    }
+                    if (error.response.data['cwe']) {
+                      this.error_msgs['cwe'] = true
+                      this.error_msgs['cwe_msg'] = error.response.data['cwe'][0]
+                    }
+                    if (error.response.data['severity']) {
+                      this.error_msgs['sev'] = true
+                      this.error_msgs['sev_msg'] = error.response.data['severity'][0]
+                    }
+                    if (error.response.data['owasp']) {
+                      this.error_msgs['owasp'] = true
+                      this.error_msgs['owasp_msg'] = error.response.data['owasp'][0]
+                    }
+                    if (error.response.data['description']) {
+                      this.error_msgs['desc'] = true
+                      this.error_msgs['desc_msg'] = error.response.data['description'][0]
+                    }
+                    if (error.response.data['remediation']) {
+                      this.error_msgs['rem'] = true
+                      this.error_msgs['rem_msg'] = error.response.data['remediation'][0]
+                    }
+                  } 
+                 else {
                   this.$router.push('/error')
                 }
               })

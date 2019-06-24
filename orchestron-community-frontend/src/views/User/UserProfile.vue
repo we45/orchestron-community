@@ -9,7 +9,7 @@
           <b-col cols="3">
             <center>
               <template v-if="logo">
-                <b-img-lazy :src="'data:image/png;base64,' + logo"  rounded="circle" blank width="250" height="220" blank-color="#777" alt="img" class="m-1" />
+                <img :src="'data:image/png;base64,' + logo"  rounded="circle" blank width="250" height="220" blank-color="#777" alt="img" class="m-1" />
               </template>
               <template v-else>
                 <b-img-lazy src="/static/img/org.png" rounded="circle" blank width="250" height="220" blank-color="#777" style="background: #f6f6f6;padding: 12px;" alt="img" class="m-1" />
@@ -52,49 +52,59 @@
             <br>
             <b-row>
               <b-col sm="2"><label class="label_visual">First Name:</label></b-col>
-              <p v-if="UpdateFirstNameError" class="error"> * {{ UpdateFirstNameError }}</p>
+              
               <b-col sm="10">
                 <b-form-input
                   v-model="firstName"
                   type="text"
                   class="visual_text_box"
                   placeholder="Enter First Name" :state="!$v.firstName.$invalid"></b-form-input>
+                  <p v-if="error_msgs['first_name']" style="text-align:left;" class="error"> * {{
+                        error_msgs['first_name_msg'] }}</p>
+                 
               </b-col>
             </b-row>
             <!-- <br> -->
             <b-row>
               <b-col sm="2"><label class="label_visual">Last Name:</label></b-col>
-              <p v-if="UpdateLastNameError" class="error"> * {{ UpdateLastNameError }}</p>
+             
               <b-col sm="10">
                 <b-form-input
                   v-model="lastName"
                   type="text"
                   class="visual_text_box"
                   placeholder="Enter Last Name" :state="!$v.lastName.$invalid"></b-form-input>
+                    <p v-if="error_msgs['last_name']" style="text-align:left;" class="error"> * {{
+                        error_msgs['last_name_msg'] }}</p>
+                   
               </b-col>
             </b-row>
             <!-- <br> -->
             <b-row>
               <b-col sm="2"><label class="label_visual">Email:</label></b-col>
-              <p v-if="UpdateEmailError" class="error"> * {{ UpdateEmailError }}</p>
               <b-col sm="10">
                 <b-form-input
                   v-model="email"
                   type="email"
                   class="visual_text_box"
                   placeholder="Enter Email" :state="!$v.email.$invalid"></b-form-input>
+                   <p v-if="error_msgs['email']" style="text-align:left;" class="error"> * {{ error_msgs['email_msg']
+                        }}</p>
+
               </b-col>
             </b-row>
             <!-- <br> -->
             <b-row>
               <b-col sm="2"><label class="label_visual">Logo:</label></b-col>
-              <p v-if="UpdateImgError" class="error"> * {{ UpdateImgError }}</p>
               <b-col sm="10">
                 <b-form-file
                   class="visual_text_box"
                   v-model="logo"
                   placeholder="Choose a logo..."
                   accept="image/jpeg, image/png,image/jpg,"></b-form-file>
+                  <p v-if="error_msgs['logo']" style="text-align:left;" class="error"> * {{ error_msgs['logo_msg']
+                  }}</p>
+
               </b-col>
             </b-row>
             <br>
@@ -134,6 +144,8 @@
                   placeholder="Enter current Password"
                   :state="!$v.oldPassword.$invalid"
                 ></b-form-input>
+                <p v-if="error_msgs_pwd['old']" style="text-align:left;" class="error"> * {{ error_msgs_pwd['old_msg']
+                  }}</p>
               </b-col>
             </b-row>
             <br>
@@ -152,6 +164,8 @@
                 <p class="passFormValid" v-if="!password_test_conditions.small"> Has a lowercase letter</p>
                 <p class="passFormValid" v-if="!password_test_conditions.num"> Has a number</p>
                 <p class="passFormValid" v-if="!password_test_conditions.spe"> Has a special character</p>
+                 <p v-if="error_msgs_pwd['new']" style="text-align:left;" class="error"> * {{ error_msgs_pwd['new_msg']
+                  }}</p>
 
               </b-col>
             </b-row>
@@ -166,6 +180,8 @@
                   placeholder="Enter Confirm Password"
                   :state="!$v.confirmPassword.$invalid"
                 ></b-form-input>
+                 <p v-if="error_msgs_pwd['new']" style="text-align:left;" class="error"> * {{ error_msgs_pwd['new_msg']
+                  }}</p>
               </b-col>
             </b-row>
 
@@ -191,7 +207,7 @@
 </template>
 <script>
   import axios from '@/utils/auth'
-  import {required, minLength, email, sameAs} from 'vuelidate/lib/validators'
+  import {required, minLength, email, sameAs, maxLength} from 'vuelidate/lib/validators'
   import Loading from 'vue-loading-overlay'
   import 'vue-loading-overlay/dist/vue-loading.min.css'
   import {notValidUser} from '@/utils/checkAuthUser'
@@ -225,18 +241,35 @@
         UpdateEmailError: '',
         UpdateImgError: '',
         password_test_conditions: {"caps":false, "num":false, "small":false, "eight":false, "len":false, "spe":false},
+        error_msgs: {
+          "name": false,
+          "logo": false,
+          "name_msg": "",
+          "logo_msg": "",
+          "first_name": false,
+          "first_name_msg": "",
+          "last_name": false,
+          "last_name_msg": "",
+          "email": false,
+          "email_msg": ""
+        },
         user_type: { "admin": false, "superuser":false, "normal": false},
+        error_msgs_pwd: {"old": false, "old_msg": "", "new": false, "new_msg": ""},
         full_name : '',
       }
     },
     validations: {
       firstName: {
         required,
-        minLength: minLength(1)
+        minLength: minLength(1),
+        maxLength: maxLength(30)
+
       },
       lastName: {
         required,
-        minLength: minLength(1)
+        minLength: minLength(1),
+        maxLength: maxLength(30)
+
       },
       email: {
         required,
@@ -262,6 +295,43 @@
       this.user_type["admin"] = localStorage.getItem('admin')
       this.user_type["superuser"] = localStorage.getItem('superuser')
       this.fetchData()
+    },
+    watch: {
+      'firstName': function (value_name) {
+        if (value_name.length > 30) {
+          this.error_msgs['first_name'] = true
+          this.error_msgs['first_name_msg'] = 'Ensure this field has no more than 30 characters.'
+        } else {
+          this.error_msgs['first_name'] = false
+        }
+      },
+      'lastName': function (value_name) {
+        if (value_name.length > 30) {
+          this.error_msgs['last_name'] = true
+          this.error_msgs['last_name_msg'] = 'Ensure this field has no more than 30 characters.'
+        } else {
+          this.error_msgs['last_name'] = false
+        }
+      },
+      'email': function (value_name) {
+        if (!this.validEmail(value_name)) {
+
+          this.error_msgs['email'] = true
+          this.error_msgs['email_msg'] = "Please Provide Valid Email"
+
+        } else {
+          this.error_msgs['email'] = false
+        }
+      },
+      'logo': function (value_name) {
+        this.error_msgs['logo'] = false
+      },
+       'newPassword': function (value_name) {
+        this.error_msgs_pwd['new'] = false
+      },
+      'oldPassword': function (value_name) {
+        this.error_msgs_pwd['old'] = false
+      },
     },
     methods: {
       fetchData() {
@@ -358,18 +428,22 @@
               this.isLoading = false
             }).catch(error => {
               if(error.response.status === 400) {
-                if (error.response.data.first_name !== undefined && error.response.data.first_name.length > 0) {
-                  this.UpdateFirstNameError = 'Please enter a valid Firstname'
-                }
-                if (error.response.data.last_name !== undefined && error.response.data.last_name.length > 0) {
-                  this.UpdateLastNameError = 'Please enter a valid LastName'
-                }
-                if (error.response.data.email !== undefined && error.response.data.email.length > 0) {
-                  this.UpdateEmailError = 'Please enter a valid Email'
-                }
-                if (error.response.data.img !== undefined && error.response.data.img.length > 0) {
-                  this.UpdateImgError = 'Please upload a valid Image'
-                }
+                 if (error.response.data['first_name']) {
+                    this.error_msgs['first_name'] = true
+                    this.error_msgs['first_name_msg'] = error.response.data['first_name'][0]
+                  }
+                  if (error.response.data['img']) {
+                    this.error_msgs['logo'] = true
+                    this.error_msgs['logo_msg'] = error.response.data['img'][0]
+                  }
+                  if (error.response.data['last_name']) {
+                    this.error_msgs['last_name'] = true
+                    this.error_msgs['last_name_msg'] = error.response.data['last_name'][0]
+                  }
+                  if (error.response.data['email']) {
+                    this.error_msgs['email'] = true
+                    this.error_msgs['email_msg'] = error.response.data['email'][0]
+                  }
               }
               else if (error.response.status === 404) {
               this.$router.push('/not_found')
@@ -446,6 +520,18 @@
               })
               this.isLoading = false
             }).catch(error => {
+
+              if (error.response.status === 400) {
+                if (error.response.data['old_password'] || error.response.data['non_field_errors']) {
+                  this.error_msgs_pwd['old'] = true
+                  this.error_msgs_pwd['old_msg'] = error.response.data['non_field_errors'][0]
+                }
+                if (error.response.data['new_password'] || error.response.data['non_field_errors']) {
+                  this.error_msgs_pwd['new'] = true
+                  this.error_msgs_pwd['new_msg'] = 'Invalid Password'
+                }
+
+            }
             if (error.response.status === 404) {
               this.$notify({
                 group: 'foo',
@@ -454,19 +540,10 @@
                 text: 'Invalid Current Password',
                 position: 'top right'
               })
-              this.$router.push('/not_found')
+              // this.$router.push('/not_found')
             } else if (error.response.status === 403) {
-              this.$router.push('/forbidden')
+              // this.$router.push('/forbidden')
             } 
-            else if(error.response.status === 400){
-              this.$notify({
-                group: 'foo',
-                type: 'error',
-                title: 'error',
-                text: 'Invalid Current Password',
-                position: 'top right'
-              })
-            }
             else {
               this.$router.push('/error')
             }

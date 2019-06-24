@@ -20,6 +20,8 @@
                                         type="text"
                                         class="inline-form-control"
                                         placeholder="Enter JIRA URL" :state="!$v.jiraURL.$invalid"></b-form-input>
+                                          <p v-if="error_jira_msgs['jiraurl']" style="text-align: left;" class="error"> * {{ error_jira_msgs['jiraurl_msg']
+                  }}</p>
                                 </b-col>
                             </b-row>
                             <br>
@@ -31,6 +33,8 @@
                                         type="text"
                                         class="inline-form-control"
                                         placeholder="Enter JIRA UserName" :state="!$v.jiraUserName.$invalid"></b-form-input>
+                                        <p v-if="error_jira_msgs['jirauser']" style="text-align: left;" class="error"> * {{ error_jira_msgs['jirauser_msg']
+                  }}</p>
                                 </b-col>
                             </b-row>
                             <br>
@@ -42,8 +46,11 @@
                                         type="password"
                                         class="inline-form-control"
                                         placeholder="Enter JIRA Password" :state="!$v.jiraPassword.$invalid"></b-form-input>
+                                          <p v-if="error_jira_msgs['jirapwd']" style="text-align: left;" class="error"> * {{ error_jira_msgs['jirapwd_msg']
+                  }}</p>
                                 </b-col>
                             </b-row>
+                          <p v-if="error_jira_msgs['invalid']" style="text-align: left;" class="error"> * {{ error_jira_msgs['invalid_msg'] }}</p>
                             <b-col cols="12" slot="modal-footer">
                                 <br>
                                 <div class="pull-right" style="float: right">
@@ -75,6 +82,8 @@
                                                     v-model="updateOrgName"
                                                     type="text"
                                                     class="inline-form-control"></b-form-input>
+                                                    <p v-if="error_msgs['orgname']" style="text-align: left;" class="error"> * {{ error_msgs['orgname_msg']
+                  }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -85,6 +94,8 @@
                                                     placeholder="Choose a logo..."
                                                     accept="image/jpeg, image/png,image/jpg,"
                                                     :state="!$v.updateOrgLogo.$invalid"></b-form-file>
+                                                    <p v-if="error_msgs['orglogo']" style="text-align: left;" class="error"> * {{ error_msgs['orglogo_msg']
+                  }}</p>
                                                 <br>
                                                 <p>Previous logo: {{ updateOrgLogo }} </p>
                                                 <p>{{ updateOrgLogo.name }}</p>
@@ -101,6 +112,7 @@
                                                     type="text"
                                                     class="inline-form-control"
                                                     placeholder="Enter Location" :state="!$v.updateOrgLocation.$invalid"></b-form-input>
+                                                    <p  v-if="error_msgs['orgloc']" style="text-align: left;" class="error"> * {{ error_msgs['orgloc_msg'] }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -111,6 +123,7 @@
                                                   format="yyyy-MM-dd"
                                                   lang="en" width="100%"
                                                   :not-before="today" :state="!$v.updateOrgEndDate.$invalid"></date-picker>
+                                                  <p  v-if="error_msgs['orgend']" style="text-align: left;" class="error"> * {{ error_msgs['orgend_msg'] }}</p>
                                             </b-col>
                                           </b-col>
                                         </b-row>
@@ -125,6 +138,7 @@
                                                     label="label"
                                                     placeholder="Select Organization Type"
                                                     :state="!$v.updateOrgType.$invalid"></v-select>
+                                                    <p  v-if="error_msgs['orgind']" style="text-align: left;" class="error"> * {{ error_msgs['orgind_msg'] }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -136,6 +150,9 @@
                                                     label="label"
                                                     placeholder="Select Timezone"
                                                     :state="!$v.updateOrgTimezone.$invalid"></v-select>
+                                                    <p v-if="error_msgs['orgtime']" style="text-align: left;" class="error"> * {{ error_msgs['orgtime_msg']
+                  }}</p>
+
 
                                             </b-col>
                                           </b-col>
@@ -226,7 +243,45 @@ export default {
       updateOrgEndDate: '',
       updateOrgName: '',
       orgTypeOption: [],
-      orgTimezoneOption: []
+      orgTimezoneOption: [],
+      error_msgs: {
+          'usrfirst': false,
+          'usrfirst_msg': '',
+          'usrlast': false,
+          'usrlast_msg': '',
+          'usremail': false,
+          'usremail_msg': '',
+          'usrteam': false,
+          'usrteam_msg': '',
+          'usradmin': false,
+          'usradmin_msg': '',
+          'team': false,
+          'team_msg': '',
+          'teamdesc': false,
+          'teamdesc_msg': '',
+          'orgname': false,
+          'orgname_msg': '',
+          'orgloc': false,
+          'orgloc_msg': '',
+          'orglogo': false,
+          'orglogo_msg': '',
+          'orgtime': false,
+          'orgtime_msg': '',
+          'orgind': false,
+          'orgind_msg': '',
+          'orgend': false,
+          'orgend_msg': ''
+        },
+    error_jira_msgs: {
+      'jiraurl': false,
+      'jiraurl_msg':'',
+      'jirauser': false,
+      'jirauser_msg':'',
+      'jirapwd':false,
+      'jirapwd_msg':'',
+      'invalid': false,
+      'invalid_msg': ''
+    },
     }
   },
   validations: {
@@ -340,6 +395,62 @@ export default {
     this.token = localStorage.getItem('token')
     this.fetchData()
   },
+   watch: {
+      'updateOrgName': function (value_name) {
+        if (value_name.length > 200) {
+          this.error_msgs['orgname'] = true
+          this.error_msgs['orgname_msg'] = 'Ensure this field has no more than 200 characters.'
+        } else {
+          this.error_msgs['orgname'] = false
+        }
+      },
+      'updateOrgLogo': function (value_name) {
+        this.error_msgs['orglogo'] = false
+      },
+      'updateOrgTimezone': function (value_name) {
+        this.error_msgs['orgtime'] = false
+      },
+      'updateOrgLocation': function (value_name) {
+        if (value_name.length > 100) {
+          this.error_msgs['orgloc'] = true
+          this.error_msgs['orgloc_msg'] = 'Ensure this field has no more than 100 characters.'
+        } else {
+          this.error_msgs['orgloc'] = false
+        }
+      },
+      'updateOrgType': function (value_name) {
+        this.error_msgs['orgind'] = false
+      },
+      'firstName': function (value_name) {
+        if (value_name.length > 30) {
+          this.error_msgs['usrfirst'] = true
+          this.error_msgs['usrfirst_msg'] = 'Ensure this field has no more than 30 characters.'
+        } else {
+          this.error_msgs['usrfirst'] = false
+        }
+      },
+      'lastName': function (value_name) {
+        if (value_name.length > 30) {
+          this.error_msgs['usrlast'] = true
+          this.error_msgs['usrlast_msg'] = 'Ensure this field has no more than 30 characters.'
+        } else {
+          this.error_msgs['usrlast'] = false
+        }
+      },
+      'jiraURL': function (value_name) {
+        this.error_msgs['jiraurl'] = false
+      },
+      'jiraUserName': function (value_name) {
+        this.error_msgs['jirauser'] = false
+      },
+
+      'jiraPassword': function (value_name) {
+        this.error_msgs['jirapwd'] = false
+      },
+
+
+
+    },
   updated() {
     this.$nextTick(function() {     
       if (this.isLoading) {
@@ -387,7 +498,6 @@ export default {
         axios
         .get('/organizations/' + this.org + '/jira/')
         .then(res => {
-            console.log("resssssssssssssssssssssssssss", res.data)
           this.jiraURL = res.data.url
           this.jiraUserName = '****'
           this.jiraPassword = ''
@@ -493,16 +603,36 @@ export default {
               }).catch(error => {
                 if (error.response.status === 404) {
                   this.$router.push('/not_found')
-                } else if (error.response.status === 400) {
-                  // this.$router.push('/forbidden')
-                  this.$notify({
-                  group: 'foo',
-                  type: 'error',
-                  title: 'error',
-                  text: 'Validation error!!',
-                  position: 'top right'
-                })
-                } else {
+                }
+
+                if (error.response.status === 400) {
+                if (error.response.data['name']) {
+                  this.error_msgs['orgname'] = true
+                  this.error_msgs['orgname_msg'] = error.response.data['name'][0]
+                }
+                if (error.response.data['timezone']) {
+                  this.error_msgs['orgtime'] = true
+                  this.error_msgs['orgtime_msg'] = error.response.data['timezone'][0]
+                }
+                if (error.response.data['end_date']) {
+                  this.error_msgs['orgend'] = true
+                  this.error_msgs['orgend_msg'] = error.response.data['end_date'][0]
+                }
+                if (error.response.data['location']) {
+                  this.error_msgs['orgloc'] = true
+                  this.error_msgs['orgloc_msg'] = error.response.data['location'][0]
+                }
+                if (error.response.data['industry']) {
+                  this.error_msgs['orgind'] = true
+                  this.error_msgs['orgind_msg'] = error.response.data['industry'][0]
+                }
+                if (error.response.data['logo']) {
+                  this.error_msgs['orglogo'] = true
+                  this.error_msgs['orglogo_msg'] = error.response.data['logo'][0]
+                }
+              }
+
+                else {
                   this.$router.push('/error')
                 }
               })
@@ -526,13 +656,34 @@ export default {
             this.isLoading = false
           })
           .catch(error => {
-            this.$notify({
-              group: 'foo',
-              type: 'error',
-              title: 'error',
-              text: 'Please enter a valid JIRA credentials',
-              position: 'top right'
-            })
+            if (error.response.status === 400) {
+              if (error.response.data['url']) {
+                this.error_jira_msgs['jiraurl'] = true
+                this.error_jira_msgs['jiraurl_msg'] = error.response.data['url'][0]
+              }
+              if (error.response.data['username']) {
+                this.error_jira_msgs['jirauser'] = true
+                this.error_jira_msgs['jirauser_msg'] = error.response.data['username'][0]
+              }
+              if (error.response.data['password']) {
+                this.error_jira_msgs['jirapwd'] = true
+                this.error_jira_msgs['jirapwd_msg'] = error.response.data['password'][0]
+              }
+              
+            }
+            else{
+              this.error_jira_msgs['invalid'] = true
+              this.error_jira_msgs['invalid_msg'] = "Provided credentials are invalid or server timeout"
+
+            }
+
+            // this.$notify({
+            //   group: 'foo',
+            //   type: 'error',
+            //   title: 'error',
+            //   text: 'Please enter a valid JIRA credentials',
+            //   position: 'top right'
+            // })
             this.isLoading = false
           })
       } else {
@@ -721,5 +872,13 @@ export default {
     padding: 3px 12px;
     margin-bottom: 0;
     font-size: 14px;
+  }
+  .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

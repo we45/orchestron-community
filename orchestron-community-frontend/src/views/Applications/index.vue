@@ -90,6 +90,8 @@
                                             v-model="uploadTool"
                                             label="label"
                                             :state="!$v.uploadTool.$invalid"></v-select>
+                                            <p v-if="error_scans['tool']" style="text-align:left;" class="error"> * {{ error_scans['tool_msg']
+                      }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -101,6 +103,8 @@
                                             type="text"
                                             class="inline-form-control"
                                             placeholder="Enter Name" :state="!$v.uploadName.$invalid"></b-form-input>
+                                             <p v-if="error_scans['name']" style="text-align:left;" class="error"> * {{ error_scans['name_msg']
+                      }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -112,6 +116,8 @@
                                             placeholder="Choose a file..."
                                             accept="xml,json"
                                             :state="!$v.uploadFile.$invalid"></b-form-file>
+                                             <p v-if="error_scans['file']" style="text-align:left;" class="error"> * {{ error_scans['file_msg']
+                      }}</p>
                                         <br>
                                         <p>{{ uploadFile.name }}</p>
                                     </b-col>
@@ -146,6 +152,9 @@
                                             type="text"
                                             class="inline-form-control"
                                             placeholder="Enter Scan Name" :state="!$v.manualScanName.$invalid"></b-form-input>
+                                             <p v-if="error_msgs['manual']" style="text-align:left;" class="error"> * {{
+                                                error_msgs['manual_msg']
+                                                }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -157,6 +166,8 @@
                                             type="text"
                                             class="inline-form-control"
                                             placeholder="Enter Vulnerability Name" :state="!$v.manualVulName.$invalid"></b-form-input>
+                                             <p v-if="error_msgs['vul']" style="text-align:left;" class="error"> * {{ error_msgs['vul_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -168,6 +179,8 @@
                                             type="number"
                                             class="inline-form-control"
                                             placeholder="Enter CWE" :state="!$v.manualCwe.$invalid"></b-form-input>
+                                             <p v-if="error_msgs['cwe']" style="text-align:left;" class="error"> * {{ error_msgs['cwe_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -178,6 +191,8 @@
                                         :options="manualSeverityList"
                                         v-model="manualSeverity"
                                         placeholder="Select Severity" :state="!$v.manualSeverity.$invalid"></v-select>
+                                         <p v-if="error_msgs['sev']" style="text-align:left;" class="error"> * {{ error_msgs['sev_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -188,6 +203,8 @@
                                         :options="manualOwaspList"
                                         v-model="manualOwasp"
                                         placeholder="Select OWASP" :state="!$v.manualOwasp.$invalid"></v-select>
+                                          <p v-if="error_msgs['owasp']" style="text-align:left;" class="error"> * {{ error_msgs['owasp_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -215,6 +232,8 @@
                                             :rows="3"
                                             :max-rows="6"
                                             placeholder="Enter Description" :state="!$v.manualVulDesc.$invalid"></b-form-textarea>
+                                             <p v-if="error_msgs['desc']" style="text-align:left;" class="error"> * {{ error_msgs['desc_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -228,6 +247,8 @@
                                             :rows="3"
                                             :max-rows="6"
                                             placeholder="Enter Description" :state="!$v.manualVulRemedy.$invalid"></b-form-textarea>
+                                            <p v-if="error_msgs['rem']" style="text-align:left;" class="error"> * {{ error_msgs['rem_msg']
+                        }}</p>
                                     </b-col>
                                 </b-row>
                                 <br>
@@ -304,7 +325,7 @@
                               <button type="button"
                                       style="float: right;"
                                         class="btn btn-orange-close pull-right"
-                                        @click="createManualScanWithVul() " v-if="!$v.manualVulUrl.$invalid && !$v.manualVulParam.$invalid && !$v.manualVulUrlDesc.$invalid && !$v.manualVulUrlFile.$invalid">
+                                        @click="createManualScanWithVul() " v-if="!$v.manualVulUrl.$invalid && !$v.manualVulParam.$invalid && !$v.manualVulUrlDesc.$invalid && !$v.manualVulUrlFile.$invalid && validated_evidence_file">
                                     Submit
                                     </button>
                             </form>
@@ -408,7 +429,7 @@
   import DonutChart from '@/components/Charts/orchyDonutSeverityChart'
   import AppBarChart from '@/components/Dashboard/Charts/BarChart'
   import axios from '@/utils/auth'
-  import { required, minLength, url } from 'vuelidate/lib/validators'
+  import { required, minLength, url, between, integer, maxLength } from 'vuelidate/lib/validators'
   import Loading from 'vue-loading-overlay'
   import 'vue-loading-overlay/dist/vue-loading.min.css'
   import { notValidUser } from '@/utils/checkAuthUser'
@@ -463,6 +484,7 @@
         uploadTool: '',
         manualScanName: '',
         manualVulName: '',
+        validated_evidence_file: false,
         curlCmd_secret_access_key : 'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -H "Scan-Name: <scan_name>"-v -F file=@<file_path> ' + this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/',
         manualCwe: '',
         manualSeverityList: [
@@ -507,6 +529,25 @@
         webhookId : '',
         api_site_url: '',
         userToken: '',
+        error_msgs: {
+          'scan': false,
+          'scan_msg': '',
+          'vul': false,
+          'vul_msg': '',
+          'cwe': false,
+          'cwe_msg': '',
+          'sev': false,
+          'sev_msg': '',
+          'owasp': false,
+          'owasp_msg': '',
+          'desc': false,
+          'desc_msg': '',
+          'rem': false,
+          'rem_msg': '',
+          'manual': false,
+          'manual_msg': ''
+        },
+        error_scans: { 'tool': false, 'tool_msg': '', 'name': false, 'name_msg': '', 'file': false, 'file_msg': '' },
         update_app_wise_jira: false,
         curlCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -v -F file=@<file_path> http://127.0.0.1/api/webhook/post/',
         jsonCmd: 'curl -H "Authorization: Token " -H "X-Engagement-ID: <engagement_id>" -d \'{"vuls":<json_dictionary>}\' http://127.0.0.1/api/webhook/post/'
@@ -515,7 +556,8 @@
     validations: {
       uploadName: {
         required,
-        minLength: minLength(1)
+        minLength: minLength(1),
+        maxLength: maxLength(200)
       },
       uploadFile: {
         required
@@ -533,7 +575,9 @@
       },
       manualCwe: {
         required,
-        minLength: minLength(1)
+        minLength: minLength(1),
+        integer,
+        between: between(0, 1000)
       },
       manualSeverity: {
         required,
@@ -606,6 +650,53 @@
         }
       })
     },
+    watch: {
+        'manualVulUrlFile': function(value_name) {
+            var ext = value_name.name.split(".")
+            var realData = ext[(ext.length)-1]
+            var validated_data =  ['png','jpg','jpeg','bmp','gif','tiff']
+            var data_form_submit = validated_data.includes(realData);
+            var size_of_file = 1024 * 1024 * 20
+            if(data_form_submit &&  (value_name.size < size_of_file)){
+                this.validated_evidence_file = true
+            }
+            else{
+                this.validated_evidence_file = false
+            }
+        },
+         'manualScanName': function(value_name) {
+        if (value_name.length > 255) {
+          this.error_msgs['manual'] = true
+          this.error_msgs['manual_msg'] = 'Max Length is 255 Characters'
+        } else {
+          this.error_msgs['manual'] = false
+        }
+      },
+      'manualVulName': function(value_name) {
+        if (value_name.length > 255) {
+          this.error_msgs['vul'] = true
+          this.error_msgs['vul_msg'] = 'Max Length is 255 Characters'
+        } else {
+          this.error_msgs['vul'] = false
+        }
+      },
+       'uploadFile': function(value_name) {
+        this.error_scans['file'] = false
+      },
+      'uploadName': function(value_name) {
+        this.error_scans['name'] = false
+        if (value_name.length > 200) {
+            this.error_scans['name'] = true
+          this.error_scans['name_msg'] = 'Max Length is 200 Characters'
+        }
+        else {
+          this.error_msgs['vul'] = false
+        }
+      },
+      'uploadTool': function(value_name) {
+        this.error_scans['tool'] = false
+      },
+    },
     methods: {
 
     onCopy: function (e) {
@@ -628,7 +719,6 @@
       },
       getIP(){
          axios.get('/get/ip/').then(res => {
-            console.log("res", res.data)
            this.ipWebhook = res.data.ip
            if(res.data.protocol){
             var protocall = res.data.protocol +'://'
@@ -979,10 +1069,32 @@
               this.parsingStatus = res.data.message
               this.parsingScanId = res.data.scan_name
             }).catch(error => {
-              if (error.res.status === 404) {
+              if (error.response.status === 404) {
                 this.$router.push('/not_found')
-              } else if (error.res.status === 403) {
-                this.$router.push('/forbidden')
+              } 
+               if (error.response.status === 400) {
+                if (error.response.data['tool']) {
+                  this.error_scans['tool'] = true
+                  this.error_scans['tool_msg'] = error.response.data['tool'][0]
+                }
+                if (error.response.data['name']) {
+                  this.error_scans['name'] = true
+                  this.error_scans['name_msg'] = error.response.data['name'][0]
+                }
+                if (error.response.data['file']) {
+                  this.error_scans['file'] = true
+                  this.error_scans['file_msg'] = error.response.data['file'][0]
+                }
+                if (error.response.data['Error']) {
+                  this.error_scans['file'] = true
+                  this.error_scans['file_msg'] = error.response.data['Error']
+                }
+              }
+
+              else if (error.response.status === 403) {
+                this.error_scans['file'] = true
+                this.error_scans['file_msg'] = "Invalid File"
+
               } else {
                 this.$router.push('/error')
               }
@@ -1070,11 +1182,45 @@
                     this.$router.push('/not_found')
                   } else if (error.res.status === 404) {
                     this.$router.push('/forbidden')
-                  } else {
+                  } 
+                  else if (error.response.status === 400) {
+                    if (error.response.data['name']) {
+                      this.error_msgs['vul'] = true
+                      this.error_msgs['vul_msg'] = error.response.data['name'][0]
+                    }
+                    if (error.response.data['cwe']) {
+                      this.error_msgs['cwe'] = true
+                      this.error_msgs['cwe_msg'] = error.response.data['cwe'][0]
+                    }
+                    if (error.response.data['severity']) {
+                      this.error_msgs['sev'] = true
+                      this.error_msgs['sev_msg'] = error.response.data['severity'][0]
+                    }
+                    if (error.response.data['owasp']) {
+                      this.error_msgs['owasp'] = true
+                      this.error_msgs['owasp_msg'] = error.response.data['owasp'][0]
+                    }
+                    if (error.response.data['description']) {
+                      this.error_msgs['desc'] = true
+                      this.error_msgs['desc_msg'] = error.response.data['description'][0]
+                    }
+                    if (error.response.data['remediation']) {
+                      this.error_msgs['rem'] = true
+                      this.error_msgs['rem_msg'] = error.response.data['remediation'][0]
+                    }
+                  } 
+                  else {
                     this.$router.push('/error')
                   }
                 })
             }).catch(error => {
+                if (error.response.status === 400) {
+                    if (error.response.data['short_name']) {
+                      this.error_msgs['manual'] = true
+                      this.error_msgs['manual_msg'] = error.response.data['short_name'][0]
+                    }
+              }
+
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 404) {
@@ -1206,6 +1352,13 @@
     color: #ff542c;
     text-align: center;
   }
-
+  .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
+  }
 
 </style>

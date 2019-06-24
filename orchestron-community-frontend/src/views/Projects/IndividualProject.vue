@@ -26,6 +26,8 @@
                                       :state="!$v.appName.$invalid"
                                       placeholder="Create Application Name">
                                     </b-form-input>
+                                      <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+
                                 </b-col>
                             </b-col>
                             <b-col cols="6">
@@ -36,6 +38,8 @@
                                       accept="image/jpeg, image/png,image/jpg,"
                                       :state="!$v.appLogo.$invalid"
                                       placeholder="Choose a logo..."></b-form-file>
+                                    <p  v-if="error_msgs['logo']" style="text-align: left;" class="error"> * {{ error_msgs['logo_msg'] }}</p>
+
                                   <br>
                                   <p>{{ appLogo.name }}</p>
                                 </b-col>
@@ -51,6 +55,8 @@
                                     v-model="appHostType"
                                     placeholder="Select Target Type"
                                     :state="!$v.appHostType.$invalid"></v-select>
+                                     <p  v-if="error_msgs['target']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
@@ -61,6 +67,8 @@
                                   v-model="appPlatformTags"
                                   placeholder="Select Platform"
                                   :state="!$v.appPlatformTags.$invalid"></v-select>
+                                     <p  v-if="error_msgs['platform']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                               </b-col>
                           </b-col>
 
@@ -77,6 +85,8 @@
                                       class="inline-form-control"
                                       placeholder="http://example.com">
                                     </b-form-input>
+                                     <p  v-if="error_msgs['url']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
@@ -89,6 +99,8 @@
                                     class="inline-form-control"
                                     placeholder="127.0.0.1">
                                   </b-form-input>
+                                  <p  v-if="error_msgs['ipv4']" style="text-align: left;" class="error"> * {{ error_msgs['ipv4_msg'] }}</p>
+
                               </b-col>
                           </b-col>
                       </b-row>
@@ -104,6 +116,8 @@
                                   :state="!$v.appOsInfo.$invalid"
                                   placeholder="Ubuntu">
                                 </b-form-input>
+                                <p  v-if="error_msgs['os_info']" style="text-align: left;" class="error"> * {{ error_msgs['os_info_msg'] }}</p>
+
                               </b-col>
                           </b-col>
                       </b-row>
@@ -137,6 +151,8 @@
                                       :state="!$v.appUpdateName.$invalid"
                                       placeholder="Update Application Name">
                                     </b-form-input>
+                                    <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+
                                 </b-col>
                             </b-col>
                             <b-col cols="6">
@@ -146,6 +162,8 @@
                                       v-model="appUpdateLogo"
                                       placeholder="Choose a logo..."
                                       accept="image/jpeg, image/png,image/jpg,"></b-form-file>
+                                  <p  v-if="error_msgs['logo']" style="text-align: left;" class="error"> * {{ error_msgs['logo_msg'] }}</p>
+
                                   <br>
                                   <p>{{ appUpdateOldLogoName }}</p>
                                 </b-col>
@@ -160,6 +178,8 @@
                                     :options="appTargetOption"
                                     v-model="appUpdateHostType"
                                     :state="!$v.appUpdateHostType.$invalid"></v-select>
+                                     <p  v-if="error_msgs['target']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
@@ -169,6 +189,8 @@
                                   :options="appPlatformOption"
                                   v-model="appUpdatePlatformTags"
                                   :state="!$v.appUpdatePlatformTags.$invalid"></v-select>
+                                     <p  v-if="error_msgs['platform']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                               </b-col>
                           </b-col>
 
@@ -185,6 +207,8 @@
                                       class="inline-form-control"
                                       placeholder="http://example.com">
                                     </b-form-input>
+                                     <p  v-if="error_msgs['url']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
@@ -197,6 +221,8 @@
                                     :state="!$v.appUpdateIpv4.$invalid"
                                     placeholder="127.0.0.1">
                                   </b-form-input>
+                                     <p  v-if="error_msgs['ipv4']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
+
                               </b-col>
                           </b-col>
                       </b-row>
@@ -212,6 +238,8 @@
                                   :state="!$v.appUpdateOsInfo.$invalid"
                                   placeholder="Ubuntu">
                                 </b-form-input>
+                                <p  v-if="error_msgs['os_info']" style="text-align: left;" class="error"> * {{ error_msgs['os_info_msg'] }}</p>
+
                               </b-col>
                           </b-col>
                       </b-row>
@@ -330,6 +358,8 @@
         reloadPage : false,
         paginatedVulnerabilitiesList: [],
         isClicked: false,
+        error_msgs : {"name": false,"logo": false,"name_msg":"", "logo_msg":"", "target": false, "target_msg": "", "platform": false, "platform_msg":"", "url":false, "url_msg": "", "ipv4": false, "ipv4_msg":"", "os_info":false, "os_info_msg":"", "team":false, "team_msg":""},
+
 
       }
     },
@@ -384,6 +414,38 @@
       this.param = this.$route.params.projectId
       this.fetchProjectData()
       this.fetchData()
+    },
+    watch: {
+      'appName': function(value_name){
+          if(value_name.length > 200){
+            this.error_msgs['name'] = true
+            this.error_msgs['name_msg'] = 'Ensure this field has no more than 200 characters.'
+          }
+          else{
+            this.error_msgs['name'] = false
+          }
+        },
+        'appUrl':function(value_name){
+         this.error_msgs['url'] = false
+        },
+         'appUpdateUrl':function(value_name){
+         this.error_msgs['url'] = false
+        },
+      'appUpdateName': function(value_name){
+          if(value_name.length > 200){
+            this.error_msgs['name'] = true
+            this.error_msgs['name_msg'] = 'Ensure this field has no more than 200 characters.'
+          }
+          else{
+            this.error_msgs['name'] = false
+          }
+        },
+      'appLogo': function(value_name){
+        this.error_msgs['logo'] = false
+      },
+      'appUpdateLogo': function(value_name){
+        this.error_msgs['logo'] = false
+      },
     },
     // updated() {
     //   this.$nextTick(function() {
@@ -576,14 +638,39 @@
             }).catch(error => {
               this.isClicked = false
               var status_info = error.response.status
-              if(status_info === 400){
-                  this.$notify({
-                    group: 'foo',
-                    type: 'error',
-                    title: 'error',
-                    text: 'Error in creation of application',
-                    position: 'top right'
-                })
+              if (error.response.status === 400) {
+                 if(error.response.data['name']){
+                    this.error_msgs['name'] = true
+                    this.error_msgs['name_msg'] = error.response.data['name'][0]
+                  }
+                 if(error.response.data['logo']){
+                    this.error_msgs['logo'] = true
+                    this.error_msgs['logo_msg'] = error.response.data['logo'][0]
+                  }
+                 if(error.response.data['host_type']){
+                    this.error_msgs['target'] = true
+                    this.error_msgs['target_msg'] = error.response.data['host_type'][0]
+                  }
+                 if(error.response.data['url']){
+                    this.error_msgs['url'] = true
+                    this.error_msgs['url_msg'] = error.response.data['url'][0]
+                  }
+                if(error.response.data['languages']){
+                    this.error_msgs['platform'] = true
+                    this.error_msgs['platform_msg'] = error.response.data['languages'][0]
+                  }
+                 if(error.response.data['ipv4']){
+                    this.error_msgs['ipv4'] = true
+                    this.error_msgs['ipv4_msg'] = error.response.data['ipv4'][0]
+                  }
+                 if(error.response.data['os_info']){
+                    this.error_msgs['os_info'] = true
+                    this.error_msgs['os_info_msg'] = error.response.data['os_info'][0]
+                  }
+                 if(error.response.data['group']){
+                    this.error_msgs['team'] = true
+                    this.error_msgs['team_msg'] = error.response.data['group'][0]
+                  }
               }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -729,14 +816,48 @@
 
             }).catch(error => {
                var status_info = error.response.status
-              if(status_info === 400){
-                  this.$notify({
-                    group: 'foo',
-                    type: 'error',
-                    title: 'error',
-                    text: 'Error in updation of application',
-                    position: 'top right'
-                })
+              // if(status_info === 400){
+              //     this.$notify({
+              //       group: 'foo',
+              //       type: 'error',
+              //       title: 'error',
+              //       text: 'Error in updation of application',
+              //       position: 'top right'
+              //   })
+              // }
+               if (error.response.status === 400) {
+                  if(error.response.data['name']){
+                      this.error_msgs['name'] = true
+                      this.error_msgs['name_msg'] = error.response.data['name'][0]
+                    }
+                 if(error.response.data['logo']){
+                      this.error_msgs['logo'] = true
+                      this.error_msgs['logo_msg'] = error.response.data['logo'][0]
+                    }
+                 if(error.response.data['host_type']){
+                      this.error_msgs['target'] = true
+                      this.error_msgs['target_msg'] = error.response.data['host_type'][0]
+                    }
+                 if(error.response.data['url']){
+                      this.error_msgs['url'] = true
+                      this.error_msgs['url_msg'] = error.response.data['url'][0]
+                    }
+                 if(error.response.data['languages']){
+                      this.error_msgs['platform'] = true
+                      this.error_msgs['platform_msg'] = error.response.data['languages'][0]
+                    }
+                 if(error.response.data['ipv4']){
+                      this.error_msgs['ipv4'] = true
+                      this.error_msgs['ipv4_msg'] = error.response.data['ipv4'][0]
+                    }
+                 if(error.response.data['os_info']){
+                      this.error_msgs['os_info'] = true
+                      this.error_msgs['os_info_msg'] = error.response.data['os_info'][0]
+                    }
+                 if(error.response.data['group']){
+                      this.error_msgs['team'] = true
+                      this.error_msgs['team_msg'] = error.response.data['group'][0]
+                    }
               }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -911,5 +1032,13 @@
     line-height: 0.99;
     text-align: center;
     color: #232325;
+  }
+   .error{
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

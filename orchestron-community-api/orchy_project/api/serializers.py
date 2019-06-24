@@ -209,7 +209,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
 class OrganizationConfigurationSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = OrganizationConfiguration
-		fields = ['enable_jira','enable_email','org','created_on','edited_on','enable_orl']
+		fields = ['enable_jira','org','created_on','edited_on']
 		read_only_fields = ['created_on','edited_on','org']
 
 
