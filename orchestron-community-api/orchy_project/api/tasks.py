@@ -127,7 +127,7 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
             elif tool == 'OWASP Dependency Checker':
                 parse_owasp_dep_checker(complete_path,user,init_es)
             elif tool == "FindSecBugs":
-                parser_findsecbug(complete_path,user,init_es)           
+                parser_findsecbug(complete_path,user,init_es)
             info_debug_log(ip=user_host,user=user,event='XML Parsing',status='success')
             if hook_log:
                 hook_log.scan_process_event = True

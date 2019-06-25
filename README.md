@@ -15,5 +15,45 @@ Orchestron allows you to do the following quite effectively:
 * Easily manage releases and "in-time" security assessments with Engagements. See "Engagements" for more details
 * Unlike many other tools, Orchestron also attempts to correlate/merge results from across SAST, DAST and SCA tools
 
-## Installation Details and Full User-Guide
-https://we45devteam.atlassian.net/wiki/spaces/OR/overview
+## Setup
+
+### Prerequisites
+* Install [Docker](https://docs.docker.com/install/)
+* Install [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Getting started
+
+
+To Get Started with Orchestron , run the following steps
+
+```commandline
+git clone https://github.com/we45/orchestron-community.git
+
+cd orchestron-community
+
+docker-compose up -d
+
+```
+
+* Browser to [http://localhost](http://localhost)
+
+* Default `username` and `password`
+
+```commandline
+username: admin@organization.com
+password: Str0ngP@ssw0rd
+
+```
+
+### Update the existing orchestron
+```commandline
+cd orchestron-community
+
+docker-compose pull
+
+docker-compose up -d
+
+```
+
+### Documentation
+Click here for [Orchestron documentation](https://docs-orchestron.netlify.com/) it includes a detailed guides.
