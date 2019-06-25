@@ -577,7 +577,7 @@
         required,
         minLength: minLength(1),
         integer,
-        between: between(0, 1000)
+        between: between(0, 1500)
       },
       manualSeverity: {
         required,
