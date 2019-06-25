@@ -49,7 +49,7 @@
                                     <span class="sub-value">{{ row.item.appName }}</span>
                                 </p>
                             </b-col>
-                            <b-col cols="8">
+                            <b-col cols="8" v-if=" row.item.engId ">
                                 <p>
                                     <span class="sub-title">Engagement ID</span>
                                     <span class="sub-divider">:</span>

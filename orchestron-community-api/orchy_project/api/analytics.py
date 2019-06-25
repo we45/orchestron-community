@@ -14,7 +14,6 @@ from api.serializers import QueryParamSerializer, BasePostParamSerializer,Applic
 	RaiseJIRATicketSerializer, OpenVulSerializer, ClosedVulSerializer, UnCategorisedSerializer
 from datetime import datetime
 from rest_framework.permissions import IsAuthenticated
-from api.orl import get_open_vul_info_from_api
 from django.core.serializers import serialize
 import json
 import math
@@ -71,15 +70,6 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
     def max_min_cvss(self, kwargs={}, exclude_kwargs={}):
         cvss = self.get_open_vul_query(kwargs, exclude_kwargs).aggregate(max_cvss=Max('cvss'),min_cvss=Min('cvss'))
         return cvss
-
-    def risks(self, kwargs={}, exclude_kwargs={}):
-        cwes = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('scan__application__org','cwe')
-        risk_list = []
-        for org,cwe in cwes:
-            if org.orl_config_exists():
-                vul_info = get_open_vul_info_from_api(cwe,org)
-                risk_list.extend(vul_info.get('risk',[]))
-        return list(set(risk_list))
 
     def severity_count(self, kwargs={}, exclude_kwargs={}):
         sevs = self.get_open_vul_query(kwargs, exclude_kwargs).values_list('severity',flat=True)
@@ -147,30 +137,7 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
         elif value >= 90 and value <= 100:
             return 'A'
         else:
-            return 'No Data'                            
-
-    # def aging_count(self, kwargs={}, exclude_kwargs={}):
-    #     aging_list = self.get_open_vul_query(kwargs, exclude_kwargs)\
-    #     .annotate(open_for=Aging('created_on'))\
-    #     .values_list('open_for',flat=True)
-    #     days = dict(Counter(aging_list))
-    #     days_list = []
-    #     for day, count in days.items():
-    #         if day <= 5:
-    #             days_list.append(('0-5 days',count))
-    #         elif day > 5 and day <= 10: 
-    #             days_list.append(('6-10 days',count))
-    #         elif day > 10 and day <= 20: 
-    #             days_list.append(('11-20 days',count))
-    #         elif day > 20 and day <= 40: 
-    #             days_list.append(('21-40 days',count))
-    #         elif day > 40 and day <= 80: 
-    #             days_list.append(('41-80 days',count))
-    #         elif day > 80 and day <= 100: 
-    #             days_list.append(('81-100 days',count))
-    #         elif day > 100:
-    #             days_list.append(('More than 100 days',count))
-    #     return days_list
+            return 'No Data'
 
     def aging_count(self, kwargs={}, exclude_kwargs={}):
         aging_list = self.get_open_vul_query(kwargs, exclude_kwargs)\

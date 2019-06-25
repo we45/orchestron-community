@@ -357,7 +357,7 @@
                   id: value.id,
                   url: 'individual_engagement/' + value.id + '/',
                   appName: value.app_details.name,
-                  engId: value.uniq_id
+                  engId: false
                 })
               }
             }).catch(error => {

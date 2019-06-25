@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 import json
 from api.app_log import *
-from api.orl import get_open_vul_info_from_api, get_open_vul_name_from_api, get_cwe_from_name
 from api.minio_utils import MinioUtil
 
 
@@ -19,7 +18,6 @@ def create_vul(data,es_reference,confidence,severity,cwe,tool,evidences):
         cvss_dict = {3:7.5,2:4.5,1:2.5,0:0}
         vul_name = data['vulnerability'].get('name','')
         created_on = timezone.now()
-        # created_on = data['vulnerability'].get('created_on',timezone.now())
         scan_obj = Scan.objects.select_related('application__org').get(name=es_reference)
         org_obj = scan_obj.application.org
         cwe = cwe or 0
@@ -103,7 +101,6 @@ def create_vul(data,es_reference,confidence,severity,cwe,tool,evidences):
             pass
     except BaseException as e:
         log_exception(e)
-        # general_error_messages.delay(path='create_vul function',msg=log_exception(e))
         critical_debug_log(event=e,status='failure')
 
 
@@ -168,10 +165,7 @@ def write_results_to_db(data):
             es_reference = data.get('scan_reference',{}).get('es_reference','')
             if not cwe:
                 scan_obj = Scan.objects.select_related('application__org').get(name=es_reference)
-                org_obj = scan_obj.application.org
-                if org_obj.orl_config_exists():
-                    cwe = get_cwe_from_name(vul_name,org_obj)
-                    data['vulnerability']['cwe'] = {'cwe_id':cwe}                     
+                org_obj = scan_obj.application.org                   
             if cwe:              
                 data['vulnerability']['cwe']['cwe_id'] = cwe
                 data['vulnerability']['severity'] = severity                                                               
@@ -192,4 +186,3 @@ def write_results_to_db(data):
     except BaseException as e:
         log_exception(e)
         critical_debug_log(event=e,status='failure')
-        # general_error_messages.delay(path='write_fpdata_to_es function',msg=log_exception(e))

@@ -192,9 +192,6 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
 
     def month_severity_count(self, user, kwargs={}, exclude_kwargs={}):
         raw_vuls = self.get_open_vul_query(user, kwargs, exclude_kwargs).order_by('created_on')
-        # months = raw_vuls.annotate(month=Concat(V('01'),V('-'),ExtractMonth('created_on'),V('-'),ExtractYear('created_on'))\
-        #     ,severity=F('severity'))\
-        #     .values_list('month','severity')
         months = raw_vuls.annotate(
             month=Concat(V('01'), V('-'), ExtractMonth('created_on'), V('-'), ExtractYear('created_on')) \
             , severity=F('severity')) \

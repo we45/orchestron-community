@@ -24,6 +24,8 @@
                                     type="text"
                                     class="inline-form-control"
                                     placeholder="Enter Project Name" :state="!$v.projectName.$invalid"></b-form-input>
+                                    <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+
                             </b-col>
                         </b-row>
                         <br>
@@ -35,6 +37,8 @@
                                     placeholder="Choose a logo..."
                                     accept="image/jpeg, image/png,image/jpg,"
                                     ></b-form-file>
+                                    <p  v-if="error_msgs['logo']" style="text-align: left;" class="error"> * {{ error_msgs['logo_msg'] }}</p>
+
                                 <br>
                                 <p v-if="projectLogo">{{ projectLogo.name }}</p>
                             </b-col>
@@ -63,6 +67,8 @@
                                     type="text"
                                     class="inline-form-control"
                                     placeholder="Update Project Name" :state="!$v.updateProjectName.$invalid"></b-form-input>
+                                    <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+
                             </b-col>
                         </b-row>
                         <br>
@@ -73,6 +79,8 @@
                                     v-model="updateProjectLogo"
                                     placeholder="Choose a logo..."
                                     accept="image/jpeg, image/png,image/jpg,"></b-form-file>
+                                    <p  v-if="error_msgs['logo']" style="text-align: left;" class="error"> * {{ error_msgs['logo_msg'] }}</p>
+
                                 <br>
                                 <br>
                                 <p>{{ updateLogoName }}</p>
@@ -176,6 +184,8 @@ export default {
         logo: '',
         full_Data: [],
         isLoadingPage: false,
+        error_msgs: { 'name': false, 'logo': false, 'name_msg': '', 'logo_msg': '' },
+
       }
     },
     validations: {
@@ -192,6 +202,30 @@ export default {
       this.org = localStorage.getItem('org')
       this.token = localStorage.getItem('token')
       this.fetchData()
+    },
+     watch: {
+      'projectName': function(value_name) {
+        if (value_name.length > 100) {
+          this.error_msgs['name'] = true
+          this.error_msgs['name_msg'] = 'Ensure this field has no more than 100 characters.'
+        } else {
+          this.error_msgs['name'] = false
+        }
+      },
+      'projectLogo': function(value_name) {
+        this.error_msgs['logo'] = false
+      },
+      'updateProjectLogo': function(value_name) {
+        this.error_msgs['logo'] = false
+      },
+      'updateProjectName': function(value_name) {
+        if (value_name.length > 100) {
+          this.error_msgs['name'] = true
+          this.error_msgs['name_msg'] = 'Ensure this field has no more than 100 characters.'
+        } else {
+          this.error_msgs['name'] = false
+        }
+      }
     },
     updated() {
       this.$nextTick(function() {
@@ -279,14 +313,19 @@ export default {
               // this.$router.go('/projects/')
             }).catch(error => {
               var status_info = error.response.status
-              if(status_info === 400){
-                  this.$notify({
-                    group: 'foo',
-                    type: 'error',
-                    title: 'error',
-                    text: 'Error in creation of project',
-                    position: 'top right'
-                })
+              if (error.response.status === 400) {
+                if (error.response.data['name']) {
+                  this.error_msgs['name'] = true
+                  this.error_msgs['name_msg'] = error.response.data['name'][0]
+                }
+                if (error.response.data['logo']) {
+                  this.error_msgs['logo'] = true
+                  this.error_msgs['logo_msg'] = error.response.data['logo'][0]
+                }
+                // else{
+                //   this.error_msgs['name'] = true
+                //   this.error_msgs['name_msg'] = "Error In Creating Project"
+                // }
               }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -374,14 +413,28 @@ export default {
               this.updateLogoName = ''
             }).catch(error => {
               var status_info = error.response.status
-              if(status_info === 400){
-                  this.$notify({
-                    group: 'foo',
-                    type: 'error',
-                    title: 'error',
-                    text: 'Error in updation of project',
-                    position: 'top right'
-                })
+              // if(status_info === 400){
+              //     this.$notify({
+              //       group: 'foo',
+              //       type: 'error',
+              //       title: 'error',
+              //       text: 'Error in updation of project',
+              //       position: 'top right'
+              //   })
+              // }
+              if (error.response.status == 400) {
+                if (error.response.data['name']) {
+                  this.error_msgs['name'] = true
+                  this.error_msgs['name_msg'] = error.response.data['name'][0]
+                }
+                if (error.response.data['logo']) {
+                  this.error_msgs['logo'] = true
+                  this.error_msgs['logo_msg'] = error.response.data['logo'][0]
+                }
+                // else{
+                //   this.error_msgs['name'] = true
+                //   this.error_msgs['name_msg'] = "Error In Updating Project !!!"
+                // }
               }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
@@ -572,5 +625,13 @@ export default {
     line-height: 0.99;
     text-align: center;
     color: #232325;
+  }
+   .error{
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

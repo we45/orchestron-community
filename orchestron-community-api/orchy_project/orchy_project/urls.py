@@ -5,10 +5,10 @@ from django.conf import settings
 from api.api import OrganizationView, ProjectView, ApplicationView, ScanView, EngagementView, \
 	WebhookView, WebhookUploadView, VulnerabilityView, VulnerabilityEvidenceView, \
     VulnerabilityRemediationView, VulnerabilityEvidenceRemediationView, UserView, OrganizationConfigurationView, \
-    JiraIssueTypesView, EmailConfigurationView, OpenVulnerabilityView, RequestResponseView, RemediateOpenVulnerabilityView,\
+    JiraIssueTypesView, OpenVulnerabilityView, RequestResponseView, RemediateOpenVulnerabilityView,\
     ClosedVulnerabilityView, UserUtilityView, UserProfileView, MediaServeView, OrganizationOptionView,UserUtilityForgotView, \
     OptionsListView, ParserView, JiraConnectionTestView, \
-    ORLConfigView, ScanResultView, JiraProjectsView, JIRAListView, \
+    ScanResultView, JiraProjectsView, JIRAListView, \
     ScanStatusView, OrganizationListView, ProjectListView, ApplicationListView, UserListView, ExecutiveReportView,\
     CategorizeVulnerability, TokenRenewView, GetTokenView, DjangoSiteChangeView, \
     IPAdressView, PasswordUtilityView
@@ -54,9 +54,7 @@ urlpatterns = [
     re_path(r'^api/organizations/(?P<pk>\d+)/projects/$',  OrganizationAnalyticsView.as_view({'get':'projects'}),name='org_pro_openvul'),
     re_path(r'^api/organizations/(?P<pk>\d+)/config/$',  OrganizationConfigurationView.as_view({'get':'retrieve','put':'config','post':'update','delete':'destroy'}),name='ind_org_config'),
     re_path(r'^api/organizations/(?P<pk>\d+)/jira/$',  JiraIssueTypesView.as_view({'get':'retrieve','put':'config','post':'update','delete':'destroy'}),name='ind_org_jira_config'),
-    re_path(r'^api/organizations/(?P<pk>\d+)/email/$',  EmailConfigurationView.as_view({'get':'retrieve','put':'config','post':'update','delete':'destroy'}),name='ind_org_email_config'),
-    re_path(r'^api/organizations/(?P<pk>\d+)/orl/$',  ORLConfigView.as_view({'get':'retrieve','put':'config','post':'update','delete':'destroy'}),name='ind_org_orl_config'),
-
+   
     re_path(r'^api/jira/connection/test/$',  JiraConnectionTestView.as_view(),name='test_jira_con'),
 
     re_path(r'^api/projects/$', ProjectView.as_view({'get':'list','put':'create'}),name='pro'),

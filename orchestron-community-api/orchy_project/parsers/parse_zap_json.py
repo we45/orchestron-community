@@ -107,7 +107,3 @@ def parse_zap_json(file_path, user_name, init_es):
 		log_exception(e)
 	else: 
 		print('XML Parsing Completed')
-
-
-
-# parse_zap_json(file_path,init_es)		

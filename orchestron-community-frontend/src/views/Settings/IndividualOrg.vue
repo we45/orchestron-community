@@ -2,224 +2,16 @@
     <div>
         <b-container fluid>
           <loading :active.sync="reloadPage" :can-cancel="true" :is-full-page="true"></loading>
-            <settings-org-header :settingsHeader="headerData" :logoOrg="orgLogo" @configureSettings="configureOrgSettings" @updateOrg="updateOrg"></settings-org-header>
-            <b-container fluid v-if="showConfig" style="background-color: #FFFFFF;">
-                <br>
-                <p>Organization Configure</p>
-                <hr>
-                <b-row>
-                    <b-col cols="1"></b-col>
-                    <b-col cols="10">
-                        <b-row>
-                            <b-col cols="6">
-                                <b-row>
-                                    <b-col sm="6"><label class="label">Enable JIRA:</label></b-col>
-                                    <b-col sm="6">
-                                        <toggle-button
-                                            v-model="enableJira"
-                                            :value="enableJira" :labels="{checked: 'Yes', unchecked: 'No'}" :width="60" :height="30" style="font-size: 12px;"/>
-                                    </b-col>
-                                </b-row>
-                            </b-col>
-                       <!--      <b-col cols="6">
-                            <b-row>
-                                    <b-col sm="6"><label class="label">Enable Email:</label></b-col>
-                                    <b-col sm="6">
-                                        <toggle-button
-                                            v-model="enableEmail"
-                                            :value="enableEmail" :labels="{checked: 'Yes', unchecked: 'No'}" :width="60" :height="30" style="font-size: 12px;"/>
-                                    </b-col>
-                                </b-row>
-                            </b-col>
- -->
-                          <b-col>
-                            <br>
-                            <div class="pull-right" style="float: right">
-                                <button type="button"
-                                    class="btn btn-orange-submit pull-right"
-                                    @click=" submitOrgConfigSettings() ">
-                                Submit
-                                </button>
-                            </div>
-                            </b-col>
-                        </b-row>
-                        <br>
-                    </b-col>
-                    <b-col cols="1"></b-col>
-                </b-row>
-            </b-container>
+            <settings-org-header :settingsHeader="headerData" :logoOrg="orgLogo" @updateOrg="updateOrg"></settings-org-header>
             <br>
-            <!-- <b-container fluid style="background-color: #FFFFFF;">
-                <br>
-                <p class="title">Manage Users</p>
-                <hr>
-                <b-tabs style="background-color: #FFFFFF;">
-                    <br>
-                    <b-tab title="Users" small>
-                        <div>
-                            <br>
-                            <b-container fluid>
-                                <user-table
-                                :data-items="userData"
-                                @updateModal="updateUser($event)"
-                                @deleteModal="deleteUser($event)"
-                                @createModal="createUser"></user-table>
-                            </b-container>
-                        </div>
-                    </b-tab>
-                </b-tabs>
-                <br>
-                <b-modal
-                    ref="userCreateModal"
-                    title="Create User"
-                    size="lg"
-                    centered>
-                    <div>
-                        <form @submit.prevent="submitCreateUser">
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">First Name:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="firstName"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter First Name" :state="!$v.firstName.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Last Name:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="lastName"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Last Name" :state="!$v.lastName.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Email:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="email"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Email" :state="!$v.email.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                        </form>
-                    </div>
-                    <b-col cols="12" slot="modal-footer">
-                        <div class="pull-right" style="float: right">
-                            <button type="button" class="btn btn-orange-close pull-right" @click=" closeCreateUser() "> Close</button>
-                            <button type="button" class="btn btn-orange-submit pull-right"
-                                data-dismiss="modal"
-                                @click=" submitCreateUser() "
-                                v-if="!$v.firstName.$invalid && !$v.lastName.$invalid && !$v.email.$invalid">
-                            Submit
-                            </button>
-                        </div>
-                    </b-col>
-                </b-modal>
-                <b-modal
-                    ref="userUpdateModal"
-                    title="Update User"
-                    size="lg"
-                    centered>
-                    <div>
-                        <form @submit.prevent="submitUpdateUser">
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">First Name:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="updateFirstName"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter First Name" :state="!$v.updateFirstName.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Last Name:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="updateLastName"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Last Name" :state="!$v.updateLastName.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Email:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="updateEmail"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Email" :state="!$v.updateEmail.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                        </form>
-                    </div>
-                    <b-col cols="12" slot="modal-footer">
-                        <div class="pull-right" style="float: right">
-                            <button type="button" class="btn btn-orange-close pull-right" @click=" closeUpdateUser() "> Close</button>
-                            <button type="button" class="btn btn-orange-submit pull-right"
-                                data-dismiss="modal"
-                                @click=" submitUpdateUser() "
-                                v-if="!$v.updateFirstName.$invalid && !$v.updateLastName.$invalid && !$v.updateEmail.$invalid">
-                            Submit
-                            </button>
-                        </div>
-                    </b-col>
-                </b-modal>
-                <b-modal ref="deleteUserModal" title="Delete User" centered size="lg">
-                    <div>
-                        <form @submit.prevent="deleteSubmitUser">
-                            <p class="delete-header">Are you sure want to delete this User ?</p>
-                            <br>
-                            <br>
-                        </form>
-                    </div>
-                    <b-col cols="12" slot="modal-footer">
-                        <div class="pull-right" style="float: right;">
-                            <button type="button" class="btn btn-orange-close" @click=" deleteCloseSubmitUser() ">No</button>
-                            <button type="button" class="btn btn-orange-submit"
-                                data-dismiss="modal" @click=" deleteSubmitUser() ">
-                            Yes
-                            </button>
-                        </div>
-                    </b-col>
-                </b-modal>
-            </b-container> -->
-            <br>
-            <b-container fluid style="background-color: #FFFFFF;" v-if="enableJira">
+            <b-container fluid style="background-color: #FFFFFF;" >
                 <br>
                 <p class="title">Manage Communication and Bug Tracking System</p>
                 <hr>
                 <b-tabs style="background-color: #FFFFFF;">
                     <br>
-                    <b-tab title="Bug Tracking System" small v-if="enableJira">
-                        <b-row>
-                            <b-col cols="12">
-                                <b-col cols="4">
-                                    <label>Select Bug Tracking System:</label>
-                                </b-col>
-                                <b-col cols="8">
-                                    <v-select
-                                        v-model="selectedBugTracking"
-                                        :options="listBugTracking"
-                                        placeholder="Select Bug Tracking System" ></v-select>
-                                </b-col>
-                            </b-col>
-                        </b-row>
-                        <br>
-                        <br>
-                        <div v-if="selectedBugTracking==='JIRA' && enableJira">
+                    <b-tab title="Bug Tracking System (  JIRA )" small >
+                        <div >
                             <b-row class="my-1">
                                 <b-col sm="2"><label class="label">URL:</label></b-col>
                                 <b-col sm="10">
@@ -228,6 +20,8 @@
                                         type="text"
                                         class="inline-form-control"
                                         placeholder="Enter JIRA URL" :state="!$v.jiraURL.$invalid"></b-form-input>
+                                          <p v-if="error_jira_msgs['jiraurl']" style="text-align: left;" class="error"> * {{ error_jira_msgs['jiraurl_msg']
+                  }}</p>
                                 </b-col>
                             </b-row>
                             <br>
@@ -239,6 +33,8 @@
                                         type="text"
                                         class="inline-form-control"
                                         placeholder="Enter JIRA UserName" :state="!$v.jiraUserName.$invalid"></b-form-input>
+                                        <p v-if="error_jira_msgs['jirauser']" style="text-align: left;" class="error"> * {{ error_jira_msgs['jirauser_msg']
+                  }}</p>
                                 </b-col>
                             </b-row>
                             <br>
@@ -250,8 +46,11 @@
                                         type="password"
                                         class="inline-form-control"
                                         placeholder="Enter JIRA Password" :state="!$v.jiraPassword.$invalid"></b-form-input>
+                                          <p v-if="error_jira_msgs['jirapwd']" style="text-align: left;" class="error"> * {{ error_jira_msgs['jirapwd_msg']
+                  }}</p>
                                 </b-col>
                             </b-row>
+                          <p v-if="error_jira_msgs['invalid']" style="text-align: left;" class="error"> * {{ error_jira_msgs['invalid_msg'] }}</p>
                             <b-col cols="12" slot="modal-footer">
                                 <br>
                                 <div class="pull-right" style="float: right">
@@ -283,6 +82,8 @@
                                                     v-model="updateOrgName"
                                                     type="text"
                                                     class="inline-form-control"></b-form-input>
+                                                    <p v-if="error_msgs['orgname']" style="text-align: left;" class="error"> * {{ error_msgs['orgname_msg']
+                  }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -293,6 +94,8 @@
                                                     placeholder="Choose a logo..."
                                                     accept="image/jpeg, image/png,image/jpg,"
                                                     :state="!$v.updateOrgLogo.$invalid"></b-form-file>
+                                                    <p v-if="error_msgs['orglogo']" style="text-align: left;" class="error"> * {{ error_msgs['orglogo_msg']
+                  }}</p>
                                                 <br>
                                                 <p>Previous logo: {{ updateOrgLogo }} </p>
                                                 <p>{{ updateOrgLogo.name }}</p>
@@ -309,6 +112,7 @@
                                                     type="text"
                                                     class="inline-form-control"
                                                     placeholder="Enter Location" :state="!$v.updateOrgLocation.$invalid"></b-form-input>
+                                                    <p  v-if="error_msgs['orgloc']" style="text-align: left;" class="error"> * {{ error_msgs['orgloc_msg'] }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -319,6 +123,7 @@
                                                   format="yyyy-MM-dd"
                                                   lang="en" width="100%"
                                                   :not-before="today" :state="!$v.updateOrgEndDate.$invalid"></date-picker>
+                                                  <p  v-if="error_msgs['orgend']" style="text-align: left;" class="error"> * {{ error_msgs['orgend_msg'] }}</p>
                                             </b-col>
                                           </b-col>
                                         </b-row>
@@ -333,6 +138,7 @@
                                                     label="label"
                                                     placeholder="Select Organization Type"
                                                     :state="!$v.updateOrgType.$invalid"></v-select>
+                                                    <p  v-if="error_msgs['orgind']" style="text-align: left;" class="error"> * {{ error_msgs['orgind_msg'] }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -344,6 +150,9 @@
                                                     label="label"
                                                     placeholder="Select Timezone"
                                                     :state="!$v.updateOrgTimezone.$invalid"></v-select>
+                                                    <p v-if="error_msgs['orgtime']" style="text-align: left;" class="error"> * {{ error_msgs['orgtime_msg']
+                  }}</p>
+
 
                                             </b-col>
                                           </b-col>
@@ -364,107 +173,6 @@
                                     </div>
                                 </b-col>
                       </b-modal>
-                    <!-- <b-tab title="Email" small v-if="enableEmail">
-                        <b-row>
-                            <b-col cols="12">
-                                <b-col cols="4">
-                                    <label>Select SMTP Type:</label>
-                                </b-col>
-                                <b-col cols="8">
-                                    <v-select
-                                        v-model="selectedSmtp"
-                                        :options="listSmtpTypes"
-                                        placeholder="Select SMTP Type" ></v-select>
-                                </b-col>
-                            </b-col>
-                        </b-row>
-                        <br>
-                        <br>
-                        <div v-if="selectedSmtp==='SMTP with Password' && enableEmail">
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">HOST:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="emailHost"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Email Host" :state="!$v.emailHost.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Port:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="emailPort"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Email Port" :state="!$v.emailPort.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Host User:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="emailUser"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Host User" :state="!$v.emailUser.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Password:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="emailPassword"
-                                        type="password"
-                                        class="inline-form-control"
-                                        placeholder="Enter Password" :state="!$v.emailPassword.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">From Email:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="emailFromEmail"
-                                        type="email"
-                                        class="inline-form-control"
-                                        placeholder="Enter From Email" :state="!$v.emailFromEmail.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">Display Name:</label></b-col>
-                                <b-col sm="10">
-                                    <b-form-input
-                                        v-model="emailDisplayName"
-                                        type="text"
-                                        class="inline-form-control"
-                                        placeholder="Enter Display Name" :state="!$v.emailDisplayName.$invalid"></b-form-input>
-                                </b-col>
-                            </b-row>
-                            <br>
-                            <b-row class="my-1">
-                                <b-col sm="2"><label class="label">TLS/SSL:</label></b-col>
-                                <b-col sm="10">
-                                    <v-select v-model="emailTlsSsl" :options="transportLayerOption" placeholder="Select Transport Layer" :state="!$v.emailTlsSsl.$invalid"></v-select>
-                                </b-col>
-                            </b-row>
-                            <b-col cols="12">
-                                <div class="pull-right" style="float: right">
-                                    <button type="button"
-                                        class="btn btn-orange-close pull-right"
-                                        @click=" submitWithPasswordSMTP() "
-                                        v-if="!$v.emailHost.$invalid && !$v.emailPort.$invalid && !$v.emailUser.$invalid
-                                        && !$v.emailPassword.$invalid && !$v.emailFromEmail.$invalid && !$v.emailDisplayName.$invalid
-                                        && !$v.emailTlsSsl.$invalid">Save Configuration</button>
-                                </div>
-                            </b-col>
-                        </div>
-                    </b-tab> -->
                 </b-tabs>
                 <br>
             </b-container>
@@ -535,7 +243,45 @@ export default {
       updateOrgEndDate: '',
       updateOrgName: '',
       orgTypeOption: [],
-      orgTimezoneOption: []
+      orgTimezoneOption: [],
+      error_msgs: {
+          'usrfirst': false,
+          'usrfirst_msg': '',
+          'usrlast': false,
+          'usrlast_msg': '',
+          'usremail': false,
+          'usremail_msg': '',
+          'usrteam': false,
+          'usrteam_msg': '',
+          'usradmin': false,
+          'usradmin_msg': '',
+          'team': false,
+          'team_msg': '',
+          'teamdesc': false,
+          'teamdesc_msg': '',
+          'orgname': false,
+          'orgname_msg': '',
+          'orgloc': false,
+          'orgloc_msg': '',
+          'orglogo': false,
+          'orglogo_msg': '',
+          'orgtime': false,
+          'orgtime_msg': '',
+          'orgind': false,
+          'orgind_msg': '',
+          'orgend': false,
+          'orgend_msg': ''
+        },
+    error_jira_msgs: {
+      'jiraurl': false,
+      'jiraurl_msg':'',
+      'jirauser': false,
+      'jirauser_msg':'',
+      'jirapwd':false,
+      'jirapwd_msg':'',
+      'invalid': false,
+      'invalid_msg': ''
+    },
     }
   },
   validations: {
@@ -649,6 +395,62 @@ export default {
     this.token = localStorage.getItem('token')
     this.fetchData()
   },
+   watch: {
+      'updateOrgName': function (value_name) {
+        if (value_name.length > 200) {
+          this.error_msgs['orgname'] = true
+          this.error_msgs['orgname_msg'] = 'Ensure this field has no more than 200 characters.'
+        } else {
+          this.error_msgs['orgname'] = false
+        }
+      },
+      'updateOrgLogo': function (value_name) {
+        this.error_msgs['orglogo'] = false
+      },
+      'updateOrgTimezone': function (value_name) {
+        this.error_msgs['orgtime'] = false
+      },
+      'updateOrgLocation': function (value_name) {
+        if (value_name.length > 100) {
+          this.error_msgs['orgloc'] = true
+          this.error_msgs['orgloc_msg'] = 'Ensure this field has no more than 100 characters.'
+        } else {
+          this.error_msgs['orgloc'] = false
+        }
+      },
+      'updateOrgType': function (value_name) {
+        this.error_msgs['orgind'] = false
+      },
+      'firstName': function (value_name) {
+        if (value_name.length > 30) {
+          this.error_msgs['usrfirst'] = true
+          this.error_msgs['usrfirst_msg'] = 'Ensure this field has no more than 30 characters.'
+        } else {
+          this.error_msgs['usrfirst'] = false
+        }
+      },
+      'lastName': function (value_name) {
+        if (value_name.length > 30) {
+          this.error_msgs['usrlast'] = true
+          this.error_msgs['usrlast_msg'] = 'Ensure this field has no more than 30 characters.'
+        } else {
+          this.error_msgs['usrlast'] = false
+        }
+      },
+      'jiraURL': function (value_name) {
+        this.error_msgs['jiraurl'] = false
+      },
+      'jiraUserName': function (value_name) {
+        this.error_msgs['jirauser'] = false
+      },
+
+      'jiraPassword': function (value_name) {
+        this.error_msgs['jirapwd'] = false
+      },
+
+
+
+    },
   updated() {
     this.$nextTick(function() {     
       if (this.isLoading) {
@@ -682,40 +484,6 @@ export default {
               .then(res => {
                 this.orgLogo = res.data
               })
-              // .catch(error => {
-              //   if (error.response.status === 404) {
-              //     this.$router.push('/not_found')
-              //   } else if (error.response.status === 403) {
-              //     this.$router.push('/forbidden')
-              //   } else {
-              //     this.$router.push('/error')
-              //   }
-              // })
-            // for (const value of res.data.users) {
-            //   let name = ''
-            //   if (
-            //     value.fields.first_name == null ||
-            //   value.fields.last_name === null
-            //   ) {
-            //     name = value.fields.email
-            //   } else if (
-            //     value.fields.first_name === null &&
-            //   value.fields.last_name == null
-            //   ) {
-            //     name = value.fields.email
-            //   } else {
-            //     name = value.fields.first_name + ' ' + value.fields.last_name
-            //   }
-            //   if (value.fields.is_admin === true) {
-            //     isAdmin = true
-            //   }
-            //   this.userData.push({
-            //     name: name,
-            //     email: value.fields.email,
-            //     id: value.fields.id,
-            //     isAdmin: isAdmin
-            //   })
-            // }
           })
           .catch(error => {
             if (error.response.status === 404) {
@@ -728,42 +496,14 @@ export default {
           })
 
         axios
-          .get('/organizations/' + this.org + '/config/')
-          .then(res => {
-            this.enableJira = res.data.enable_jira
-            this.enableEmail = res.data.enable_email
-            this.isConfCreated = true
-            if (this.enableJira) {
-              axios
-                .get('/organizations/' + this.org + '/jira/')
-                .then(res => {
-                  this.jiraURL = res.data.url
-                  this.jiraUserName = '****'
-                  this.jiraPassword = ''
-                  this.post_jira_method = true
-                })
-                // .catch(error => {
-                //     this.reloadPage = false
-                //   if (error.response.status === 404) {
-                //     this.$router.push('/not_found')
-                //   } else if (error.response.status === 403) {
-                //     this.$router.push('/forbidden')
-                //   } else {
-                //     this.$router.push('/error')
-                //   }
-                // })
-            }
-            this.reloadPage = false
-          })
-          .catch(error => {
-            this.reloadPage = false
-            if (error.response.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.response.status === 403) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
+        .get('/organizations/' + this.org + '/jira/')
+        .then(res => {
+          this.jiraURL = res.data.url
+          this.jiraUserName = '****'
+          this.jiraPassword = ''
+          this.post_jira_method = true
+        }).catch(error => {
+            this.post_jira_method = false
           })
         this.reloadPage = false
 
@@ -863,16 +603,36 @@ export default {
               }).catch(error => {
                 if (error.response.status === 404) {
                   this.$router.push('/not_found')
-                } else if (error.response.status === 400) {
-                  // this.$router.push('/forbidden')
-                  this.$notify({
-                  group: 'foo',
-                  type: 'error',
-                  title: 'error',
-                  text: 'Validation error!!',
-                  position: 'top right'
-                })
-                } else {
+                }
+
+                if (error.response.status === 400) {
+                if (error.response.data['name']) {
+                  this.error_msgs['orgname'] = true
+                  this.error_msgs['orgname_msg'] = error.response.data['name'][0]
+                }
+                if (error.response.data['timezone']) {
+                  this.error_msgs['orgtime'] = true
+                  this.error_msgs['orgtime_msg'] = error.response.data['timezone'][0]
+                }
+                if (error.response.data['end_date']) {
+                  this.error_msgs['orgend'] = true
+                  this.error_msgs['orgend_msg'] = error.response.data['end_date'][0]
+                }
+                if (error.response.data['location']) {
+                  this.error_msgs['orgloc'] = true
+                  this.error_msgs['orgloc_msg'] = error.response.data['location'][0]
+                }
+                if (error.response.data['industry']) {
+                  this.error_msgs['orgind'] = true
+                  this.error_msgs['orgind_msg'] = error.response.data['industry'][0]
+                }
+                if (error.response.data['logo']) {
+                  this.error_msgs['orglogo'] = true
+                  this.error_msgs['orglogo_msg'] = error.response.data['logo'][0]
+                }
+              }
+
+                else {
                   this.$router.push('/error')
                 }
               })
@@ -881,238 +641,6 @@ export default {
             this.$router.push('/')
           }
         },
-    // createUser() {
-    //   this.$refs.userCreateModal.show()
-    // },
-    // closeCreateUser() {
-    //   this.$refs.userCreateModal.hide()
-    // },
-    // submitCreateUser() {
-    //   if (this.org && this.org && this.token) {
-    //     const form_data = {
-    //       first_name: this.firstName,
-    //       last_name: this.lastName,
-    //       email: this.email,
-    //       is_staff: true,
-    //       org: this.org,
-    //       is_admin: this.isAdmin
-    //     }
-    //     axios
-    //       .put('/users/', form_data)
-    //       .then(res => {
-    //         if (response.status === 200) {
-    //           this.$refs.userCreateModal.hide()
-    //           this.isLoading = true
-    //           this.reloadPage = true
-    //           this.$router.push('/settings/individual_org/' + this.org + '/')
-    //           this.$notify({
-    //             group: 'foo',
-    //             type: 'success',
-    //             title: 'success',
-    //             text: 'The user has been created successfully!',
-    //             position: 'top right'
-    //           })
-    //         }
-    //       })
-    //       .catch(error => {
-    //         if (error.response.status === 404) {
-    //           this.$router.push('/not_found')
-    //         } else if (error.response.status === 403) {
-    //           this.$router.push('/forbidden')
-    //         } else {
-    //           this.$router.push('/error')
-    //         }
-    //       })
-    //   } else {
-    //     notValidUser()
-    //     this.$router.push('/')
-    //   }
-    // },
-    // updateUser(event) {
-    //   this.userId = event.id
-    //   this.$refs.userUpdateModal.show()
-    //   if (this.org && this.org && this.token) {
-    //     axios
-    //       .get('/users/' + this.userId + '/')
-    //       .then(res => {
-    //         if (response.status === 200) {
-    //           this.updateFirstName = res.data.first_name
-    //           this.updateLastName = res.data.last_name
-    //           this.updateEmail = res.data.email
-    //           this.updateIsAdmin = res.data.is_admin
-    //         }
-    //       })
-    //       .catch(error => {
-    //         if (error.response.status === 404) {
-    //           this.$router.push('/not_found')
-    //         } else if (error.response.status === 404) {
-    //           this.$router.push('/forbidden')
-    //         } else {
-    //           this.$router.push('/error')
-    //         }
-    //       })
-    //   } else {
-    //     notValidUser()
-    //     this.$router.push('/')
-    //   }
-    // },
-    // closeUpdateUser() {
-    //   this.$refs.userUpdateModal.hide()
-    // },
-    // submitUpdateUser() {
-    //   const form_data = {
-    //     first_name: this.updateFirstName,
-    //     last_name: this.updateLastName,
-    //     email: this.updateEmail,
-    //     is_staff: true,
-    //     org: this.org,
-    //     is_admin: this.updateIsAdmin
-    //   }
-    //   if (this.org && this.org && this.token) {
-    //     axios
-    //       .post('/users/' + this.userId + '/', form_data)
-    //       .then(res => {
-    //         if (response.status === 200) {
-    //           this.$refs.userUpdateModal.hide()
-    //           this.isLoading = true
-    //           this.reloadPage = true
-    //           this.$router.push('/settings/individual_org/' + this.org + '/')
-    //           this.userId = ''
-    //           this.$notify({
-    //             group: 'foo',
-    //             type: 'info',
-    //             title: 'success',
-    //             text: 'The user has been updated successfully!',
-    //             position: 'top right'
-    //           })
-    //         }
-    //       })
-    //       .catch(error => {
-    //         if (error.response.status === 404) {
-    //           this.$router.push('/not_found')
-    //         } else if (error.response.status === 403) {
-    //           this.$router.push('/forbidden')
-    //         } else {
-    //           this.$router.push('/error')
-    //         }
-    //       })
-    //   } else {
-    //     notValidUser()
-    //     this.$router.push('/')
-    //   }
-    // },
-    // deleteUser(event) {
-    //   this.userId = event.id
-    //   this.$refs.deleteUserModal.show()
-    // },
-    // deleteCloseSubmitUser() {
-    //   this.$refs.deleteUserModal.hide()
-    // },
-    // deleteSubmitUser() {
-    //   if (this.org && this.userId && this.org && this.token) {
-    //     axios
-    //       .delete('/users/' + this.userId + '/')
-    //       .then(res => {
-    //         if (response.status === 200) {
-    //           this.$refs.deleteUserModal.hide()
-    //           this.userId = ''
-    //           this.isLoading = true
-    //           this.reloadPage = true
-    //           this.$router.push('/settings/individual_org/' + this.org + '/')
-    //           this.$notify({
-    //             group: 'foo',
-    //             type: 'info',
-    //             title: 'success',
-    //             text: 'The user has been deleted successfully!',
-    //             position: 'top right'
-    //           })
-    //         }
-    //       })
-    //       .catch(error => {
-    //         if (error.response.status === 404) {
-    //           this.$router.push('/not_found')
-    //         } else if (error.response.status === 404) {
-    //           this.$router.push('/forbidden')
-    //         } else {
-    //           this.$router.push('/error')
-    //         }
-    //       })
-    //   } else {
-    //     notValidUser()
-    //     this.$router.push('/')
-    //   }
-    // },
-    configureOrgSettings() {
-      if (this.showConfig === true) {
-        this.showConfig = false
-      } else {
-        this.showConfig = true
-      }
-    },
-    submitOrgConfigSettings() {
-      const form_data = {
-        'enable_jira': this.enableJira,
-        'enable_email': this.enableEmail
-      }
-      if (this.org && this.org && this.token) {
-        if (this.isConfCreated) {
-          axios
-            .post('/organizations/' + this.org + '/config/', form_data)
-            .then(res => {
-              // if (response.status === 200) {
-                this.showConfig = false
-                this.isLoading = true
-                this.$router.go('/settings/individual_org/' + this.org + '/')
-                this.$notify({
-                  group: 'foo',
-                  type: 'success',
-                  title: 'success',
-                  text: 'The organization has been created successfully!',
-                  position: 'top right'
-                })
-              // }
-            })
-            .catch(error => {
-              if (error.response.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.response.status === 403) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
-        } else {
-          axios
-            .put('/organizations/' + this.org + '/config/', form_data)
-            .then(res => {
-              // if (response.status === 200) {
-                this.showConfig = false
-                this.isLoading = true
-                this.$router.go('/settings/individual_org/' + this.org + '/')
-                this.$notify({
-                  group: 'foo',
-                  type: 'success',
-                  title: 'success',
-                  text: 'The organization has been created successfully!',
-                  position: 'top right'
-                })
-              // }
-            })
-            .catch(error => {
-              if (error.response.status === 404) {
-                this.$router.push('/not_found')
-              } else if (error.response.status === 404) {
-                this.$router.push('/forbidden')
-              } else {
-                this.$router.push('/error')
-              }
-            })
-        }
-      } else {
-        notValidUser()
-        this.$router.push('/')
-      }
-    },
     testJiraConnection() {
       if (this.org && this.org && this.token) {
         this.isLoading = true
@@ -1128,13 +656,34 @@ export default {
             this.isLoading = false
           })
           .catch(error => {
-            this.$notify({
-              group: 'foo',
-              type: 'error',
-              title: 'error',
-              text: 'Please enter a valid JIRA credentials',
-              position: 'top right'
-            })
+            if (error.response.status === 400) {
+              if (error.response.data['url']) {
+                this.error_jira_msgs['jiraurl'] = true
+                this.error_jira_msgs['jiraurl_msg'] = error.response.data['url'][0]
+              }
+              if (error.response.data['username']) {
+                this.error_jira_msgs['jirauser'] = true
+                this.error_jira_msgs['jirauser_msg'] = error.response.data['username'][0]
+              }
+              if (error.response.data['password']) {
+                this.error_jira_msgs['jirapwd'] = true
+                this.error_jira_msgs['jirapwd_msg'] = error.response.data['password'][0]
+              }
+              
+            }
+            else{
+              this.error_jira_msgs['invalid'] = true
+              this.error_jira_msgs['invalid_msg'] = "Provided credentials are invalid or server timeout"
+
+            }
+
+            // this.$notify({
+            //   group: 'foo',
+            //   type: 'error',
+            //   title: 'error',
+            //   text: 'Please enter a valid JIRA credentials',
+            //   position: 'top right'
+            // })
             this.isLoading = false
           })
       } else {
@@ -1150,12 +699,10 @@ export default {
           password: this.jiraPassword
         }
         if(this.post_jira_method){
-
         axios
           .post('/organizations/' + this.org + '/jira/', form_data)
           .then(res => {
-            // if (response.status === 200) {
-              this.$refs.userCreateModal.hide()
+          
               this.isLoading = true
               this.$router.go('/settings/individual_org/' + this.org + '/')
               this.$notify({
@@ -1166,7 +713,6 @@ export default {
                 position: 'top right'
               })
               this.isLoading = false
-            // }
           })
           .catch(error => {
             if (error.response.status === 404) {
@@ -1182,8 +728,7 @@ export default {
              axios
           .put('/organizations/' + this.org + '/jira/', form_data)
           .then(res => {
-            // if (response.status === 200) {
-              this.$refs.userCreateModal.hide()
+            
               this.isLoading = true
               this.$router.go('/settings/individual_org/' + this.org + '/')
               this.$notify({
@@ -1194,7 +739,6 @@ export default {
                 position: 'top right'
               })
               this.isLoading = false
-            // }
           })
           .catch(error => {
             if (error.response.status === 404) {
@@ -1224,7 +768,6 @@ export default {
         axios
           .put('/organizations/' + this.org + '/email/', form_data)
           .then(res => {
-            // if (response.status === 200) {
               this.$refs.userCreateModal.hide()
               this.isLoading = true
               this.$router.go('/settings/individual_org/' + this.org + '/')
@@ -1236,7 +779,6 @@ export default {
                 position: 'top right'
               })
               this.isLoading = false
-            // }
           })
           .catch(error => {
             if (error.response.status === 404) {
@@ -1330,5 +872,13 @@ export default {
     padding: 3px 12px;
     margin-bottom: 0;
     font-size: 14px;
+  }
+  .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

@@ -15,7 +15,6 @@ from api.app_log import *
 import io
 from api.jira_utils import get_jira_con
 from time import sleep
-from api.orl import get_open_vul_info_from_api
 from django.conf import settings
 from api.models import User
 from django.contrib.sites.models import Site
@@ -24,7 +23,6 @@ import celery
 
 @celery.task
 def sync_jira_users(org_id):
-    print('Sync JIRA Users')
     jira_config = JiraIssueTypes.objects.get(org__id=org_id)
     jira_con = get_jira_con(jira_config)
     if jira_con:
@@ -98,8 +96,6 @@ def raise_jira_ticket(obj,org_id):
                     jira.assign_issue(new_issue,assignee)
                     info_debug_log(event='Assign Jira ticket to an assignee',status='success')
     except BaseException as e:
-        print("Error raising JIRA tickets")
-        # general_error_messages.delay(path='raise_jira_ticket function',msg=log_exception(e))
         critical_debug_log(event=e,status='failure')
 
 
@@ -129,9 +125,9 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
                 elif ext == 'xml':
                     parse_zap(complete_path,user,init_es)            
             elif tool == 'OWASP Dependency Checker':
-                parse_owasp_dep_checker(complete_path,user,init_es)            
+                parse_owasp_dep_checker(complete_path,user,init_es)
             elif tool == "FindSecBugs":
-                parser_findsecbug(complete_path,user,init_es)                            
+                parser_findsecbug(complete_path,user,init_es)
             info_debug_log(ip=user_host,user=user,event='XML Parsing',status='success')
             if hook_log:
                 hook_log.scan_process_event = True
@@ -158,7 +154,6 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
                 hook_log.scan_process_datetime = timezone.now()
                 hook_log.scan_id = ''
                 hook_log.save()
-            # general_error_messages.delay(path='process_files function',msg=log_exception(e))
             critical_debug_log(ip=user_host,user=user,event=e,status='failure')
     except BaseException as e:
         log_exception(e)

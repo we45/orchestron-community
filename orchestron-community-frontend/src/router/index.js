@@ -313,7 +313,7 @@ export const constantRouterMap = [
         component: IndividualOrg,
         name: 'Settings',
         meta: {
-          title: 'settings',
+          title: 'Settings',
           icon: 'settings'
         }
       }

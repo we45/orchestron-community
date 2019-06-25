@@ -48,7 +48,7 @@ def flat_file_validator(data):
 		file_size_validator(data)
 		name,ext = os.path.splitext(data.name)
 		content_type = data.content_type
-		if ext not in ['.xml','.html','.json','.nessus']:
+		if ext not in ['.xml','.json']:
 			raise serializers.ValidationError(FLAT_FILE_VALIDATION)					
 	return data	
 

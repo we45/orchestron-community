@@ -12,7 +12,6 @@ from collections import Counter
 from datetime import date as ddate
 from functools import reduce
 from parsers.exceptions import MalFormedXMLException
-from api.orl import get_open_vul_info_from_api
 from django.forms.models import model_to_dict
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
@@ -93,10 +92,7 @@ def get_single_vul_context(vuls):
         context[cwe]['cvss'] = v.cvss
         context[cwe]['app_languages'] = v.scan.application.platform_tags
         org_obj = v.scan.application.org
-        if org_obj.orl_config_exists():
-            vul_info = get_open_vul_info_from_api(cwe,org_obj)
-        else:
-            vul_info = {}
+        vul_info = {}
         context[cwe]['dread'] = vul_info.get('dread_score',0)
         context[cwe]['common_name'] = vul_info.get('name','')
         context[cwe]['description'] = vul_info.get('description','')
@@ -125,8 +121,6 @@ def get_single_vul_context(vuls):
 
 def get_request_response(host,evidences):
     domain = 'http://{0}'.format(host)
-    # if not domain.startswith("http://") or not domain.startswith("https://"):
-        # domain = 'http://{0}'.format(domain)
     context = {}
     for evidence in evidences:
         context[evidence.url] = {}
@@ -170,10 +164,7 @@ def get_closed_vul_context(host,vuls):
         context[cwe]['names'].add((v.name,v.scan.application.name))
         context[cwe]['cvss'] = v.cvss
         org_obj = v.scan.application.org
-        if org_obj.orl_config_exists():
-            vul_info = get_open_vul_info_from_api(cwe,org_obj)
-        else:
-            vul_info = {}
+        vul_info = {}
         context[cwe]['dread'] = vul_info.get('dread_score',0)
         context[cwe]['common_name'] = vul_info.get('name','')
         context[cwe]['description'] = vul_info.get('description','')
@@ -192,7 +183,6 @@ def get_closed_vul_context(host,vuls):
                 context[cwe]['evidences'][evidence.url] = set()
             context[cwe]['evidences'][evidence.url].add(evidence.param)
         remediation = v.vulnerabilityremediation_set.last()
-        # for remediation in remediation_set:
         if remediation:
             user = User.objects.filter(id=remediation.remediated_by).last()
             if user:
@@ -242,15 +232,12 @@ def write_results(data):
     Writes the false positive reduction analysis data th ES (sarpaastra index)
     """
     write_results_to_db(data)
-    # app_info_logger(" Event - Update false positive data to ES; Status - success.")
-    # app_debug_logger(" Event - Update false positive data to ES; Status - success.")
 
 
 def log_exception(e):
     exc_type, exc_value, exc_traceback = sys.exc_info()
     if settings.DEBUG:
         print("Line no :%s Exception %s"%(exc_traceback.tb_lineno,e))
-        # info_debug_log(event='Log exception',status='success')
     else:
         return exc_traceback.tb_lineno,e
 
@@ -271,48 +258,20 @@ def validate_allowed_files(flat_file):
         ext = flat_file.split('.')[-1]
         if ext == 'json':
             with codecs.open(flat_file,encoding='utf-8') as data_file:
-                data = json.load(data_file)
-                is_retirejs_json = is_brakeman = is_bandit = False
-                is_arachni = is_nodejsscan = is_snyk = False
-                is_zap_json = is_nodejs_json = is_npm_audit_json = False
-                is_orchy_json = is_gosec_json = False
+                data = json.load(data_file)              
+                is_zap_json = False
                 is_burp = False
-                is_safety = False
-                if isinstance(data,dict):
-                    is_brakeman = data.get('scan_info',{}).get('brakeman_version')
-                    is_bandit = data.get('results',[])
-                    is_arachni = data.get('issues',[])
+                if isinstance(data,dict):                    
                     is_zap_json = data.get('Report',[])
-                    is_nodejs_json = data.get('files',[])
-                    is_npm_audit_json = data.get('advisories',{})
                 elif isinstance(data,list):
-                    if isinstance(data[0],list):
-                        is_safety = True
-                    elif data[0].get('results',False):
-                        is_retirejs_json = True
-                    elif data[0].get('issue',False):
+                    if data[0].get('issue',False):
                         is_burp = True
-                if is_brakeman:
-                    return 'Brakeman'
-                elif is_bandit:
-                    return 'Bandit'
-                elif is_arachni:
-                    return 'Arachni'
-                elif is_nodejs_json:
-                    return 'NodeJsScan'
+                        return 'Burp'
                 elif is_zap_json:
                     return 'ZAP'
-                elif is_retirejs_json:
-                    return 'RetireJS'
-                elif is_npm_audit_json:
-                    return 'NpmAudit'
-                elif is_burp:
-                    return 'Burp'
-                elif is_safety:
-                    return 'Safety'
                 else:
                     return None
-        elif ext == 'xml' or ext == 'nessus':
+        elif ext == 'xml':
             try:
                 nreport = xml.parse(flat_file)
                 root_elem = nreport.getroot()
@@ -322,19 +281,6 @@ def validate_allowed_files(flat_file):
                     if nsmap:
                         tag = tag.replace('{'+nsmap+'}','')
                     header = settings.HEADER_MAP.get(tag)
-                    if header:
-                        return header
-                    else:
-                        remove_file(flat_file)
-                return None
-            except (xml.XMLSyntaxError,xml.ParserError):
-                return None
-        elif ext == 'html':
-            try:
-                nreport = xml.parse(flat_file)
-                root_elem = nreport.getroot()
-                if root_elem is not None:
-                    header = settings.HEADER_MAP.get(root_elem.tag)
                     if header:
                         return header
                     else:
@@ -354,7 +300,7 @@ def validate_flat_file(file_name):
     Check whether the uploaded file has the extension ".xml" 
     """
     file_root, file_ext = os.path.splitext(file_name)
-    if file_ext in ['.xml','.json','.html']:        
+    if file_ext in ['.xml','.json']:        
         return True
     return False
 

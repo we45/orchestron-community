@@ -14,7 +14,6 @@ import os
 import datetime
 import djcelery
 djcelery.setup_loader()
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CELERY_IMPORTS = ("api.tasks")
 
@@ -68,8 +67,6 @@ INSTALLED_APPS = [
     'api',
     'corsheaders',
     'djcelery'
-    # 'rest_framework_filters',
-    # 'django_extensions'
 ]
 AMQP_HOST = os.environ.get('AMQP_IP', '127.0.0.1')
 AMQP_PORT = os.environ.get('AMQP_PORT', 5672)
@@ -84,7 +81,6 @@ SITE_ID = 1
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 CORS_ORIGIN_WHITELIST = (
-    # 'localhost:8000',
     'localhost:8080',
 )
 
@@ -220,34 +216,40 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
-    # 'EXCEPTION_HANDLER': 'orchy_project.exception_handler.custom_exception_handler'
 }
 
 
+# minio_url = os.environ.get('MINIO_URL')
+# minio_port = os.environ.get('MINIO_PORT')
+
+# MINIO = {
+#     'bucket_name':os.environ.get('MINIO_BUCKET_NAME'),
+#     'access_key':os.environ.get('MINIO_ACCESS_KEY'),
+#     'secret_key':os.environ.get('MINIO_SECRET_KEY'),
+#     'url': '{0}:{1}'.format(minio_url, minio_port)
+# }
+
 minio_url = os.environ.get('MINIO_URL')
-minio_port = os.environ.get('MINIO_PORT')
 
 MINIO = {
     'bucket_name':os.environ.get('MINIO_BUCKET_NAME'),
     'access_key':os.environ.get('MINIO_ACCESS_KEY'),
     'secret_key':os.environ.get('MINIO_SECRET_KEY'),
-    'url': '{0}:{1}'.format(minio_url, minio_port)
+    'url': '{0}'.format(minio_url)
 }
 
-
 WEBHOOK_TOOLS = {
-    'Orchestron JSON':'json',
     'ZAP':'json,xml',
-    'Burp':'json,xml',    
-    'OWASP Dependency Checker':'xml',    
-    'FindSecBugs':'xml'    
+    'Burp':'json,xml',
+    'OWASP Dependency Checker':'xml',
+    'FindSecBugs':'xml'
 }
 
 
 HEADER_MAP = {
     'issues':'Burp',
-    'OWASPZAPReport':'ZAP',    
-    'analysis':'OWASP Dependency Checker',    
+    'OWASPZAPReport':'ZAP',
+    'analysis':'OWASP Dependency Checker',
     'BugCollection':'FindSecBugs'
 }
 
