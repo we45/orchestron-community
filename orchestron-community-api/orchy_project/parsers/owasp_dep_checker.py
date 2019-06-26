@@ -94,6 +94,6 @@ def parse_owasp_dep_checker(xml_file,user_name,init_es):
 			vul_dict_final['vulnerability'] = v
 			write_results(vul_dict_final)
 	except BaseException as e:
-		log_exception(e,module_name=inspect.stack()[0][3])
+		log_exception(e)
 	else:
 		print('[ + ] OWASP Dependency Checker parsing completed')
