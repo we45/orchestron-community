@@ -10,6 +10,7 @@ from datetime import datetime
 from random import randint 
 import sys
 from base64 import b64encode
+from dateutil import parser
 import os
 
 script_dir = os.path.dirname(__file__)
@@ -28,6 +29,9 @@ def parse_burp(xml_file,user_name,init_es):
         except (xml.XMLSyntaxError,xml.ParserError):
             raise MalFormedXMLException(user_name)        
         root_elem = nreport.getroot()
+        current_date = timezone.now().strftime("%Y-%m-%d %H:%M:%S") 
+        scan_date = root_elem.attrib.get('exportTime',current_date)
+        created_on = parser.parse(scan_date).strftime("%Y-%m-%d %H:%M:%S")
         reg_path = r'issue/name'
         uniq_objs = root_elem.xpath(reg_path)
         vuls = set([i.text for i in uniq_objs])
@@ -103,7 +107,7 @@ def parse_burp(xml_file,user_name,init_es):
                 'vul_type':'Insecure Coding',
                 'remediation':re.sub('<[^<]+?>', '',solution),
                 'observations':obs,
-                'created_on':timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'created_on':created_on,
             }
             vul_dict['vulnerability']['evidences'] = url_param_list
             vul_dict['vulnerability']['cwe'] = {
@@ -113,7 +117,7 @@ def parse_burp(xml_file,user_name,init_es):
     except BaseException as e:
         log_exception(e)
     else:
-        print('Checkmarx XML parsing completed')
+        print('Burp XML parsing completed')
 
 
 # End-Of-File            

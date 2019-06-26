@@ -55,7 +55,7 @@ class OpenVulnerabilityStatView(viewsets.ViewSet):
 
     def avg_ageing(self, kwargs={}, exclude_kwargs={}):
         raw_vuls = self.get_open_vul_query(kwargs, exclude_kwargs)
-        open_vuls = raw_vuls.annotate(open_for=Aging('created_on')) 
+        open_vuls = raw_vuls.annotate(open_for=Aging('created_on'))
         avg_ageing_val = 0  
         if open_vuls:
             all_ageing_count = [v.get('open_for') for v in open_vuls]
