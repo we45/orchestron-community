@@ -30,7 +30,6 @@
                                     accept="image/jpeg, image/png,image/jpg,"
                                     :state="!$v.updateOrgLogo.$invalid"></b-form-file>
                                 <br>
-                                <p>Previous logo: {{ updateOrgLogo }} </p>
                                 <p>{{ updateOrgLogo.name }}</p>
                             </b-col>
                           </b-col>

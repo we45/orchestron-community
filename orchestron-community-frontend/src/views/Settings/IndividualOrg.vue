@@ -6,7 +6,7 @@
             <br>
             <b-container fluid style="background-color: #FFFFFF;" >
                 <br>
-                <p class="title">Manage Communication and Bug Tracking System</p>
+                <p class="title">Bug Tracking System</p>
                 <hr>
                 <b-tabs style="background-color: #FFFFFF;">
                     <br>
@@ -97,7 +97,6 @@
                                                     <p v-if="error_msgs['orglogo']" style="text-align: left;" class="error"> * {{ error_msgs['orglogo_msg']
                   }}</p>
                                                 <br>
-                                                <p>Previous logo: {{ updateOrgLogo }} </p>
                                                 <p>{{ updateOrgLogo.name }}</p>
                                             </b-col>
                                           </b-col>
