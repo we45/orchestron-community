@@ -4,12 +4,19 @@ from django.utils import timezone
 from api.utils import log_exception
 from api.utils import write_results
 from base64 import b64encode
+from dateutil import parser
 import codecs
 
 def parse_zap_json(file_path, user_name, init_es):
 	try:
 		with codecs.open(file_path,'r',encoding='utf-8') as fp:
 			data = json.loads(fp.read())
+			current_date = timezone.now().strftime("%Y-%m-%d %H:%M:%S") 
+			scan_date = data.get('Report',{}).get('ScanDate',current_date)
+			split_date = re.split(r"\s+",scan_date)
+			split_date.pop(-1)
+			scan_date = ' '.join(split_date)
+			created_on = parser.parse(scan_date).strftime("%Y-%m-%d %H:%M:%S")
 			hosts = data.get('Report',{}).get('Sites',[])
 
 			def post_results(hosts):
@@ -82,7 +89,7 @@ def parse_zap_json(file_path, user_name, init_es):
 						'description':re.sub('<[^<]+?>', '',desc),
 						'vul_type':'Insecure Coding',
 						'remediation':re.sub('<[^<]+?>', '',solution),                
-						'created_on':timezone.now().strftime("%Y-%m-%d %H:%M:%S") 
+						'created_on':created_on
 					}
 					vul_dict['vulnerability']['evidences'] = url_param_list		
 					vul_dict['vulnerability']['cwe'] = {

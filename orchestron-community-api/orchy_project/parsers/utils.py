@@ -5,6 +5,8 @@ import uuid
 import json
 from parsers.exceptions import MalFormedXMLException
 from api.utils import log_exception, validate_allowed_files
+from django.utils import timezone
+from dateutil import parser
 
 def remove_file(file_name):
     """
@@ -45,3 +47,14 @@ def upload_to_server(file_name,temp_file_obj,user):
     allowed = validate_allowed_files(complete_path)
     if allowed:
         return complete_path
+
+def get_created_on(scan_date):
+    current_date = timezone.now().strftime("%Y-%m-%d %H:%M:%S") 
+    try:
+        if scan_date:
+            created_on = parser.parse(scan_date).strftime("%Y-%m-%d %H:%M:%S") 
+        else:
+            created_on = current_date  
+    except:
+        created_on = current_date
+    return created_on

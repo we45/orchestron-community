@@ -261,13 +261,13 @@ def validate_allowed_files(flat_file):
                 data = json.load(data_file)              
                 is_zap_json = False
                 is_burp = False
-                if isinstance(data,dict):                    
+                if isinstance(data,dict):
                     is_zap_json = data.get('Report',[])
                 elif isinstance(data,list):
                     if data[0].get('issue',False):
                         is_burp = True
                         return 'Burp'
-                elif is_zap_json:
+                if is_zap_json:
                     return 'ZAP'
                 else:
                     return None

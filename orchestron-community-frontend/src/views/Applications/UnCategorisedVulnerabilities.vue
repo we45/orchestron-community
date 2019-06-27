@@ -144,7 +144,7 @@
       updateUncategorizedVulCWE:{
         required,
         integer,
-        between: between(0, 1000)
+        between: between(0, 1500)
       }
     },
     updated() {
