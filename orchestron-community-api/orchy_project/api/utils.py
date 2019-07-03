@@ -258,17 +258,30 @@ def validate_allowed_files(flat_file):
         ext = flat_file.split('.')[-1]
         if ext == 'json':
             with codecs.open(flat_file,encoding='utf-8') as data_file:
-                data = json.load(data_file)              
+                data = json.load(data_file)           
                 is_zap_json = False
                 is_burp = False
+                is_bandit = False
+                is_nodejs_json = False
+                is_npm_audit_json = False
                 if isinstance(data,dict):
+                    print("yes yes yes")
                     is_zap_json = data.get('Report',[])
-                elif isinstance(data,list):
+                    is_bandit = data.get('results',[])
+                    is_nodejs_json = data.get('files',[])
+                    is_npm_audit_json = data.get('advisories',{})
+                if isinstance(data,list):
                     if data[0].get('issue',False):
                         is_burp = True
                         return 'Burp'
                 if is_zap_json:
                     return 'ZAP'
+                elif is_bandit:
+                    return 'Bandit'
+                elif is_nodejs_json:
+                    return 'NodeJsScan'
+                elif is_npm_audit_json:
+                    return 'NpmAudit'
                 else:
                     return None
         elif ext == 'xml':

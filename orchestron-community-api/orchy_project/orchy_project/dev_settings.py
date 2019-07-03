@@ -242,7 +242,10 @@ WEBHOOK_TOOLS = {
     'ZAP':'json,xml',
     'Burp':'json,xml',
     'OWASP Dependency Checker':'xml',
-    'FindSecBugs':'xml'
+    'FindSecBugs':'xml',
+    'Bandit':'json',
+    'NodeJsScan':'json',
+    'NpmAudit':'json'
 }
 
 

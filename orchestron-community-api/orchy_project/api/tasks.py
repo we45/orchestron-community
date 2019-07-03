@@ -6,7 +6,10 @@ from parsers.burp import parse_burp
 from parsers.zap import parse_zap
 from parsers.parse_zap_json import parse_zap_json
 from parsers.findsecbug import parser_findsecbug
+from parsers.npm_audit import parse_npm_audit
+from parsers.nodejsscan import parse_nodejsscan
 from parsers.burp_json import parse_burp_json
+from parsers.bandit import parse_bandit
 from parsers.owasp_dep_checker import parse_owasp_dep_checker
 from api.models import Scan, WebhookLog, Application, JiraIssueTypes, Vulnerability, \
     VulnerabilityEvidence, JiraUsers, ScanLog
@@ -128,6 +131,12 @@ def process_files(user, application, complete_path, init_es, tool, scan_name, us
                 parse_owasp_dep_checker(complete_path,user,init_es)
             elif tool == "FindSecBugs":
                 parser_findsecbug(complete_path,user,init_es)
+            elif tool == "NpmAudit":
+                parse_npm_audit(complete_path,user,init_es)
+            elif tool == 'NodeJsScan':
+                parse_nodejsscan(complete_path,user,init_es)
+            elif tool == 'Bandit':
+                parse_bandit(complete_path,user,init_es)
             info_debug_log(ip=user_host,user=user,event='XML Parsing',status='success')
             if hook_log:
                 hook_log.scan_process_event = True
