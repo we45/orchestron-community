@@ -134,12 +134,6 @@
               this.$router.go('/')
 
           }).catch(error => {
-
-          }).catch(error => {
-              this.$router.push('/')
-
-          }).catch(error => {
-
             if (error.response.data.detail === 'Signature has expired.') {
               notValidUser()
               this.$router.push('/')

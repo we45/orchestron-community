@@ -193,6 +193,10 @@
                   })
                 }
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
                 this.reloadPage = false
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
@@ -215,6 +219,10 @@
               
             }).catch(error => {
                 this.reloadPage = false
+              if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+              }
 
               if (error.res.status === 404) {
                   this.$router.push('/not_found')
@@ -248,6 +256,10 @@
                 }
                 this.$refs.updateOrgModal.show()
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {
@@ -299,6 +311,10 @@
                   position: 'top right'
                 })
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 403) {

@@ -74,6 +74,7 @@ import axios from 'axios'
 import validUserCheck from '@/utils/auth'
 import { required, minLength, email } from 'vuelidate/lib/validators'
 import Loading from 'vue-loading-overlay'
+import { notValidUser } from '@/utils/checkAuthUser'
 export default {
   name: 'Login',
    components: {
@@ -145,6 +146,10 @@ export default {
             localStorage.removeItem('breadCum')
           }
         }).catch(error => {
+          if (error.response.data.detail === 'Signature has expired.'){
+            notValidUser()
+            this.$router.push('/')
+          }
           localStorage.removeItem('username')
           localStorage.removeItem('token')
           localStorage.removeItem('superuser')
@@ -165,6 +170,10 @@ export default {
           .then(res => {
             this.$router.push('/org/dashboard')
           }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+              notValidUser()
+              this.$router.push('/')
+            }
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {
@@ -202,6 +211,10 @@ export default {
             })
       })
         .catch(error => {
+          if (error.response.data.detail === 'Signature has expired.'){
+              notValidUser()
+              this.$router.push('/')
+          }
           this.$notify({
               group: 'foo',
               type: 'error',
@@ -209,7 +222,7 @@ export default {
               text: 'Invalid  email !!',
               position: 'top right'
             })
-          console.log("error", error.response)
+          // console.log("error", error.response)
           this.isLoading = false
         })
     },

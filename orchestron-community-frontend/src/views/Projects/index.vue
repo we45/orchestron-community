@@ -156,7 +156,7 @@
 <script>
   import CommonTable from '../../components/Projects/CommonTable'
   import axios from '@/utils/auth'
-  import { required, minLength } from 'vuelidate/lib/validators'
+  import { required, minLength, maxLength } from 'vuelidate/lib/validators'
   import Loading from 'vue-loading-overlay'
   import 'vue-loading-overlay/dist/vue-loading.min.css'
   import { notValidUser } from '@/utils/checkAuthUser'
@@ -191,11 +191,14 @@ export default {
     validations: {
       projectName: {
         required,
-        minLength: minLength(1)
+        minLength: minLength(1),
+        maxLength: maxLength(100)
       },
       updateProjectName: {
         required,
-        minLength: minLength(3)
+        minLength: minLength(1),
+        maxLength: maxLength(100)
+
       }
     },
     created() {
@@ -204,7 +207,7 @@ export default {
       this.fetchData()
     },
      watch: {
-      'projectName': function(value_name) {
+      'projectName': function(value_name, old_val) {
         if (value_name.length > 100) {
           this.error_msgs['name'] = true
           this.error_msgs['name_msg'] = 'Ensure this field has no more than 100 characters.'
@@ -259,6 +262,10 @@ export default {
             this.projectsList = this.full_Data.slice(0, 5)
              this.isLoading = false
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
              this.isLoading = false
 
               if (error.res.status === 404) {
@@ -312,6 +319,10 @@ export default {
               this.projectName = ''
               // this.$router.go('/projects/')
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               var status_info = error.response.status
               if (error.response.status === 400) {
                 if (error.response.data['name']) {
@@ -361,7 +372,10 @@ export default {
                           this.logo = res.data
                         })                      
             }).catch(error => {
-              
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -412,6 +426,10 @@ export default {
               this.updateProjectId = ''
               this.updateLogoName = ''
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               var status_info = error.response.status
               // if(status_info === 400){
               //     this.$notify({
@@ -460,6 +478,7 @@ export default {
       },
       closeDeleteProject() {
         this.deleteProjectId = ''
+        this.$refs.deleteProjectModal.hide()
         this.$refs.beforeDeleteProjectModal.hide()
       },
       beforeSubmitDeleteProject() {
@@ -499,6 +518,10 @@ export default {
               // this.deleteProjectId = ''
               this.typeDelete = ''
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {

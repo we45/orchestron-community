@@ -157,6 +157,10 @@
               }
               // this.totalVul = res.data.count
             }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+                  notValidUser()
+                  this.$router.push('/')
+            }
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 404) {
@@ -247,13 +251,17 @@
               }
               // this.totalVul = res.data.count
             }).catch(error => {
-            if (error.res.status === 404) {
-              this.$router.push('/not_found')
-            } else if (error.res.status === 404) {
-              this.$router.push('/forbidden')
-            } else {
-              this.$router.push('/error')
-            }
+              if (error.response.data.detail === 'Signature has expired.') {
+                  notValidUser()
+                  this.$router.push('/')
+              }
+              if (error.res.status === 404) {
+                this.$router.push('/not_found')
+              } else if (error.res.status === 404) {
+                this.$router.push('/forbidden')
+              } else {
+                this.$router.push('/error')
+              }
           })
         } else {
           notValidUser()
@@ -333,6 +341,10 @@
                   }
                   this.totalVul = res.data.count
                 }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+                }
                 if (error.response.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.response.status === 403) {

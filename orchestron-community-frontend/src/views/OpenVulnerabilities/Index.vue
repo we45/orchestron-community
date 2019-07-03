@@ -225,7 +225,10 @@
               this.reloadPage = false
 
             }).catch(error => {
-
+            if (error.response.data.detail === 'Signature has expired.'){
+                notValidUser()
+                this.$router.push('/')
+            }
             this.reloadPage = false
 
             if (error.res.status === 404) {
@@ -311,7 +314,10 @@
               this.reloadPage = false
 
             }).catch(error => {
-
+              if (error.response.data.detail === 'Signature has expired.'){
+                notValidUser()
+                this.$router.push('/')
+              }
             this.reloadPage = false
 
             if (error.res.status === 404) {
@@ -410,6 +416,10 @@
                   this.reloadPage = false
 
                 }).catch(error => {
+                  if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+                  }
                 this.reloadPage = false
 
                 if (error.res.status === 404) {
