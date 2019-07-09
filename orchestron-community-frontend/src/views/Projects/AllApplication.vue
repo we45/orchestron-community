@@ -390,6 +390,10 @@ export default {
                   this.data_showing = this.applicationsList.slice(0, 5)
                   this.isDataLoading = false
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.response.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.response.status === 403) {
@@ -406,6 +410,10 @@ export default {
             .then(res => {
               this.appPlatformOption = res.data
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.response.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.response.status === 403) {
@@ -496,6 +504,10 @@ export default {
               const logoSplit = updatelogoSplit.pop()
               this.appUpdateOldLogoName = logoSplit
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               // if (error.response.status === 404) {
               //   this.$router.push('/not_found')
               // } else if (error.response.status === 403) {
@@ -509,6 +521,10 @@ export default {
             .then(res => {
               this.appTargetOption = res.data
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.response.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.response.status === 403) {
@@ -574,7 +590,10 @@ export default {
                 position: 'top right'
               })
             }).catch(error => {
-
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.response.status === 400) {
                  if(error.response.data['name']){
                     this.error_msgs['name'] = true
@@ -635,6 +654,7 @@ export default {
       },
       closeDeleteApplication() {
         this.typeDelete = ''
+        this.$refs.deleteApplicationModal.hide()
         this.$refs.beforedeleteApplicationModal.hide()
       },
       BeforeSubmitDeleteApplication() {
@@ -656,6 +676,10 @@ export default {
                   position: 'top right'
                 })
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+                }
                 if (error.response.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.response.status === 404) {

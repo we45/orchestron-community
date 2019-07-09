@@ -207,6 +207,10 @@ export default {
               this.$router.push('/forbidden')
             }
           }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+            }
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 404) {
@@ -299,6 +303,10 @@ export default {
               this.$router.push('/forbidden')
             }
           }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+            }
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 404) {
@@ -379,6 +387,10 @@ export default {
                 //   this.$router.push('/forbidden')
                 // }
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+                }
                 if (error.res.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.res.status === 404) {

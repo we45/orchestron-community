@@ -17,10 +17,7 @@
               <br>
               <row>
                 <!-- <br> -->
-                  <btn class="btn btn-orange-submit btn-sm" style="color: #FFFFFF;cursor: pointer;" v-b-modal.modal1>
-                        Change Password
-                  </btn>
-
+                  
                   <p>
                     <!-- <b-badge 
                             class="w3-btn"
@@ -117,10 +114,16 @@
                   Submit
                 </button>
               </div>
-              <br>
-              <br>
-              <br>
+              
             </b-col>
+            <b-col cols="8">
+                <btn class="btn btn-orange-submit btn-sm" style="color: #FFFFFF;cursor: pointer;" v-b-modal.modal1>
+                          Change Password
+                </btn>
+            </b-col>
+            <br>
+              <br>
+              <br>
           </b-col>
         </b-row>
       </b-container>
@@ -150,7 +153,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Required :</label></b-col>
+              <b-col sm="2"><label class="label">New Password:</label></b-col>
               <b-col sm="10">
                 <input placeholder="Enter your password" name="password" class="inline-form-control" type="password" @input="latest_password_settings(newPassword)" v-model="newPassword" />
                 <!-- <p class="passFormValid" :class="{'passFormValidPassed' : newPassword.length > 8}"> Longer than 8 characters</p>
@@ -171,7 +174,7 @@
             </b-row>
             <br>
             <b-row class="my-1">
-              <b-col sm="2"><label class="label">Confirm :</label></b-col>
+              <b-col sm="2"><label class="label">Confirm New Password  :</label></b-col>
               <b-col sm="10">
                 <b-form-input
                   v-model="confirmPassword"
@@ -351,6 +354,10 @@
                   this.logo = res.data
                 })
               }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.') {
+              notValidUser()
+              this.$router.push('/')
+            }
             if (error.response.status === 404) {
               this.$router.push('/not_found')
             } else if (error.response.status === 403) {
@@ -417,7 +424,18 @@
           })
             .then(res => {
               this.isLoading = true
-              this.$router.go('/org/profile/')
+              if(this.email != localStorage.getItem('email')){
+                localStorage.removeItem('username')
+                localStorage.removeItem('token')
+                localStorage.removeItem('superuser')
+                localStorage.removeItem('admin')
+                localStorage.removeItem('email')
+                localStorage.removeItem('org')
+                this.$router.push('/')
+              } 
+              else{
+                this.fetchData()
+              }
               this.$notify({
                 group: 'foo',
                 type: 'info',
@@ -427,6 +445,11 @@
               })
               this.isLoading = false
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.') {
+              notValidUser()
+              this.$router.push('/')
+            }
+
               if(error.response.status === 400) {
                  if (error.response.data['first_name']) {
                     this.error_msgs['first_name'] = true
@@ -520,6 +543,10 @@
               })
               this.isLoading = false
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.') {
+              notValidUser()
+              this.$router.push('/')
+            }
 
               if (error.response.status === 400) {
                 if (error.response.data['old_password'] || error.response.data['non_field_errors']) {
@@ -568,7 +595,7 @@
 <style scoped>
   .label {
     font-family: 'Avenir';
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.33;
     color: #000000;
   }

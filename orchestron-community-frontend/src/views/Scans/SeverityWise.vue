@@ -83,6 +83,10 @@ export default {
             }
             this.totalVul = res.data.vuls.length
           }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+              notValidUser()
+              this.$router.push('/')
+            }
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {
@@ -130,6 +134,10 @@ export default {
             }
             
           }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+              notValidUser()
+              this.$router.push('/')
+            }
             if (error.res.status === 404) {
               this.$router.push('/not_found')
             } else if (error.res.status === 403) {

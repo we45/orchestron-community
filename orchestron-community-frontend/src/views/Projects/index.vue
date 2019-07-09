@@ -15,23 +15,29 @@
                 size="lg"
                 centered>
                 <div>
-                    <form @submit.prevent="submitCreateProject">
-                        <b-row class="my-1">
-                            <b-col sm="2"><label  class="label">Name: *</label></b-col>
-                            <b-col sm="10">
-                                <b-form-input
-                                    v-model="projectName"
-                                    type="text"
-                                    class="inline-form-control"
-                                    placeholder="Enter Project Name" :state="!$v.projectName.$invalid"></b-form-input>
-                                    <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
-
-                            </b-col>
+                    <form @submit.prevent="submitCreateProject" style="padding: 7px;">
+                        <b-row class="my-1" >
+                            <!-- <b-col sm="2"><label  class="label">Name: *</label></b-col> -->
+                            <b-col sm="12">
+                                <label  class="label">Name : *</label>
+                                  <b-form-input
+                                      v-model="projectName"
+                                      type="text"
+                                      class="inline-form-control"
+                                      maxlength="100"
+                                      placeholder="Enter Project Name" :state="!$v.projectName.$invalid">
+                                      </b-form-input>
+                                      <label id="input_count">
+                                            {{ error_msgs['name_count'] }}
+                                      </label>
+                                      <p  v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p> 
+                              </b-col>
                         </b-row>
                         <br>
                         <b-row class="my-1">
-                            <b-col sm="2"><label for="input-small" class="label">Logo:</label></b-col>
-                            <b-col sm="10">
+                            <!-- <b-col sm="2"><label for="input-small" class="label">Logo:</label></b-col> -->
+                            <b-col sm="12">
+                              <label for="input-small" class="label">Logo :</label>
                                 <b-form-file
                                     v-model="projectLogo"
                                     placeholder="Choose a logo..."
@@ -57,24 +63,30 @@
             </b-modal>
             <b-modal ref="updateProjectModal" title="Update Project" centered size="lg">
                 <div>
-                    <form @submit.prevent="submitUpdateProject">
+                    <form @submit.prevent="submitUpdateProject" style="padding: 7px;">
                         <input type="hidden" v-model="updateProjectId">
                         <b-row class="my-1">
-                            <b-col sm="2"><label class="label">Name: *</label></b-col>
-                            <b-col sm="10">
+                            <!-- <b-col sm="2"><label class="label">Name: *</label></b-col> -->
+                            <b-col sm="12">
+                                <label  class="label">Name : *</label>
                                 <b-form-input
                                     v-model="updateProjectName"
                                     type="text"
                                     class="inline-form-control"
+                                    maxlength="100"
                                     placeholder="Update Project Name" :state="!$v.updateProjectName.$invalid"></b-form-input>
-                                    <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                                    <label id="input_count">
+                                            {{ error_msgs['name_count'] }}
+                                    </label>
+                                    <p  v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p>
 
                             </b-col>
                         </b-row>
                         <br>
                         <b-row class="my-1">
-                            <b-col sm="2"><label class="label">Logo:</label></b-col>
-                            <b-col sm="10">
+                            <!-- <b-col sm="2"></b-col> -->
+                            <b-col sm="12">
+                                <label class="label">Logo:</label>
                                 <b-form-file
                                     v-model="updateProjectLogo"
                                     placeholder="Choose a logo..."
@@ -84,9 +96,11 @@
                                 <br>
                                 <br>
                                 <p>{{ updateLogoName }}</p>
-                                <template v-if="logo">
-                                  <b-img-lazy :src="'data:image/png;base64,' + logo" rounded="circle" blank width="250" height="200"  alt="img" />
-                                </template>
+                                <center>
+                                  <template v-if="logo">
+                                    <b-img-lazy :src="'data:image/png;base64,' + logo" rounded="circle" blank width="250" height="200"  alt="img" />
+                                  </template>
+                                </center>
                             </b-col>
                         </b-row>
                         <br>
@@ -156,7 +170,7 @@
 <script>
   import CommonTable from '../../components/Projects/CommonTable'
   import axios from '@/utils/auth'
-  import { required, minLength } from 'vuelidate/lib/validators'
+  import { required, minLength, maxLength } from 'vuelidate/lib/validators'
   import Loading from 'vue-loading-overlay'
   import 'vue-loading-overlay/dist/vue-loading.min.css'
   import { notValidUser } from '@/utils/checkAuthUser'
@@ -184,18 +198,21 @@ export default {
         logo: '',
         full_Data: [],
         isLoadingPage: false,
-        error_msgs: { 'name': false, 'logo': false, 'name_msg': '', 'logo_msg': '' },
+        error_msgs: { 'name': false, 'logo': false, 'name_msg': '', 'logo_msg': '', 'name_count':100 },
 
       }
     },
     validations: {
       projectName: {
         required,
-        minLength: minLength(1)
+        minLength: minLength(1),
+        maxLength: maxLength(100)
       },
       updateProjectName: {
         required,
-        minLength: minLength(3)
+        minLength: minLength(1),
+        maxLength: maxLength(100)
+
       }
     },
     created() {
@@ -204,8 +221,10 @@ export default {
       this.fetchData()
     },
      watch: {
-      'projectName': function(value_name) {
-        if (value_name.length > 100) {
+      'projectName': function(value_name, old_val) {
+          this.error_msgs['name_count'] = 100-value_name.length
+
+        if (value_name.length > 99) {
           this.error_msgs['name'] = true
           this.error_msgs['name_msg'] = 'Ensure this field has no more than 100 characters.'
         } else {
@@ -219,7 +238,8 @@ export default {
         this.error_msgs['logo'] = false
       },
       'updateProjectName': function(value_name) {
-        if (value_name.length > 100) {
+        this.error_msgs['name_count'] = 100-value_name.length
+        if (value_name.length > 99) {
           this.error_msgs['name'] = true
           this.error_msgs['name_msg'] = 'Ensure this field has no more than 100 characters.'
         } else {
@@ -259,6 +279,10 @@ export default {
             this.projectsList = this.full_Data.slice(0, 5)
              this.isLoading = false
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
              this.isLoading = false
 
               if (error.res.status === 404) {
@@ -312,6 +336,10 @@ export default {
               this.projectName = ''
               // this.$router.go('/projects/')
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               var status_info = error.response.status
               if (error.response.status === 400) {
                 if (error.response.data['name']) {
@@ -361,7 +389,10 @@ export default {
                           this.logo = res.data
                         })                      
             }).catch(error => {
-              
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -412,6 +443,10 @@ export default {
               this.updateProjectId = ''
               this.updateLogoName = ''
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               var status_info = error.response.status
               // if(status_info === 400){
               //     this.$notify({
@@ -460,6 +495,7 @@ export default {
       },
       closeDeleteProject() {
         this.deleteProjectId = ''
+        this.$refs.deleteProjectModal.hide()
         this.$refs.beforeDeleteProjectModal.hide()
       },
       beforeSubmitDeleteProject() {
@@ -499,6 +535,10 @@ export default {
               // this.deleteProjectId = ''
               this.typeDelete = ''
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                      notValidUser()
+                      this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -598,17 +638,17 @@ export default {
     -moz-box-sizing: border-box;
     outline: none;
     width: 100%;
-    padding: 7px;
+    padding: 7px 30px 7px 7px;
     border: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid #ddd;
     background: transparent;
     margin-bottom: 10px;
-    font: 16px 'Avenir';
+    font: 17px 'Avenir';
     height: 45px;
     position: relative;
     display: inline-block;
   }
-
+ 
   .delete-header {
     font-family: 'Avenir';
     font-size: 16px;
@@ -627,11 +667,32 @@ export default {
     color: #232325;
   }
    .error{
+    /*position:fixed;*/
     font-family: 'Avenir';
     font-size: 16px;
     font-weight: 400;
     line-height: 0.99;
     text-align: center;
     color: #f44336;
+    /*padding-top: 30px;*/
   }
+   #input_container {
+    position:relative;
+    padding:0 0 0 20px;
+    margin:0 20px;
+    background:#ddd;
+    direction: rtl;
+    width: 200px;
+}
+
+  #input_count {
+    position:absolute;
+    bottom:2px;
+    right:15px;
+    width:24px;
+    height:24px;
+    /*color: #909090;*/
+    color: green;
+    font-size: 14px;
+}
 </style>

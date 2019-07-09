@@ -730,6 +730,10 @@
            'curl -H "Secret-Key: '+this.secret_key+'" -H "Access-Key: '+this.access_key+'" -v -F file=@<file_path> ' + protocall+this.ipWebhook + '/api/webhooks/post/' + this.webhookId + '/'
           }).catch(error => {
             if (error.response.data.detail === 'Signature has expired.') {
+                notValidUser()
+                this.$router.push('/')
+            }
+            if (error.response.data.detail === 'Signature has expired.') {
               this.$router.push('/')
             }
           })
@@ -747,6 +751,10 @@
             this.access_key = res.data.access_key
             this.secret_key = res.data.secret_key
           }).catch(error => {
+            if (error.response.data.detail === 'Signature has expired.') {
+                notValidUser()
+                this.$router.push('/')
+            }
             if (error.response.data.detail === 'Signature has expired.') {
               this.$router.push('/')
             }
@@ -770,6 +778,10 @@
                 .then(res => {
                   this.appLogo = res.data
                 }).catch(error => {
+                  if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+                  }
                   if (error.res.status === 404) {
                     this.$router.push('/not_found')
                   } else if (error.res.status === 404) {
@@ -855,8 +867,11 @@
         this.reloadPage = false
 
             }).catch(error => {
-        this.reloadPage = false
-
+                this.reloadPage = false
+              if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -872,6 +887,12 @@
                   .then(res => {
                     this.enable_Jira = true
                      
+                  }).catch(error => {
+                        this.reloadPage = false
+                      if (error.response.data.detail === 'Signature has expired.') {
+                            notValidUser()
+                            this.$router.push('/')
+                      }
                   })
            
         } else {
@@ -958,7 +979,6 @@
                 position: 'top right'
               })
             }).catch(error => {
-                console.log("error", error)
                 // if(error.res.status === 400) {
                      axios.post('/applications/' + this.param + '/jira/', formData)
                     .then(res => {
@@ -973,6 +993,10 @@
                       })
                     })
                 // }
+              if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -1000,6 +1024,10 @@
                 })
               }
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -1030,6 +1058,10 @@
               this.isLoading = true
               this.reloadPage = true
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+              }
               if (error.res.status === 404) {
                 this.$router.push('/not_found')
               } else if (error.res.status === 403) {
@@ -1069,6 +1101,10 @@
               this.parsingStatus = res.data.message
               this.parsingScanId = res.data.scan_name
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+              }
               if (error.response.status === 404) {
                 this.$router.push('/not_found')
               } 
@@ -1168,6 +1204,10 @@
                       })
                       this.isLoading = false
                     }).catch(error => {
+                      if (error.response.data.detail === 'Signature has expired.') {
+                            notValidUser()
+                            this.$router.push('/')
+                      }
                       if (error.res.status === 404) {
                         this.$router.push('/not_found')
                       } else if (error.res.status === 404) {
@@ -1178,6 +1218,11 @@
                     })
                   this.$router.go('/projects/individual_application/' + appId)
                 }).catch(error => {
+                    if (error.response.data.detail === 'Signature has expired.') {
+                        notValidUser()
+                        this.$router.push('/')
+                    }
+
                   if (error.res.status === 404) {
                     this.$router.push('/not_found')
                   } else if (error.res.status === 404) {
@@ -1214,6 +1259,11 @@
                   }
                 })
             }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.') {
+                    notValidUser()
+                    this.$router.push('/')
+                }
+
                 if (error.response.status === 400) {
                     if (error.response.data['short_name']) {
                       this.error_msgs['manual'] = true

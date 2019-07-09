@@ -34,6 +34,7 @@ def parse_owasp_dep_checker(xml_file,user_name,init_es):
 		names_list = []
 		vul_dict = {}
 		for dependency in dependencies:
+			url_param_list = []
 			vulnerabilities_parent = dependency.find('%svulnerabilities'%NS)
 			related_dependencies_parent = dependency.find('%srelatedDependencies'%NS)
 			if vulnerabilities_parent is not None:
@@ -66,12 +67,11 @@ def parse_owasp_dep_checker(xml_file,user_name,init_es):
 					match = re.search(r'(CVE)-(\d+)-(\d+)',vul_name)
 					if match:
 						cve = match.group()
-					evid_dict = {
-						'module':module,
-						'version':version,
-						'related_dependency':dep_dict,
-						'cve':cve
-					}
+					url_param_list.append({
+						'url':module,
+						'name':version,
+						'log':''
+						})
 					data_dict = {
 						'name':vul_name,
 						'is_false_positive':False,
@@ -87,7 +87,7 @@ def parse_owasp_dep_checker(xml_file,user_name,init_es):
 							'cwe_link':'https://cwe.mitre.org/data/definitions/{0}.html'.format(cwe)
 						}
 					}
-					vul_dict[vul_name]['evidences'].append(evid_dict)
+					vul_dict[vul_name]['evidences'] = url_param_list
 					vul_dict[vul_name].update(data_dict)
 		for v in vul_dict.values():
 			vul_dict_final = init_es

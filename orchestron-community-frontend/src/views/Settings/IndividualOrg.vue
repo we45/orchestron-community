@@ -6,7 +6,7 @@
             <br>
             <b-container fluid style="background-color: #FFFFFF;" >
                 <br>
-                <p class="title">Manage Communication and Bug Tracking System</p>
+                <p class="title">Bug Tracking System</p>
                 <hr>
                 <b-tabs style="background-color: #FFFFFF;">
                     <br>
@@ -97,7 +97,6 @@
                                                     <p v-if="error_msgs['orglogo']" style="text-align: left;" class="error"> * {{ error_msgs['orglogo_msg']
                   }}</p>
                                                 <br>
-                                                <p>Previous logo: {{ updateOrgLogo }} </p>
                                                 <p>{{ updateOrgLogo.name }}</p>
                                             </b-col>
                                           </b-col>
@@ -486,6 +485,10 @@ export default {
               })
           })
           .catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+                notValidUser()
+                this.$router.push('/')
+            }
             if (error.response.status === 404) {
               this.$router.push('/not_found')
             } else if (error.response.status === 403) {
@@ -503,6 +506,10 @@ export default {
           this.jiraPassword = ''
           this.post_jira_method = true
         }).catch(error => {
+          if (error.response.data.detail === 'Signature has expired.'){
+                notValidUser()
+                this.$router.push('/')
+            }
             this.post_jira_method = false
           })
         this.reloadPage = false
@@ -519,6 +526,10 @@ export default {
                 this.reloadPage = false
               
             }).catch(error => {
+              if (error.response.data.detail === 'Signature has expired.'){
+                notValidUser()
+                this.$router.push('/')
+              } 
                 this.reloadPage = false
 
               if (error.response.status === 404) {
@@ -552,6 +563,10 @@ export default {
                 }
                 this.$refs.updateOrgModal.show()
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.'){
+                notValidUser()
+                this.$router.push('/')
+              }
                 if (error.response.status === 404) {
                   this.$router.push('/not_found')
                 } else if (error.response.status === 403) {
@@ -601,6 +616,10 @@ export default {
                 })
                 this.reloadPage = true
               }).catch(error => {
+                if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+                }
                 if (error.response.status === 404) {
                   this.$router.push('/not_found')
                 }
@@ -656,6 +675,10 @@ export default {
             this.isLoading = false
           })
           .catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+            }
             if (error.response.status === 400) {
               if (error.response.data['url']) {
                 this.error_jira_msgs['jiraurl'] = true
@@ -715,6 +738,10 @@ export default {
               this.isLoading = false
           })
           .catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+            }
             if (error.response.status === 404) {
               this.$router.push('/not_found')
             } else if (error.response.status === 403) {
@@ -741,6 +768,10 @@ export default {
               this.isLoading = false
           })
           .catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+            }
             if (error.response.status === 404) {
               this.$router.push('/not_found')
             } else if (error.response.status === 403) {
@@ -781,6 +812,10 @@ export default {
               this.isLoading = false
           })
           .catch(error => {
+            if (error.response.data.detail === 'Signature has expired.'){
+                  notValidUser()
+                  this.$router.push('/')
+            }
             if (error.response.status === 404) {
               this.$router.push('/not_found')
             } else if (error.response.status === 404) {

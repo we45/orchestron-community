@@ -11,7 +11,7 @@
               <br>
                 <b-row>
                     <b-col md="6" class="my-1">
-                        <b-form-input v-model="filter" placeholder="Type to Search" class="inline-form-control"/>
+                        <!-- <b-form-input v-model="filter" placeholder="Type to Search" class="inline-form-control"/> -->
                     </b-col>
                     <b-col md="1"></b-col>
                     <b-col md="5">
@@ -35,7 +35,7 @@
                     :sort-desc.sync="sortDesc"
                     @filtered="onFiltered"
                     class="m2_top">
-                    <template slot="name" slot-scope="row">
+                    <template slot="name"  slot-scope="row" style="font-size: 32px;">
                     <router-link :to="row.item.url">
                           <p class="title">
                             {{ row.item.name.vul_name }}
@@ -173,7 +173,7 @@ export default {
 <style scoped>
  .title {
     font-family: 'Avenir';
-    font-size: 14px;
+    font-size: 16px;
    white-space: nowrap;
    overflow: hidden;
    width: 500px;
