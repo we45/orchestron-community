@@ -379,7 +379,7 @@
               <br>
                     </b-col>
                 </b-row> -->
-                 <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;width: 100%;">
+                 <div style="background-color: #2b2b2b  ; border-radius: 5px; height:100px;width: 100%;">
                   <p style="text-align:left;vertical-align: middle; padding-top: 2%;" class="webhook_label_curl">
                   <!-- <span class="webhook-label"
                         style="padding:7px;">Curl Command (File Processing) Using Secrect and Access Key: </span> -->
@@ -387,15 +387,10 @@
                                {{curlCmd_secret_access_key}}
                             </span>
                   </p>
-                  <br>
+                  <!-- <br> -->
                 </div>
-                <br>
- <b-btn type="button"
-                            align="right"
-                        class="btn-orange-submit pull-right" 
-                          v-clipboard:copy="curlCmd_secret_access_key"
-                          v-clipboard:success="onCopy"
-                          v-clipboard:error="onError" style="float:right;">Copy Curl Command!</b-btn>
+                <!-- <br> -->
+ 
              <!--  <div style="background-color: #2b2b2b; border-radius: 5px; height:100px;display: table;width: 100%;">
                   <p style="text-align:left;vertical-align: middle;padding-top: 2%;">
                    <span class="webhook-label" style="padding:7px;"> Curl Command (JSON Processing) : </span>
@@ -406,6 +401,12 @@
                   <br>
                 </div> -->
                 <b-col cols="12" slot="modal-footer">
+                        <b-btn type="button"
+                            align="right"
+                        class="btn-orange-close pull-right" 
+                          v-clipboard:copy="curlCmd_secret_access_key"
+                          v-clipboard:success="onCopy"
+                          v-clipboard:error="onError" style="float:right;">Copy Curl Command!</b-btn>
                    <!--  <div style="display: flex; justify-content: flex-end">
                         
                  <b-btn type="button"
@@ -1380,7 +1381,7 @@
     word-wrap:break-word;
     font-family: 'Avenir';
     padding: 5px;
-      font-size: 16px;
+    font-size: 17px;
   }
   .webhook-label{
     font-family: 'Avenir';

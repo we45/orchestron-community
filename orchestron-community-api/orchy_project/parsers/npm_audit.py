@@ -36,10 +36,8 @@ def parse_npm_audit(json_file,user_name,init_es):
 					for p in paths:
 						dep_dict['file_paths'].append(p)
 					data_dict = {
-						'module':module_name,
-						'version':version,
-						'related_dependency':dep_dict,
-						'cve':cve
+						'url':module_name,
+						'name':version
 					}
 					evid_list.append(data_dict)
 				vul_dict = init_es
@@ -62,6 +60,6 @@ def parse_npm_audit(json_file,user_name,init_es):
 					}
 				write_results(vul_dict)
 	except BaseException as e:
-		log_exception(e,module_name=inspect.stack()[0][3])
+		log_exception(e)
 	else:
 		print('NPM Audit parsing completed')

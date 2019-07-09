@@ -62,7 +62,7 @@ export const constantRouterMap = [
       {
         path: 'openvuls',
         component: OpenVulnerabilities,
-        name: 'OpenVulnerabilities',
+        name: 'Open Vulnerabilities',
         meta: {
           title: 'Open Vulnerabilities',
           icon: 'Open Vulnerabilities'

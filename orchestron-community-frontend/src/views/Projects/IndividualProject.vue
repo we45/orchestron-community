@@ -14,25 +14,29 @@
               @deleteModal="beforeDeleteModal($event)"></common-table>
             <b-modal ref="createApplicationModal" title="Create Application" centered size="lg">
                 <div>
-                    <form @submit.prevent="submitCreateApplication">
+                    <form @submit.prevent="submitCreateApplication" style="padding: 7px;">
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Name: *</label>
-                                <b-col sm="12">
+                                <!-- <b-col sm="12"> -->
+                                    <label class="label">Name: *</label>
                                     <b-form-input
                                       v-model="appName"
                                       type="text"
+                                      maxlength="200"
                                       class="inline-form-control"
                                       :state="!$v.appName.$invalid"
                                       placeholder="Create Application Name">
                                     </b-form-input>
-                                      <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                                    <label id="input_count">
+                                            {{ error_msgs['app_name_count'] }}
+                                    </label>
+                                    <p  v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p>
 
-                                </b-col>
+                                <!-- </b-col> -->
                             </b-col>
                             <b-col cols="6">
                                 <label class="label">Logo:</label>
-                                <b-col sm="12">
+                                <!-- <b-col sm="12"> -->
                                     <b-form-file
                                       v-model="appLogo"
                                       accept="image/jpeg, image/png,image/jpg,"
@@ -42,14 +46,14 @@
 
                                   <br>
                                   <p>{{ appLogo.name }}</p>
-                                </b-col>
+                                <!-- </b-col> -->
                             </b-col>
                         </b-row>
                         <br>
                         <b-row class="my-1">
                             <b-col cols="6">
                                 <label class="label">Target Type: *</label>
-                                <b-col sm="12">
+                                <!-- <b-col sm="12"> -->
                                   <v-select
                                     :options="appTargetOption"
                                     v-model="appHostType"
@@ -57,11 +61,11 @@
                                     :state="!$v.appHostType.$invalid"></v-select>
                                      <p  v-if="error_msgs['target']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
 
-                                </b-col>
+                                <!-- </b-col> -->
                             </b-col>
                           <b-col cols="6">
                               <label class="label">Platform Type: *</label>
-                              <b-col sm="12">
+                              <!-- <b-col sm="12"> -->
                                 <v-select
                                   :options="appPlatformOption"
                                   v-model="appPlatformTags"
@@ -69,7 +73,7 @@
                                   :state="!$v.appPlatformTags.$invalid"></v-select>
                                      <p  v-if="error_msgs['platform']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
 
-                              </b-col>
+                              <!-- </b-col> -->
                           </b-col>
 
                         </b-row>
@@ -77,7 +81,7 @@
                       <b-row class="my-1">
                           <b-col cols="6">
                                 <label class="label">URL: *</label>
-                                <b-col sm="12">
+                                <!-- <b-col sm="12"> -->
                                     <b-form-input
                                       v-model="appUrl"
                                       type="text"
@@ -87,11 +91,11 @@
                                     </b-form-input>
                                      <p  v-if="error_msgs['url']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
 
-                                </b-col>
+                                <!-- </b-col> -->
                             </b-col>
                           <b-col cols="6">
                               <label class="label">IPv4: *</label>
-                              <b-col sm="12">
+                              <!-- <b-col sm="12"> -->
                                   <b-form-input
                                     v-model="appIpv4"
                                     :state="!$v.appIpv4.$invalid"
@@ -101,14 +105,14 @@
                                   </b-form-input>
                                   <p  v-if="error_msgs['ipv4']" style="text-align: left;" class="error"> * {{ error_msgs['ipv4_msg'] }}</p>
 
-                              </b-col>
+                              <!-- </b-col> -->
                           </b-col>
                       </b-row>
                       <br>
                       <b-row class="my-1">
                           <b-col cols="6">
                               <label class="label">OS Info: *</label>
-                              <b-col sm="12">
+                              <!-- <b-col sm="12"> -->
                                 <b-form-input
                                   v-model="appOsInfo"
                                   type="text"
@@ -118,7 +122,7 @@
                                 </b-form-input>
                                 <p  v-if="error_msgs['os_info']" style="text-align: left;" class="error"> * {{ error_msgs['os_info_msg'] }}</p>
 
-                              </b-col>
+                              <!-- </b-col> -->
                           </b-col>
                       </b-row>
                       <br>
@@ -147,11 +151,15 @@
                                     <b-form-input
                                       v-model="appUpdateName"
                                       type="text"
+                                      maxlength="200"
                                       class="inline-form-control"
                                       :state="!$v.appUpdateName.$invalid"
                                       placeholder="Update Application Name">
                                     </b-form-input>
-                                    <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                                    <label id="input_count">
+                                            {{ error_msgs['name_count'] }}
+                                    </label>
+                                    <p  v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p>
 
                                 </b-col>
                             </b-col>
@@ -358,7 +366,7 @@
         reloadPage : false,
         paginatedVulnerabilitiesList: [],
         isClicked: false,
-        error_msgs : {"name": false,"logo": false,"name_msg":"", "logo_msg":"", "target": false, "target_msg": "", "platform": false, "platform_msg":"", "url":false, "url_msg": "", "ipv4": false, "ipv4_msg":"", "os_info":false, "os_info_msg":"", "team":false, "team_msg":""},
+        error_msgs : {"name": false,"logo": false,"name_msg":"", "logo_msg":"", "target": false, "target_msg": "", "platform": false, "platform_msg":"", "url":false, "url_msg": "", "ipv4": false, "ipv4_msg":"", "os_info":false, "os_info_msg":"", "team":false, "team_msg":"", "name_count":200, "app_name_count":200},
 
 
       }
@@ -417,7 +425,8 @@
     },
     watch: {
       'appName': function(value_name){
-          if(value_name.length > 200){
+        this.error_msgs['app_name_count'] = 200-value_name.length
+          if(value_name.length > 199){
             this.error_msgs['name'] = true
             this.error_msgs['name_msg'] = 'Ensure this field has no more than 200 characters.'
           }
@@ -432,7 +441,8 @@
          this.error_msgs['url'] = false
         },
       'appUpdateName': function(value_name){
-          if(value_name.length > 200){
+        this.error_msgs['name_count'] = 200-value_name.length
+          if(value_name.length > 199){
             this.error_msgs['name'] = true
             this.error_msgs['name_msg'] = 'Ensure this field has no more than 200 characters.'
           }
@@ -1049,7 +1059,8 @@
     -moz-box-sizing: border-box;
     outline: none;
     width: 100%;
-    padding: 7px;
+    /*padding: 7px;*/
+    padding: 7px 30px 7px 7px;
     border: none;
     border-bottom: 1px solid #ddd;
     background: transparent;
@@ -1085,4 +1096,14 @@
     text-align: center;
     color: #f44336;
   }
+    #input_count {
+    position:absolute;
+    bottom:2px;
+    right:15px;
+    width:24px;
+    height:24px;
+    /*color: #909090;*/
+    color: green;
+    font-size: 14px;
+}
 </style>

@@ -23,9 +23,13 @@
                 <b-form-input
                   v-model="engagementName"
                   type="text"
+                  maxlength="255"
                   class="inline-form-control"
                   placeholder="Enter Engagement Name" :state="!$v.engagementName.$invalid"></b-form-input>
-                <p v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                  <label id="input_count">
+                    {{ error_msgs['eng_name_count'] }}
+                  </label>
+                <p v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p>
               </b-col>
             </b-row>
             <!--   <b-col sm="12">
@@ -40,7 +44,7 @@
                   v-model="engagementDesc"
                   placeholder="Enter Description"
                   :rows="3"
-                  :max-rows="6" :state="!$v.engagementDesc.$invalid">
+                  :max-rows="6">
                   <p v-if="error_msgs['desc']" style="text-align: left;" class="error"> * {{ error_msgs['desc_msg']
                     }}</p>
                 </b-form-textarea>
@@ -107,9 +111,13 @@
                 <b-form-input
                   v-model="updateEngagementName"
                   type="text"
+                  maxlength="255"
                   class="inline-form-control"
                   placeholder="Enter Engagement Name" :state="!$v.updateEngagementName.$invalid"></b-form-input>
-                <p v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                  <label id="input_count">
+                    {{ error_msgs['eng_upd_name_count'] }}
+                  </label>
+                <p v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p>
                 <!--<p v-if="!$v.projectName.required">The name field is required!</p>-->
                 <!--<p v-if="!$v.projectName.minLength">The name field is minimum 3!</p>-->
               </b-col>
@@ -238,7 +246,7 @@
         isPaginated: false,
         reloadPage: false,
         today: new Date(),
-        error_msgs: {"name": false, "date": false, "name_msg": "", "date_msg": ""},
+        error_msgs: {"name": false, "date": false, "name_msg": "", "date_msg": "","eng_name_count":255, "eng_upd_name_count":255},
         shortcuts: [
           {
             // text: 'Today',
@@ -285,7 +293,8 @@
     },
     watch: {
       'engagementName': function (value_name) {
-        if (value_name.length > 255) {
+        this.error_msgs['eng_name_count'] = 255-value_name.length
+        if (value_name.length > 254) {
           this.error_msgs['name'] = true
           this.error_msgs['name_msg'] = 'Max Length is 255 Characters'
         } else {
@@ -293,7 +302,9 @@
         }
       },
       'updateEngagementName': function (value_name) {
-        if (value_name.length > 255) {
+         this.error_msgs['eng_upd_name_count'] = 255-value_name.length
+
+        if (value_name.length > 254) {
           this.error_msgs['name'] = true
           this.error_msgs['name_msg'] = 'Max Length is 255 Characters'
         } else {
@@ -824,7 +835,8 @@
     -moz-box-sizing: border-box;
     outline: none;
     width: 100%;
-    padding: 7px;
+    /*padding: 7px;*/
+    padding: 7px 30px 7px 7px;
     border: none;
     border-bottom: 1px solid #ddd;
     background: transparent;
@@ -852,4 +864,14 @@
     text-align: center;
     color: #f44336;
   }
+  #input_count {
+    position:absolute;
+    bottom:2px;
+    right:15px;
+    width:24px;
+    height:24px;
+    /*color: #909090;*/
+    color: green;
+    font-size: 14px;
+}
 </style>

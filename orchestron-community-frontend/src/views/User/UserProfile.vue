@@ -54,6 +54,7 @@
                 <b-form-input
                   v-model="firstName"
                   type="text"
+                  maxlength="30"
                   class="visual_text_box"
                   placeholder="Enter First Name" :state="!$v.firstName.$invalid"></b-form-input>
                   <p v-if="error_msgs['first_name']" style="text-align:left;" class="error"> * {{
@@ -69,6 +70,7 @@
                 <b-form-input
                   v-model="lastName"
                   type="text"
+                  maxlength="30"
                   class="visual_text_box"
                   placeholder="Enter Last Name" :state="!$v.lastName.$invalid"></b-form-input>
                     <p v-if="error_msgs['last_name']" style="text-align:left;" class="error"> * {{
@@ -301,7 +303,7 @@
     },
     watch: {
       'firstName': function (value_name) {
-        if (value_name.length > 30) {
+        if (value_name.length > 29) {
           this.error_msgs['first_name'] = true
           this.error_msgs['first_name_msg'] = 'Ensure this field has no more than 30 characters.'
         } else {
@@ -309,7 +311,7 @@
         }
       },
       'lastName': function (value_name) {
-        if (value_name.length > 30) {
+        if (value_name.length > 29) {
           this.error_msgs['last_name'] = true
           this.error_msgs['last_name_msg'] = 'Ensure this field has no more than 30 characters.'
         } else {

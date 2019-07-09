@@ -11,7 +11,7 @@
                 <b-tabs style="background-color: #FFFFFF;">
                     <br>
                     <b-tab title="Bug Tracking System (  JIRA )" small >
-                        <div >
+                        <div style="padding: 12px;" >
                             <b-row class="my-1">
                                 <b-col sm="2"><label class="label">URL:</label></b-col>
                                 <b-col sm="10">
@@ -81,8 +81,12 @@
                                                 <b-form-input
                                                     v-model="updateOrgName"
                                                     type="text"
+                                                    maxlength="200"
                                                     class="inline-form-control"></b-form-input>
-                                                    <p v-if="error_msgs['orgname']" style="text-align: left;" class="error"> * {{ error_msgs['orgname_msg']
+                                                    <label id="input_count">
+                                                        {{ error_msgs['update_org_name_count'] }}
+                                                    </label>
+                                                    <p v-if="error_msgs['orgname']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['orgname_msg']
                   }}</p>
                                             </b-col>
                                             </b-col>
@@ -109,9 +113,13 @@
                                                 <b-form-input
                                                     v-model="updateOrgLocation"
                                                     type="text"
+                                                    maxlength="100"
                                                     class="inline-form-control"
                                                     placeholder="Enter Location" :state="!$v.updateOrgLocation.$invalid"></b-form-input>
-                                                    <p  v-if="error_msgs['orgloc']" style="text-align: left;" class="error"> * {{ error_msgs['orgloc_msg'] }}</p>
+                                                    <label id="input_count">
+                                                        {{ error_msgs['location_count'] }}
+                                                    </label>
+                                                    <p  v-if="error_msgs['orgloc']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['orgloc_msg'] }}</p>
                                             </b-col>
                                             </b-col>
                                           <b-col cols="6">
@@ -269,7 +277,9 @@ export default {
           'orgind': false,
           'orgind_msg': '',
           'orgend': false,
-          'orgend_msg': ''
+          'orgend_msg': '',
+          'update_org_name_count':200,
+          'location_count':100
         },
     error_jira_msgs: {
       'jiraurl': false,
@@ -396,7 +406,9 @@ export default {
   },
    watch: {
       'updateOrgName': function (value_name) {
-        if (value_name.length > 200) {
+        this.error_msgs['update_org_name_count'] = 200-value_name.length
+
+        if (value_name.length > 199) {
           this.error_msgs['orgname'] = true
           this.error_msgs['orgname_msg'] = 'Ensure this field has no more than 200 characters.'
         } else {
@@ -410,7 +422,8 @@ export default {
         this.error_msgs['orgtime'] = false
       },
       'updateOrgLocation': function (value_name) {
-        if (value_name.length > 100) {
+        this.error_msgs['location_count'] = 100-value_name.length
+        if (value_name.length > 99) {
           this.error_msgs['orgloc'] = true
           this.error_msgs['orgloc_msg'] = 'Ensure this field has no more than 100 characters.'
         } else {
@@ -916,4 +929,32 @@ export default {
     text-align: center;
     color: #f44336;
   }
+     #input_count {
+    position:absolute;
+    bottom:2px;
+    right:15px;
+    width:24px;
+    height:24px;
+    /*color: #909090;*/
+    color: green;
+    font-size: 14px;
+}
+  .inline-form-control {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    outline: none;
+    width: 100%;
+    /*padding: 7px;*/
+    padding: 7px 30px 7px 7px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    background: transparent;
+    margin-bottom: 10px;
+    font: 16px 'Avenir';
+    height: 45px;
+    position: relative;
+    display: inline-block;
+  }
+
 </style>

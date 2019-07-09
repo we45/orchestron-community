@@ -9,20 +9,7 @@
               <b-btn @click="createModal" class="btn-orange" v-if="!createButton && create">Create</b-btn>
               <br>
               <br>
-                <b-row>
-                    <b-col md="6" class="my-1">
-                        <!-- <b-form-input v-model="filter" placeholder="Type to Search" class="inline-form-control"/> -->
-                    </b-col>
-                    <b-col md="1"></b-col>
-                    <b-col md="5">
-                      <b-pagination :total-rows="numPages"
-                                    :per-page="perPage"
-                                    v-model="currentPage"
-                                    align="right"
-                                    @input="paginationClick(currentPage)"></b-pagination>
-                    </b-col>
-                </b-row>
-                <br>
+              <!-- <br> -->
                 <!-- Main table element -->
                 <b-table show-empty
                     stacked="md"
@@ -73,6 +60,19 @@
               </b-button>
                     </template>
                 </b-table>
+                <b-row>
+                    <b-col md="6" class="my-1">
+                        <!-- <b-form-input v-model="filter" placeholder="Type to Search" class="inline-form-control"/> -->
+                    </b-col>
+                    <b-col md="1"></b-col>
+                    <b-col md="5">
+                      <b-pagination :total-rows="numPages"
+                                    :per-page="perPage"
+                                    v-model="currentPage"
+                                    align="right"
+                                    @input="paginationClick(currentPage)"></b-pagination>
+                    </b-col>
+                </b-row>
             </b-col>
         </b-container>
     </div>
@@ -103,7 +103,8 @@ export default {
       sortDesc: false,
       filter: null,
       numPages: 0,
-      showModal: true
+      showModal: true,
+      outlined: true
     }
   },
   props: {
