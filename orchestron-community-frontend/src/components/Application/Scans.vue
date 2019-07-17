@@ -89,12 +89,14 @@
                         </b-row>
                     </template>
                     <template slot="actions" slot-scope="row" v-if="row.item.appDashboard">
-                      <b-button
-                        size="sm"
-                        @click="deleteModal(row.item.scanId)"
-                        class="mr-1 btn-orange">
-                          Delete
-                        </b-button>
+                      <div align="right">
+                        <b-button 
+                          size="sm"
+                          @click="deleteModal(row.item.scanId)"
+                          class="mr-1 btn-orange">
+                            Delete
+                          </b-button>
+                      </div>
                     </template>
                 </b-table>
             </b-col>
@@ -119,7 +121,6 @@
       return {
         items: '',
         fields: [
-          { key: 'sev', label: ' ', sortable: true, 'class': 'title' },
           { key: 'name', label: 'Scan Name', sortable: true, 'class': 'title' },
           { key: 'actions', label: ' ', 'class': 'title', sortable: false }
         ],
@@ -130,7 +131,10 @@
         sortBy: null,
         sortDesc: false,
         filter: null,
-        showModal: true
+        showModal: true,
+        outlined: false,
+        bordered: false,
+        fixed: true
       }
     },
    beforeUpdate() {

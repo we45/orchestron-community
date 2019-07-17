@@ -13,35 +13,35 @@
                     <template v-if="item.children[0].meta.icon == 'Dashboard'">
                         <div>
                           <span class="demo-icon icon-asset-7dashboard"
-                              style="font-size: 28px;width: 40%;">&#xe800;</span>
+                              style="font-size: 28px;width: 30%;">&#xe800;</span>
                           <span v-if="item.children[0].meta.title" style="width: 60%;">{{ item.children[0].meta.title }}</span>
                         </div>
                     </template>
                     <template v-if="item.children[0].meta.icon == 'project'">
                          <div>
                           <span class="demo-icon icon-asset-8projects"
-                              style="font-size: 27px;width: 40%; ">&#xe801;</span>
+                              style="font-size: 26px;width: 30%; ">&#xe801;</span>
                           <span v-if="item.children[0].meta.title" style="width: 60%;" >{{ item.children[0].meta.title }}</span>
                         </div>
                     </template>
                     <template v-else-if="item.children[0].meta.icon == 'webhook'">
                         <div>
                           <span class="demo-icon icon-asset-10webhooks"
-                                style="font-size: 35px;width: 40%;">&#xe803;</span>
+                                style="font-size: 38px;width: 26%;">&#xe803;</span>
                           <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;">{{item.children[0].meta.title}}</span>
                         </div>
                     </template>
                     <template v-else-if="item.children[0].meta.icon == 'Engagements'">
                         <div>
                           <span class="demo-icon icon-asset-15engagements2"
-                                style="font-size: 31px;width: 40%;">&#xe805;</span>
+                                style="font-size: 31px;width: 28%;">&#xe805;</span>
                           <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;" >{{item.children[0].meta.title}}</span>
                         </div>
                     </template>
 
                       <template v-else-if="item.children[0].meta.icon == 'report'">
                                     <span class="demo-icon icon-asset-11bulk-actions"
-                                          style="font-size: 26px;width: 40%;">&#xe804;</span>
+                                          style="font-size: 26px;width: 30%;">&#xe804;</span>
                         <span v-if="item.children[0].meta.title" style="width: 60%;">{{ item.children[0].meta.title }}</span>
                       </template>
 
@@ -53,7 +53,7 @@
                     </template> -->
                     <template v-else-if="item.children[0].meta.icon == 'settings'">
                         <span class="demo-icon icon-asset-9settings"
-                              style="font-size: 24px;width: 40%;">&#xe802;</span>
+                              style="font-size: 24px;width: 30%;">&#xe802;</span>
                         <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;">{{item.children[0].meta.title}}</span>
                     </template>
                 </el-menu-item>

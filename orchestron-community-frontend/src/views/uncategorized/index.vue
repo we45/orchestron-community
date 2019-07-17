@@ -52,7 +52,7 @@
                         <br>
                         <b-row class="my-1">
                             <b-col sm="2"><label class="label">CWE:</label></b-col>
-                            <b-col sm="8">
+                            <b-col sm="10">
                               <b-form-input
                                 id="input-1"
                                 v-model="updateUncategorizedVulCWE"

@@ -43,6 +43,7 @@
                         v-on:click="submitAssignedScans"
                         style="float: right; margin-right: 3%;"
                         v-if="assignedScans">Assign</b-button>
+                    <p v-if="error_msgs['scans']" style="text-align: left;" class="error"> * {{ error_msgs['scans_msg'] }}</p>
                 </form>
                 <br>
                 <br>
@@ -111,6 +112,7 @@
           mediumLable: 'Medium',
           lowLable: 'Low',
           infoLable: 'Info',
+          error_msgs: {"scans_msg":"", "scans": false}
         }
       },
       created() {
@@ -118,6 +120,11 @@
         this.token = localStorage.getItem('token')
         this.param = this.$route.params.engagementId
         this.fetchData()
+      },
+      watch: {
+      'assignedScans': function (value_name) {
+        this.error_msgs['scans'] = false
+        }
       },
       methods: {
         fetchData() {
@@ -287,6 +294,13 @@
             this.reloadPage = false
 
               }).catch(error => {
+
+              if (error.response.status === 400) {
+                if(error.response.data["scans"]){
+                  this.error_msgs['scans'] = true
+                  this.error_msgs['scans_msg'] = error.response.data['scans'][0]
+                }
+              }
               if (error.response.data.detail === 'Signature has expired.'){
                   notValidUser()
                   this.$router.push('/')
@@ -370,5 +384,13 @@
     padding: 3px 12px;
     margin-bottom: 0;
     font-size: 14px;
+  }
+  .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

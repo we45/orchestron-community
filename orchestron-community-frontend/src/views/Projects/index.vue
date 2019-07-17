@@ -28,7 +28,7 @@
                                       placeholder="Enter Project Name" :state="!$v.projectName.$invalid">
                                       </b-form-input>
                                       <label id="input_count">
-                                            {{ error_msgs['name_count'] }}
+                                            {{ error_msgs['pro_name_count'] }}
                                       </label>
                                       <p  v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p> 
                               </b-col>
@@ -198,7 +198,7 @@ export default {
         logo: '',
         full_Data: [],
         isLoadingPage: false,
-        error_msgs: { 'name': false, 'logo': false, 'name_msg': '', 'logo_msg': '', 'name_count':100 },
+        error_msgs: { 'name': false, 'logo': false, 'name_msg': '', 'logo_msg': '', 'name_count':100 ,"pro_name_count":100},
 
       }
     },
@@ -222,7 +222,7 @@ export default {
     },
      watch: {
       'projectName': function(value_name, old_val) {
-          this.error_msgs['name_count'] = 100-value_name.length
+          this.error_msgs['pro_name_count'] = 100-value_name.length
 
         if (value_name.length > 99) {
           this.error_msgs['name'] = true
@@ -640,7 +640,7 @@ export default {
     width: 100%;
     padding: 7px 30px 7px 7px;
     border: none;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 1px solid #ddd;
     background: transparent;
     margin-bottom: 10px;
     font: 17px 'Avenir';

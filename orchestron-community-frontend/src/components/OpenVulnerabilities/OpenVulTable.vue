@@ -82,16 +82,12 @@
           </template>
           <template slot="row-details" slot-scope="row" v-if="row.item.multiple">
             <b-card>
-              <b-row v-model="cwe_val_multiple = row.item.cwe">
-                <b-col cols="12">
-                  <b-pagination size="md" align="right" :total-rows="Object.keys(row.item.name).length"
-                                v-model="currentPage_multiple" :per-page="5">
-                  </b-pagination>
-                </b-col>
-              </b-row>
+             
               <b-table
                 show-empty
                 stacked="sm"
+                :borderless="borderless"
+                :outlined="borderless"
                 :current-page="currentPage_multiple"
                 :fields="multipleFields"
                 :items="Object.entries(row.item.name)"
@@ -100,34 +96,34 @@
                 :sort-by.sync="sortBy"
                 class="m2_top"
               >
-                <template slot="name_multiple" slot-scope="row" v-for="(value, key) in row.item.name">
-                  <b-row>
-                    <b-col>
-                      <b-list-group>
-                        <b-list-group-item class="d-flex justify-content-between align-items-center">
+              <template slot="name_multiple" slot-scope="row" v-for="(value, key) in row.item.name">
+                        <!-- <div class="flex-column align-items-start"> -->
                           <b-row>
-                            <b-col cols="10">
+                            <b-col cols="8">
                               {{ row.item[0].replace('!!!###!!!'+row.item[1],"")}}
                             </b-col>
-                            <b-col cols="2" v-if="isUncategorised">
+                            <b-col cols="2" align="right" v-if="isUncategorised">
                               <b-badge variant="danger" v-if="cwe_val_multiple===0" pill
                                        style="cursor: pointer" @click="updateUncategorizedMultiple(row.item[0],row.item[1])">Uncategorized
                               </b-badge>
                             </b-col>
+                            <b-col cols="2">
+                              <b-button size="sm" @click="viewIndividualVul(row.item[1], row.item[0].replace('!!!###!!!'+row.item[1],''), cwe_val_multiple)"
+                                        class="mr-1 btn-orange">
+                                {{ row.item[1] }} 
+                              </b-button>
+                            </b-col>
                           </b-row>
-
-                          <b-button size="sm" @click="viewIndividualVul(row.item[1], row.item[0].replace('!!!###!!!'+row.item[1],''), cwe_val_multiple)"
-                                    class="mr-1 btn-orange">
-                            {{ row.item[1] }} 
-                          </b-button>
-
-                        </b-list-group-item>
-                        <br>
-                      </b-list-group>
-                    </b-col>
-                  </b-row>
+                        <!-- </div> -->
                 </template>
               </b-table>
+               <b-row v-model="cwe_val_multiple = row.item.cwe">
+                <b-col cols="12">
+                  <b-pagination size="md" align="right" :total-rows="Object.keys(row.item.name).length"
+                                v-model="currentPage_multiple" :per-page="5">
+                  </b-pagination>
+                </b-col>
+              </b-row>
               <!--  <template  v-for="(value, key) in row.item.name">
                    <b-row>
                        <b-col>
@@ -182,7 +178,8 @@
         numPages: 0,
         selected: {},
         multiple_perPage: 5,
-        cwe_val_multiple: 0
+        cwe_val_multiple: 0,
+        borderless: true
       }
     },
     props: {

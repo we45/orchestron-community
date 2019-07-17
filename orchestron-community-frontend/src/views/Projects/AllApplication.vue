@@ -19,24 +19,28 @@
             <!--Update Modal-->
             <b-modal ref="updateApplicationModal" title="Update Application" centered size="lg">
                 <div>
-                    <form @submit.prevent="submitUpdateApplication">
+                    <form @submit.prevent="submitUpdateApplication" style="padding: 7px;">
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Name: *</label>
                                 <b-col sm="12">
-                                    <b-form-input
+                                      <label class="label">Name: *</label>
+                                      <b-form-input
                                       v-model="appUpdateName"
                                       type="text"
                                       class="inline-form-control"
                                       :state="!$v.appUpdateName.$invalid"
+                                      maxlength="200"
                                       placeholder="Update Application Name">
                                     </b-form-input>
-                                      <p  v-if="error_msgs['name']" style="text-align: left;" class="error"> * {{ error_msgs['name_msg'] }}</p>
+                                    <label id="input_count">
+                                      {{ error_msgs['app_name_count'] }}
+                                    </label>
+                                      <p  v-if="error_msgs['name']" style="text-align: left;position: fixed;" class="error"> * {{ error_msgs['name_msg'] }}</p>
                                 </b-col>
                             </b-col>
                             <b-col cols="6">
-                                <label class="label">Logo:</label>
                                 <b-col sm="12">
+                                    <label class="label">Logo:</label>
                                     <b-form-file
                                       v-model="appUpdateLogo"
                                       placeholder="Choose a logo..."
@@ -50,8 +54,8 @@
                         <br>
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Target Type: *</label>
                                 <b-col sm="12">
+                                  <label class="label">Target Type: *</label>
                                   <v-select
                                     :options="appTargetOption"
                                     v-model="appUpdateHostType"
@@ -60,9 +64,9 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">Platform Type: *</label>
                               <p v-if="appUpdatePlatformTagsError" class="error"> * {{ appUpdatePlatformTagsError }}</p>
                               <b-col sm="12">
+                                <label class="label">Platform Type: *</label>
                                 <v-select
                                   :options="appPlatformOption"
                                   v-model="appUpdatePlatformTags"
@@ -81,9 +85,9 @@
                         <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                                <label class="label">URL: *</label>
                                 <p v-if="appUpdateUrlError" class="error"> * {{ appUpdateUrlError }}</p>
                                 <b-col sm="12">
+                                    <label class="label">URL: *</label>
                                     <b-form-input
                                       v-model="appUpdateUrl"
                                       type="text"
@@ -92,13 +96,12 @@
                                       placeholder="http://example.com">
                                     </b-form-input>
                                     <p  v-if="error_msgs['url']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
-
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">IPv4: *</label>
                               <p v-if="appUpdateIpv4Error" class="error"> * {{ appUpdateIpv4Error }}</p>
                               <b-col sm="12">
+                                  <label class="label">IPv4: *</label>
                                   <b-form-input
                                     v-model="appUpdateIpv4"
                                     type="text"
@@ -113,9 +116,9 @@
                       <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                              <label class="label">OS Info: *</label>
                               <p v-if="appUpdateOsInfoError" class="error"> * {{ appUpdateOsInfoError }}</p>
                               <b-col sm="12">
+                              <label class="label">OS Info: *</label>
                                 <b-form-input
                                   v-model="appUpdateOsInfo"
                                   type="text"
@@ -267,7 +270,7 @@ export default {
         data_showing: [],
         is_updated: false,
         isPageLoading: false,
-        error_msgs : {"name": false,"logo": false,"name_msg":"", "logo_msg":"", "target": false, "target_msg": "", "platform": false, "platform_msg":"", "url":false, "url_msg": "", "ipv4": false, "ipv4_msg":"", "os_info":false, "os_info_msg":"", "team":false, "team_msg":""},
+        error_msgs : {"name": false,"logo": false,"name_msg":"", "logo_msg":"", "target": false, "target_msg": "", "platform": false, "platform_msg":"", "url":false, "url_msg": "", "ipv4": false, "ipv4_msg":"", "os_info":false, "os_info_msg":"", "team":false, "team_msg":"", "app_name_count":200},
       }
     },
      validations: {
@@ -354,7 +357,8 @@ export default {
          this.error_msgs['url'] = false
         },
       'appUpdateName': function(value_name){
-          if(value_name.length > 200){
+         this.error_msgs['app_name_count'] = 200-value_name.length
+          if(value_name.length > 199){
             this.error_msgs['name'] = true
             this.error_msgs['name_msg'] = 'Ensure this field has no more than 200 characters.'
           }
@@ -780,7 +784,8 @@ export default {
     -moz-box-sizing: border-box;
     outline: none;
     width: 100%;
-    padding: 7px;
+    /*padding: 7px;*/
+    padding: 7px 30px 7px 7px;
     border: none;
     border-bottom: 1px solid #ddd;
     background: transparent;
@@ -808,4 +813,22 @@ export default {
     text-align: center;
     color: #232325;
   }
+  .error{
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
+  }
+    #input_count {
+    position:absolute;
+    bottom:2px;
+    right:15px;
+    width:24px;
+    height:24px;
+    /*color: #909090;*/
+    color: green;
+    font-size: 14px;
+}
 </style>

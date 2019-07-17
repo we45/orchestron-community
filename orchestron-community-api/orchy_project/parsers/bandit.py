@@ -40,12 +40,9 @@ def parse_bandit(json_file,user_name,init_es):
 				evid_desc = "File :{0}, Line :{1}".format(filename,line_num)
 				new_vuls[(r.get('test_name','Unknown'),r.get('issue_severity','LOW'))].append(
 					{
-						'line_number'  :  line_num,
-						'line_range'   :  line_range,
-						'path'         :  filename.split('/')[-1:][0],
-						'code_snippet' :  code,
-						'param'        :  'NA',
-						'file'         :  filename
+						'url': filename.split('/')[-1:][0],
+						'param': str(line_num) + " " + str(line_range),
+						'log': code
 					}
 				)
 			for vul_tup,url_param_list in new_vuls.items():
@@ -65,7 +62,7 @@ def parse_bandit(json_file,user_name,init_es):
 				}
 				write_results(vul_dict)
 	except Exception as e:
-		log_exception(e,module_name=inspect.stack()[0][3])
+		log_exception(e)
 	else:
 		print('Bandit JSON Parsing Completed')
 

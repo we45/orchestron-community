@@ -18,12 +18,9 @@ def parse_nodejsscan(json_file,user_name,init_es):
 					default_dict[(x.get('title'))] = {'description': '', 'evidences': []}
 					for z in v:
 						d = {
-							'line_number' : z.get('line'), 
-							'line_range'  : '',  
-							'path'        : z.get('path'), 
-							'file'        : z.get('filename'), 
-							'code_snippet': z.get('lines'), 
-							'param'       : ''
+							'url': z.get('path') +" line number "+str(z.get('line')),
+							'param': z.get('filename'),
+							'log': z.get('lines')
 						}
 						default_dict[(x.get('title'))]['evidences'].append(d)
 						default_dict[(x.get('title'))]['description'] = z.get('description')
@@ -44,6 +41,6 @@ def parse_nodejsscan(json_file,user_name,init_es):
 				}
 				write_results(vul_dict)
 	except BaseException as e:
-		log_exception(e,module_name=inspect.stack()[0][3])
+		log_exception(e)
 	else:
 		print('NodeJSScan parsing completed')
