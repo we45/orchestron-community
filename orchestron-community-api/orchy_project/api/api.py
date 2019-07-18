@@ -1356,8 +1356,8 @@ class ParserView(viewsets.ViewSet):
             }
         }
         dir_path = settings.XML_ROOT
-        if not os.path.isdir(dir_path):
-            os.mkdir(dir_path)
+        if not os.path.isdir(os.path.join(dir_path)):
+            os.mkdir(os.path.join(dir_path))
         ext = result_file.name.split('.')[-1]
         complete_path = os.path.join(dir_path, '{0}.{1}'.format(str(uuid4()), ext))
         with open(complete_path, 'wb') as fp:
