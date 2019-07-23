@@ -51,16 +51,15 @@
                             <b-col sm="2"><label class="label">CWE:</label></b-col>
                             <b-col sm="10">
                               <b-form-input
-          id="input-1"
-          v-model="updateUncategorizedVulCWE"
-          type="number"
-          placeholder="Enter CWE"
-          :state="!$v.updateUncategorizedVulCWE.$invalid"
-        ></b-form-input>
+                                  id="input-1"
+                                  v-model="updateUncategorizedVulCWE"
+                                  type="number"
+                                  placeholder="Enter CWE"
+                                  :state="!$v.updateUncategorizedVulCWE.$invalid"
+                                ></b-form-input>
+                                <p v-if="error_cwe_msg['cwe']" style="text-align:left;" class="error"> * {{ error_cwe_msg['cwe_value']
+                                          }}</p>
                             </b-col>
-                          <b-col cols="2">
-
-                          </b-col>
                         </b-row>
                         <br>
                     </form>
@@ -127,6 +126,7 @@
         reloadPage: false,
         updateUncategorizedVulName: '',
         updateUncategorizedVulCWE: '',
+        error_cwe_msg : {'cwe_value': '', 'cwe': false}
       }
     },
     components: {
@@ -140,11 +140,22 @@
       this.param = this.$route.params.applicationId
       this.fetchDataOpenVul(this.param)
     },
+     watch: {
+        'updateUncategorizedVulCWE': function(value_name) {
+          if (value_name > 9999) {
+            this.error_cwe_msg['cwe'] = true
+            this.error_cwe_msg['cwe_value'] = 'cwe range must be in between 0 to 9999'
+          }
+          else{
+            this.error_cwe_msg['cwe'] = false
+            this.error_cwe_msg['cwe_value'] = ''
+          }
+        }
+    },
     validations: {
       updateUncategorizedVulCWE:{
         required,
-        integer,
-        between: between(0, 1500)
+        integer      
       }
     },
     updated() {
@@ -566,6 +577,9 @@
           })
           this.$router.go()
         }).catch(error => {
+            this.$refs.UpdateuncategorizedModal.show()
+            this.error_cwe_msg['cwe'] = true
+            this.error_cwe_msg['cwe_value'] = 'cwe range must be in between 0 to 9999'
           if (error.response.data.detail === 'Signature has expired.'){
                   notValidUser()
                   this.$router.push('/')
@@ -664,6 +678,14 @@
     line-height: 0.99;
     text-align: center;
     color: #232325;
+  }
+  .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>
 

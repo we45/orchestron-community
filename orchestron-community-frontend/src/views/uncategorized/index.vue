@@ -60,10 +60,10 @@
                                 placeholder="Enter CWE"
                                 :state="!$v.updateUncategorizedVulCWE.$invalid"
                               ></b-form-input>
-                            </b-col>
-                          <b-col cols="2">
+                             <p v-if="error_cwe_msg['cwe']" style="text-align:left;" class="error"> * {{ error_cwe_msg['cwe_value']
+                                          }}</p>
 
-                          </b-col>
+                            </b-col>
                         </b-row>
                         <br>
                     </form>
@@ -137,18 +137,33 @@
         reloadPage: false,
         updateUncategorizedVulName: '',
         updateUncategorizedVulCWE: '',
+        error_cwe_msg : {'cwe_value': '', 'cwe': false}
+
       }
     },
      validations: {
       updateUncategorizedVulCWE:{
         required,
         integer,
-        between: between(0, 1500)
+        between: between(0, 9999)
+
       }
     },
     created() {
       this.org = localStorage.getItem('org')
       this.token = localStorage.getItem('token')
+    },
+     watch: {
+        'updateUncategorizedVulCWE': function(value_name) {
+          if (value_name > 9999) {
+            this.error_cwe_msg['cwe'] = true
+            this.error_cwe_msg['cwe_value'] = 'cwe range must be in between 0 to 9999'
+          }
+          else{
+            this.error_cwe_msg['cwe'] = false
+            this.error_cwe_msg['cwe_value'] = ''
+          }
+        }
     },
     updated() {
       if (this.isLoading) {
@@ -503,7 +518,10 @@
           })
           this.$router.go()
         }).catch(error => {
-          
+            this.$refs.UpdateuncategorizedModal.show()
+            this.error_cwe_msg['cwe'] = true
+            this.error_cwe_msg['cwe_value'] = 'cwe range must be in between 0 to 9999'
+
           if (error.response.data.detail === 'Signature has expired.'){
                   notValidUser()
                   this.$router.push('/')
@@ -604,4 +622,18 @@
     text-align: center;
     color: #232325;
   }
+  .information_data{
+    font-size: 12px;
+    font-family: 'Avenir';
+    color: #25231F;
+  }
+   .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
+  }
+
 </style>

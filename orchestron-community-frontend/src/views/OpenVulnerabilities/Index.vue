@@ -50,18 +50,17 @@
                         </b-row>
                         <br>
                         <b-row class="my-1">
-                            <b-col sm="2"><label class="label">CWE:</label></b-col>
-                            <b-col sm="8">
+                            <b-col sm="2"><label class="label">CWE: *</label></b-col>
+                            <b-col sm="10">
                               <b-form-input
-          id="input-1"
-          v-model="updateUncategorizedVulCWE"
-          type="number"
-          placeholder="Enter CWE"
-        ></b-form-input>
+                              id="input-1"
+                              v-model="updateUncategorizedVulCWE"
+                              type="number"
+                              placeholder="Enter CWE"
+                            ></b-form-input>
+                            <p v-if="error_cwe_msg['cwe']" style="text-align:left;" class="error"> * {{ error_cwe_msg['cwe_value']
+                                          }}</p>
                             </b-col>
-                          <b-col cols="2">
-
-                          </b-col>
                         </b-row>
                         <br>
                     </form>
@@ -69,7 +68,7 @@
                 <b-col cols="12" slot="modal-footer">
                     <div class="pull-right" style="float: right">
                         <button type="button" class="btn btn-orange-close pull-right" @click=" closeUncategorizedUpdateVul() ">Close</button>
-                        <button type="button" class="btn btn-orange-submit pull-right" data-dismiss="modal" @click=" promptUncategorizedUpdateVul() "
+                        <button type="button" class="btn btn-orange-submit pull-right" v-if="!$v.updateUncategorizedVulCWE.$invalid" data-dismiss="modal" @click=" promptUncategorizedUpdateVul() "
                               >
                         Submit
                         </button>
@@ -107,6 +106,7 @@
   import axios from '@/utils/auth'
   import {notValidUser} from '@/utils/checkAuthUser'
   import Loading from 'vue-loading-overlay'
+  import { required, between, integer} from 'vuelidate/lib/validators'
 
   export default {
     name: 'OpenVulnerabilities',
@@ -134,11 +134,31 @@
         checkAppNames: [],
         updateUncategorizedVulName: '',
         updateUncategorizedVulCWE: '',
+        error_cwe_msg : {'cwe_value': '', 'cwe': false}
+      }
+    },
+    validations: {
+      updateUncategorizedVulCWE:{
+        required,
+        integer,
+        between: between(0, 9999)
       }
     },
     created() {
       this.org = localStorage.getItem('org')
       this.token = localStorage.getItem('token')
+    },
+    watch: {
+        'updateUncategorizedVulCWE': function(value_name) {
+          if (value_name > 9999) {
+            this.error_cwe_msg['cwe'] = true
+            this.error_cwe_msg['cwe_value'] = 'cwe range must be in between 0 to 9999'
+          }
+          else{
+            this.error_cwe_msg['cwe'] = false
+            this.error_cwe_msg['cwe_value'] = ''
+          }
+        }
     },
     updated() {
       if (this.isLoading) {
@@ -342,9 +362,12 @@
               if (this.selectedOption == 'Default View') {
                 var url = '/openvul/org/' + this.org + '/?true=1&page=' + event.page
               }
-              else {
+              else if(this.selectedOption == 'Show False Positives'){
                 var url = '/openvul/org/' + this.org + '/?false=1&page=' + event.page
               }
+              else{
+                var url = '/openvul/org/' + this.org + '/?true=1&page=' + event.page
+              } 
               axios.get(url)
                 .then(res => {
                   this.headerTitle = 'Open Vulnerabilities'
@@ -442,8 +465,11 @@
       onInput(value) {
         if (value === 'Default View' || value === null) {
           this.fetchData()
-        } else {
+        } else if(this.selectedOption == 'Show False Positives'){
           this.fetchFalsePositiveData()
+        }
+        else{
+          this.fetchData()
         }
       },
         updateUncategorized(event) {
@@ -484,6 +510,9 @@
           })
           this.$router.go()
         }).catch(error => {
+            this.$refs.UpdateuncategorizedModal.show()
+            this.error_cwe_msg['cwe'] = true
+            this.error_cwe_msg['cwe_value'] = 'cwe range must be in between 0 to 9999'
           if (error.response.data.detail === 'Signature has expired.'){
                   notValidUser()
                   this.$router.push('/')
@@ -581,5 +610,13 @@
     line-height: 0.99;
     text-align: center;
     color: #232325;
+  }
+   .error {
+    font-family: 'Avenir';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 0.99;
+    text-align: center;
+    color: #f44336;
   }
 </style>

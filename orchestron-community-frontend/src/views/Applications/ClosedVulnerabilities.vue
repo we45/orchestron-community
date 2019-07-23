@@ -177,8 +177,8 @@
 
       fetchDataOpenVul(param) {
         if (this.param && this.org && this.token) {
-          if (this.selectedOption == 'Default View') {
-            var url = '/closedvul/app/' + param + '/?true=1'
+          if (this.selectedOption == 'Default View' || this.selectedOption == null) {
+            var url = '/closedvul/app/' + this.param + '/?true=1'
           }
           axios.get(url)
             .then(res => {
@@ -273,11 +273,14 @@
           if (event.page) {
             this.currentPage = event.page
             if (this.currentPage > 1) {
-              if (this.selectedOption == 'Default View') {
+              if (this.selectedOption == 'Default View' || this.selectedOption == null) {
                 var url = '/closedvul/app/' + this.param + '/?true=1&page=' + event.page
               }
-              else {
+              else if(this.selectedOption == 'Show False Positives'){
                 var url = '/closedvul/app/' + this.param + '/?false=1&page=' + event.page
+              }
+              else{
+                var url = '/closedvul/app/' + this.param + '/?true=1&page=' + event.page
               }
               axios.get(url)
                 .then(res => {
@@ -367,8 +370,11 @@
       onInput(value) {
         if (value === 'Default View' || value === null) {
           this.fetchDataOpenVul()
-        } else {
+        } else if(value === 'Show False Positives') {
           this.fetchDataFalsePositive()
+        }
+        else{
+          this.fetchDataOpenVul()
         }
       }
     }

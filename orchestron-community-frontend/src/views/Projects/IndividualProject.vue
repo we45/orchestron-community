@@ -146,8 +146,8 @@
                     <form @submit.prevent="submitUpdateApplication">
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Name: *</label>
                                 <b-col sm="12">
+                                    <label class="label">Name: *</label>
                                     <b-form-input
                                       v-model="appUpdateName"
                                       type="text"
@@ -164,8 +164,8 @@
                                 </b-col>
                             </b-col>
                             <b-col cols="6">
-                                <label class="label">Logo:</label>
                                 <b-col sm="12">
+                                    <label class="label">Logo:</label>
                                     <b-form-file
                                       v-model="appUpdateLogo"
                                       placeholder="Choose a logo..."
@@ -180,8 +180,8 @@
                         <br>
                         <b-row class="my-1">
                             <b-col cols="6">
-                                <label class="label">Target Type: *</label>
                                 <b-col sm="12">
+                                  <label class="label">Target Type: *</label>
                                   <v-select
                                     :options="appTargetOption"
                                     v-model="appUpdateHostType"
@@ -191,8 +191,8 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">Platform Type: *</label>
                               <b-col sm="12">
+                                <label class="label">Platform Type: *</label>
                                 <v-select
                                   :options="appPlatformOption"
                                   v-model="appUpdatePlatformTags"
@@ -206,8 +206,8 @@
                         <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                                <label class="label">URL: *</label>
                                 <b-col sm="12">
+                                    <label class="label">URL: *</label>
                                     <b-form-input
                                       v-model="appUpdateUrl"
                                       type="text"
@@ -220,8 +220,8 @@
                                 </b-col>
                             </b-col>
                           <b-col cols="6">
-                              <label class="label">IPv4: *</label>
                               <b-col sm="12">
+                                  <label class="label">IPv4: *</label>
                                   <b-form-input
                                     v-model="appUpdateIpv4"
                                     type="text"
@@ -237,8 +237,8 @@
                       <br>
                       <b-row class="my-1">
                           <b-col cols="6">
-                              <label class="label">OS Info: *</label>
                               <b-col sm="12">
+                                <label class="label">OS Info: *</label>
                                 <b-form-input
                                   v-model="appUpdateOsInfo"
                                   type="text"
