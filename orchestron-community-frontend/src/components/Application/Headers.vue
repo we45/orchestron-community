@@ -13,7 +13,7 @@
                <p class="wordwrap"> <span class="app-created-on">URL</span>  <span class="app-divider">:</span> <span class="app-value">{{ url }}</span></p>
             </b-col>
             <b-col cols="6">
-               <p class="wordwrap"> <span class="app-created-on">OS Info </span>  <span class="app-divider">:</span> <span class="app-value">{{ osInfo }}</span></p>
+               <p class="wordwrap" v-if="osInfo"> <span class="app-created-on">OS Info </span>  <span class="app-divider">:</span> <span class="app-value">{{ osInfo }}</span></p>
                <p class="wordwrap"> <span class="app-created-on">App Platform</span>  <span class="app-divider">:</span> <span class="app-value">{{ platform }}</span></p>
             </b-col>
           </b-row>

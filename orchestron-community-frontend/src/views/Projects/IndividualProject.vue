@@ -93,9 +93,8 @@
 
                                 <!-- </b-col> -->
                             </b-col>
-                          <b-col cols="6">
+                         <!--  <b-col cols="6">
                               <label class="label">IPv4: *</label>
-                              <!-- <b-col sm="12"> -->
                                   <b-form-input
                                     v-model="appIpv4"
                                     :state="!$v.appIpv4.$invalid"
@@ -104,15 +103,12 @@
                                     placeholder="127.0.0.1">
                                   </b-form-input>
                                   <p  v-if="error_msgs['ipv4']" style="text-align: left;" class="error"> * {{ error_msgs['ipv4_msg'] }}</p>
-
-                              <!-- </b-col> -->
-                          </b-col>
+                          </b-col> -->
                       </b-row>
-                      <br>
+                     <!--  <br>
                       <b-row class="my-1">
                           <b-col cols="6">
                               <label class="label">OS Info: *</label>
-                              <!-- <b-col sm="12"> -->
                                 <b-form-input
                                   v-model="appOsInfo"
                                   type="text"
@@ -121,11 +117,9 @@
                                   placeholder="Ubuntu">
                                 </b-form-input>
                                 <p  v-if="error_msgs['os_info']" style="text-align: left;" class="error"> * {{ error_msgs['os_info_msg'] }}</p>
-
-                              <!-- </b-col> -->
                           </b-col>
                       </b-row>
-                      <br>
+                      <br> -->
                     </form>
                 </div>
                 <b-col cols="12" slot="modal-footer">
@@ -134,7 +128,7 @@
                         <button type="button" class="btn btn-orange-submit"
                             data-dismiss="modal" @click=" submitCreateApplication() "
                                 v-if="!$v.appName.$invalid && !$v.appLogo.$invalid && !$v.appHostType.$invalid
-                            && !$v.appPlatformTags.$invalid && !$v.appIpv4.$invalid && !$v.appOsInfo.$invalid && !$v.appUrl.$invalid" :disabled="isClicked">
+                            && !$v.appPlatformTags.$invalid && !$v.appUrl.$invalid" :disabled="isClicked">
                         Submit
                         </button>
                     </div>
@@ -219,7 +213,7 @@
 
                                 </b-col>
                             </b-col>
-                          <b-col cols="6">
+                          <!-- <b-col cols="6">
                               <b-col sm="12">
                                   <label class="label">IPv4: *</label>
                                   <b-form-input
@@ -232,9 +226,9 @@
                                      <p  v-if="error_msgs['ipv4']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
 
                               </b-col>
-                          </b-col>
+                          </b-col> -->
                       </b-row>
-                      <br>
+                      <!-- <br>
                       <b-row class="my-1">
                           <b-col cols="6">
                               <b-col sm="12">
@@ -251,7 +245,7 @@
                               </b-col>
                           </b-col>
                       </b-row>
-                      <br>
+                      <br> -->
                     </form>
                 </div>
               <b-col cols="12" slot="modal-footer">
@@ -260,8 +254,7 @@
                         <button type="button" class="btn btn-orange-submit"
                             data-dismiss="modal" @click=" submitUpdateApplication() "
                                 v-if="!$v.appUpdateName.$invalid && !$v.appUpdateHostType.$invalid
-                            && !$v.appUpdatePlatformTags.$invalid && !$v.appUpdateIpv4.$invalid
-                            && !$v.appUpdateOsInfo.$invalid && !$v.appUpdateUrl.$invalid">
+                            && !$v.appUpdatePlatformTags.$invalid  && !$v.appUpdateUrl.$invalid">
                         Submit
                         </button>
                     </div>
@@ -637,8 +630,8 @@
           form_data.append('host_type', this.appHostType)
           form_data.append('url', this.appUrl)
           form_data.append('platform_tags', this.appPlatformTags)
-          form_data.append('ipv4', this.appIpv4)
-          form_data.append('os_info', this.appOsInfo)
+          // form_data.append('ipv4', this.appIpv4)
+          // form_data.append('os_info', this.appOsInfo)
           form_data.append('project', this.projectId)
           form_data.append('org', this.org)
           axios.put('/applications/', form_data, {
@@ -833,8 +826,8 @@
           form_data.append('host_type', this.appUpdateHostType)
           form_data.append('url', this.appUpdateUrl)
           form_data.append('platform_tags', this.appUpdatePlatformTags)
-          form_data.append('ipv4', this.appUpdateIpv4)
-          form_data.append('os_info', this.appUpdateOsInfo)
+          // form_data.append('ipv4', this.appUpdateIpv4)
+          // form_data.append('os_info', this.appUpdateOsInfo)
           form_data.append('project', this.projectId)
           form_data.append('org', this.org)
           axios.post('/applications/' + this.updateApplicationId + '/', form_data, {
