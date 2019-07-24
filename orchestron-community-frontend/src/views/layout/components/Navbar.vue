@@ -2,7 +2,7 @@
   <div>
   <el-menu class="navbar navbar-expand-sm" mode="horizontal">
     <!--<hamburger :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>-->
-    <img src="/static/img/logo.png" height="50px"/>
+    <!-- <img src="/static/img/logo.png" height="50px"/> -->
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
         <img class="user-avatar" src="/static/img/org.png" height="50px">
