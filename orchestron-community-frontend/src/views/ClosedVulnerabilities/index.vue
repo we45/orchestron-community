@@ -181,7 +181,7 @@
       fetchDataOpenVul() {
         if (this.org && this.token) {
           this.reloadPage = true
-          if (this.selectedOption == 'Default View') {
+          if (this.selectedOption == 'Default View' || this.selectedOption == null) {
             var url = '/closedvul/org/' + this.org + '/?true=1'
           }
           axios.get(url)
@@ -286,8 +286,11 @@
               if (this.selectedOption == 'Default View') {
                 var url = '/closedvul/org/' + this.org + '/?true=1&page=' + event.page
               }
-              else {
+              else if(this.selectedOption == 'Show False Positives') {
                 var url = '/closedvul/org/' + this.org + '/?false=1&page=' + event.page
+              }
+              else{
+                var url = '/closedvul/org/' + this.org + '/?true=1&page=' + event.page
               }
               axios.get(url)
                 .then(res => {
@@ -389,11 +392,13 @@
       },
       onInput(value) {
         this.reloadPage = true
-
-        if (value === 'Default View') {
+        if (value === 'Default View'  || value === null) {
           this.fetchDataOpenVul()
-        } else {
+        } else if(value === 'Show False Positives'){
           this.fetchDataClosedVulFalsePositive()
+        }
+        else{
+          this.fetchDataOpenVul()
         }
       }
     }

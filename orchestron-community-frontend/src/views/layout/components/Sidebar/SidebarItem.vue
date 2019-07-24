@@ -1,5 +1,6 @@
 <template>
     <div class="menu-wrapper" style="background-color: #F04E23; color:#FFFFFF;">
+        <img class="user-avatar" src="/static/img/small_logo.png" height="49px" width="99px">
         <br/>
         <br/>
         <br/>
@@ -10,39 +11,62 @@
                 <el-menu-item :index="item.path+'/'+item.children[0].path"
                     :class="{'submenu-title-noDropdown':!isNest}"
                     style="color:#FFFFFF;">
+                    <center>
+                      
                     <template v-if="item.children[0].meta.icon == 'Dashboard'">
                         <div>
-                          <span class="demo-icon icon-asset-7dashboard"
-                              style="font-size: 28px;width: 30%;">&#xe800;</span>
-                          <span v-if="item.children[0].meta.title" style="width: 60%;">{{ item.children[0].meta.title }}</span>
+                            <span class="demo-icon icon-asset-7dashboard"
+                                style="font-size: 42px;">&#xe800;
+                            </span>
+                            <p class="para_text">
+                              {{ item.children[0].meta.title }}
+                            </p>
+                          <!-- <span v-if="item.children[0].meta.title" style="width: 60%;">{{ item.children[0].meta.title }}</span> -->
                         </div>
                     </template>
                     <template v-if="item.children[0].meta.icon == 'project'">
                          <div>
-                          <span class="demo-icon icon-asset-8projects"
-                              style="font-size: 26px;width: 30%; ">&#xe801;</span>
-                          <span v-if="item.children[0].meta.title" style="width: 60%;" >{{ item.children[0].meta.title }}</span>
+                            <span class="demo-icon icon-asset-8projects"
+                                style="font-size: 38px;">&#xe801;
+                            </span>
+                            <p class="para_text">
+                              {{ item.children[0].meta.title }}
+                            </p>
+                          <!-- <span v-if="item.children[0].meta.title" style="width: 60%;" >{{ item.children[0].meta.title }}</span> -->
                         </div>
                     </template>
                     <template v-else-if="item.children[0].meta.icon == 'webhook'">
                         <div>
-                          <span class="demo-icon icon-asset-10webhooks"
-                                style="font-size: 38px;width: 26%;">&#xe803;</span>
-                          <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;">{{item.children[0].meta.title}}</span>
+                            <span class="demo-icon icon-asset-10webhooks"
+                                  style="font-size: 52px;">&#xe803;
+                            </span>
+                            <p class="para_text">
+                              {{ item.children[0].meta.title }}
+                            </p>
+                          <!-- <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;">{{item.children[0].meta.title}}</span> -->
                         </div>
                     </template>
                     <template v-else-if="item.children[0].meta.icon == 'Engagements'">
                         <div>
-                          <span class="demo-icon icon-asset-15engagements2"
-                                style="font-size: 31px;width: 28%;">&#xe805;</span>
-                          <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;" >{{item.children[0].meta.title}}</span>
+                            <span class="demo-icon icon-asset-15engagements2"
+                                  style="font-size: 45px;">&#xe805;
+                            </span>
+                            <p class="para_text" style="margin-left: -3px;">
+                              {{ item.children[0].meta.title }}
+                            </p>
+                          <!-- <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;" >{{item.children[0].meta.title}}</span> -->
                         </div>
                     </template>
 
                       <template v-else-if="item.children[0].meta.icon == 'report'">
                                     <span class="demo-icon icon-asset-11bulk-actions"
-                                          style="font-size: 26px;width: 30%;">&#xe804;</span>
-                        <span v-if="item.children[0].meta.title" style="width: 60%;">{{ item.children[0].meta.title }}</span>
+                                          style="font-size: 40px;">&#xe804;
+                                        <p class="para_text">
+                                          {{ item.children[0].meta.title }}
+                                        </p>
+                                    </span>
+
+                        <!-- <span v-if="item.children[0].meta.title" style="width: 60%;">{{ item.children[0].meta.title }}</span> -->
                       </template>
 
 
@@ -53,12 +77,31 @@
                     </template> -->
                     <template v-else-if="item.children[0].meta.icon == 'settings'">
                         <span class="demo-icon icon-asset-9settings"
-                              style="font-size: 24px;width: 30%;">&#xe802;</span>
-                        <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;">{{item.children[0].meta.title}}</span>
+                              style="font-size: 38px;">&#xe802;
+                        </span>
+                        <p class="para_text">
+                          {{ item.children[0].meta.title }}
+                        </p>
+
+                        <!-- <span v-if="item.children[0].meta&&item.children[0].meta.title" style="width: 60%;">{{item.children[0].meta.title}}</span> -->
                     </template>
+                    </center>
+                    <br/>
                 </el-menu-item>
             </router-link>
         </template>
+        <center>
+          <a :href="docURL" target="_blank" >
+            <center>
+               <span class="demo-icon icon-asset-9settings"
+                                  style="font-size: 38px;"> &#128366;
+                <p class="para_text">
+                  Documentation
+                </p>
+                </span>
+            </center>
+          </a>
+        </center>
     </div>
 </template>
 
@@ -72,6 +115,11 @@ export default {
     isNest: {
       type: Boolean,
       default: false
+    }
+  },
+  data(){
+    return{
+      docURL: 'https://docs-orchestron.netlify.com/'
     }
   }
 }
@@ -90,21 +138,21 @@ export default {
 
   .demo-icon
     {
+      display: inline-block;
       font-family: "fontello";
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       font-style: normal;
       font-weight: normal;
       speak: none;
-      display: inline-block;
       text-decoration: inherit;
-      width: 1em;
-      margin-right: .2em;
-      text-align: center;
-      font-variant: normal;
+      /*width: 1em;*/
+      /*margin-right: .2em;*/
+      /*text-align: center;*/
+      /*font-variant: normal;
       text-transform: none;
-      line-height: 1em;
-      margin-left: .2em;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+*/      /*line-height: 1em;*/
+      /*margin-left: .2em;*/
     }
 
 </style>
@@ -126,6 +174,10 @@ export default {
   .submenu-title-noDropdown:hover{
     color: rgb(240, 78, 35)!important;
   }
-
+.para_text{
+    text-align: left!important;
+    font-size: 12px;color: #FFFFFF;margin: 0px;
+    line-height: 1.5;
+  }
 
 </style>

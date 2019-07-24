@@ -98,7 +98,7 @@
                                     <p  v-if="error_msgs['url']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
                                 </b-col>
                             </b-col>
-                          <b-col cols="6">
+                        <!--   <b-col cols="6">
                               <p v-if="appUpdateIpv4Error" class="error"> * {{ appUpdateIpv4Error }}</p>
                               <b-col sm="12">
                                   <label class="label">IPv4: *</label>
@@ -111,9 +111,9 @@
                                   </b-form-input>
                                    <p  v-if="error_msgs['ipv4']" style="text-align: left;" class="error"> * {{ error_msgs['url_msg'] }}</p>
                               </b-col>
-                          </b-col>
+                          </b-col> -->
                       </b-row>
-                      <br>
+                     <!--  <br>
                       <b-row class="my-1">
                           <b-col cols="6">
                               <p v-if="appUpdateOsInfoError" class="error"> * {{ appUpdateOsInfoError }}</p>
@@ -131,7 +131,7 @@
                           </b-col>
                         
                       </b-row>
-                      <br>
+                      <br> -->
                     </form>
                 </div>
               <b-col cols="12" slot="modal-footer">
@@ -140,7 +140,7 @@
                         <button type="button"
                                 class="btn btn-orange-submit"
                                 data-dismiss="modal" @click=" submitUpdateApplication() "
-                                v-if="!$v.appUpdateName.$invalid && !$v.appUpdateHostType.$invalid && !$v.appUpdateUrl.$invalid && !$v.appUpdateIpv4.$invalid && !$v.appUpdateOsInfo.$invalid"
+                                v-if="!$v.appUpdateName.$invalid && !$v.appUpdateHostType.$invalid && !$v.appUpdateUrl.$invalid"
                                 >
                         Submit
                         </button>
@@ -569,8 +569,8 @@ export default {
           form_data.append('host_type', this.appUpdateHostType)
           form_data.append('url', this.appUpdateUrl)
           form_data.append('languages', platforms.toString())
-          form_data.append('ipv4', this.appUpdateIpv4)
-          form_data.append('os_info', this.appUpdateOsInfo)
+          // form_data.append('ipv4', this.appUpdateIpv4)
+          // form_data.append('os_info', this.appUpdateOsInfo)
           if(this.appUpdateGroup.value){
             form_data.append('group', this.appUpdateGroup.value)
           }
