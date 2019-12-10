@@ -1,7 +1,7 @@
 import os
 import json
 import pytz
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from uuid import uuid4
 from hashlib import sha256
 from random import getrandbits
@@ -150,7 +150,8 @@ class UserManager(BaseUserManager):
         try:
             org = Organization.objects.get(id=1)
         except:
-        	today = datetime.today().date()
+        	today = datetime.now().date()
+            end_date = datetime.now() + timedelta(days=1*365)
         	org_dict = {
         		'timezone':'UTC',
         		'name':'Admin Organization',
@@ -159,7 +160,7 @@ class UserManager(BaseUserManager):
         		'industry':'service',
         		'super_org':True,
         		'start_date':today,
-        		'end_date':datetime(today.year,today.month + 1,today.day).date(),
+        		'end_date': end_date.date(),
         	}
         	org = Organization.objects.create(**org_dict)
         user = self._create_user(username, org, email, password, True, True,**extra_fields)
