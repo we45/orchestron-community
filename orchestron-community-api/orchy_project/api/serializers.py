@@ -178,11 +178,11 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Organization
-		fields = ['id','name','contact','num_engagements','num_projects','num_users','num_apps','num_scans','industry','location','end_date','start_date','timezone','created_on','edited_on','logo','projects_count']
-		read_only_fields = ['created_on','edited_on','start_date','projects_count']
+		fields = ['id','name','contact','num_engagements','num_projects','num_users','num_apps','num_scans','industry','location','start_date','timezone','created_on','edited_on','logo','projects_count']
+		read_only_fields = ['created_on','edited_on','start_date','projects_count', 'end_date']
 
-	def validate_end_date(self,data):
-		return end_date_validator(data)
+	# def validate_end_date(self,data):
+	# 	return end_date_validator(data)
 
 	def get_projects_count(self,obj):
 		return obj.project_set.count()

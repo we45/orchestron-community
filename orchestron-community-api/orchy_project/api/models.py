@@ -68,7 +68,7 @@ class Organization(BaseModel):
     timezone = models.CharField(max_length=100,choices=TIMEZONE_LIST)
     contact = models.CharField(max_length=50, null=True, blank=True)
     super_org = models.BooleanField(default=False)
-    end_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
     start_date = models.DateField()
     num_users = models.IntegerField(default=0)
     num_apps = models.IntegerField(default=0)
@@ -150,19 +150,18 @@ class UserManager(BaseUserManager):
         try:
             org = Organization.objects.get(id=1)
         except:
-        	today = datetime.now().date()
-            end_date = datetime.now() + timedelta(days=1*365)
-        	org_dict = {
-        		'timezone':'UTC',
-        		'name':'Admin Organization',
-        		'location':'Bengaluru',
-        		'contact':'Abhay Bhargav',
-        		'industry':'service',
-        		'super_org':True,
-        		'start_date':today,
-        		'end_date': end_date.date(),
-        	}
-        	org = Organization.objects.create(**org_dict)
+            today = datetime.now().date()
+            # end_date = datetime.now() + timedelta(days=1*365)
+            org_dict = {
+                'timezone':'UTC',
+                'name': 'Admin Organization',
+                'location': 'Bengaluru',
+                'contact': 'Admin',
+                'industry': 'service',
+                'super_org': True,
+                'start_date': today
+            }
+            org = Organization.objects.create(**org_dict)
         user = self._create_user(username, org, email, password, True, True,**extra_fields)
         user.is_active = True
         user.is_staff = True

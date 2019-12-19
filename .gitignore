@@ -13,3 +13,4 @@ orchestron-community-frontend/node_modules/*
 venv/*
 *.xml
 .idea
+*.iml
