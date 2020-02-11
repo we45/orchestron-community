@@ -1,4 +1,4 @@
-Django==2.1.2
+Django==2.2.10
 pytz==2017.3
 djangorestframework==3.7.7
 Pillow==5.0.0
