@@ -54,3 +54,6 @@ docker-compose pull
 docker-compose up -d
 
 ```
+
+### Documentation
+Click here for [Orchestron documentation](https://we45devteam.atlassian.net/wiki/spaces/OR/overview) it includes a detailed guides.
